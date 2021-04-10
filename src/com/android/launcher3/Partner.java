@@ -19,8 +19,9 @@ package com.android.launcher3;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
+
+import com.sprd.ext.LogUtils;
 
 import java.io.File;
 
@@ -74,6 +75,7 @@ public class Partner {
     private Partner(String packageName, Resources res) {
         mPackageName = packageName;
         mResources = res;
+        LogUtils.d(TAG, "packageName is:" + packageName);
     }
 
     public String getPackageName() {
@@ -139,7 +141,7 @@ public class Partner {
                 iconSize = Utilities.dpiFromPx(px, dm);
             }
         } catch (Resources.NotFoundException ex) {
-            Log.e(TAG, "Invalid Partner grid resource!", ex);
+            LogUtils.e(TAG, "Invalid Partner grid resource!", ex);
             return;
         }
 

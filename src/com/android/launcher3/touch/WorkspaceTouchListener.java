@@ -156,7 +156,7 @@ public class WorkspaceTouchListener extends GestureDetector.SimpleOnGestureListe
 
     private boolean canHandleLongPress() {
         return AbstractFloatingView.getTopOpenView(mLauncher) == null
-                && mLauncher.isInState(NORMAL);
+                && mLauncher.isInState(NORMAL) && !mWorkspace.isPageInTransition();
     }
 
     private void cancelLongPress() {

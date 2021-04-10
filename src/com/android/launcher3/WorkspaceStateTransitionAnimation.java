@@ -19,6 +19,8 @@ package com.android.launcher3;
 import static com.android.launcher3.LauncherAnimUtils.DRAWABLE_ALPHA;
 import static com.android.launcher3.LauncherAnimUtils.SCALE_PROPERTY;
 import static com.android.launcher3.LauncherState.HOTSEAT_ICONS;
+import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.LauncherState.SPRING_LOADED;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_HOTSEAT_SCALE;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_HOTSEAT_TRANSLATE;
 import static com.android.launcher3.anim.AnimatorSetBuilder.ANIM_WORKSPACE_FADE;
@@ -39,7 +41,10 @@ import com.android.launcher3.LauncherStateManager.AnimationConfig;
 import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.anim.PropertySetter;
 import com.android.launcher3.dragndrop.DragLayer;
+import com.android.launcher3.folder.Folder;
 import com.android.launcher3.graphics.WorkspaceAndHotseatScrim;
+import com.sprd.ext.folder.GridFolder;
+import com.sprd.ext.multimode.MultiModeController;
 
 /**
  * Manages the animations between each of the workspace states.
@@ -112,7 +117,16 @@ public class WorkspaceStateTransitionAnimation {
                     hotseatScaleInterpolator);
 
             float hotseatIconsAlpha = (elements & HOTSEAT_ICONS) != 0 ? 1 : 0;
+            boolean isGridFolderOpen = Folder.getOpen(mLauncher) instanceof GridFolder;
+            if (isGridFolderOpen) {
+                hotseatIconsAlpha = 0;
+            }
             propertySetter.setViewAlpha(hotseat, hotseatIconsAlpha, fadeInterpolator);
+            if (MultiModeController.isSingleLayerMode()) {
+                // CASE: page indicator show only these case
+                hotseatIconsAlpha = ((state == NORMAL || state == SPRING_LOADED)
+                        && !isGridFolderOpen) ? 1 : 0;
+            }
             propertySetter.setViewAlpha(mLauncher.getWorkspace().getPageIndicator(),
                     hotseatIconsAlpha, fadeInterpolator);
         }
@@ -157,6 +171,17 @@ public class WorkspaceStateTransitionAnimation {
             AnimatorSetBuilder builder, AnimationConfig config) {
         float pageAlpha = pageAlphaProvider.getPageAlpha(childIndex);
         int drawableAlpha = Math.round(pageAlpha * (state.hasWorkspacePageBackground ? 255 : 0));
+
+        int currentPage = mWorkspace.getCurrentPage();
+        if (childIndex < currentPage - 1 || childIndex > currentPage + 1) {
+            if (config.playNonAtomicComponent()) {
+                cl.getScrimBackground().setAlpha(drawableAlpha);
+            }
+            if (config.playAtomicOverviewScaleComponent()) {
+                cl.getShortcutsAndWidgets().setAlpha(pageAlpha);
+            }
+            return;
+        }
 
         if (config.playNonAtomicComponent()) {
             propertySetter.setInt(cl.getScrimBackground(),

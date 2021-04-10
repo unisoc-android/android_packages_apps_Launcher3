@@ -159,7 +159,7 @@ final class AppToOverviewAnimationProvider<T extends BaseDraggingActivity> imple
             public void onCreateAnimation(RemoteAnimationTargetCompat[] targetCompats,
                     AnimationResult result) {
                 IconRecentsView recentsView = mRecentsView;
-                if (!recentsView.isReadyForRemoteAnim()) {
+                if (recentsView != null && !recentsView.isReadyForRemoteAnim()) {
                     recentsView.setOnReadyForRemoteAnimCallback(() -> postAsyncCallback(handler,
                             () -> onCreateAnimation(targetCompats, result))
                     );

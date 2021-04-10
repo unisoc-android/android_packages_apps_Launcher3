@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default settings of unread function -->
+    <bool name="config_default_unread_call_enable">false</bool>
+    <bool name="config_default_unread_sms_enable">false</bool>
+    <bool name="config_default_unread_email_enable">false</bool>
+    <bool name="config_default_unread_calendar_enable">false</bool>
+    <string name="unread_default_call_cn" translatable="false">com.android.dialer/com.android.dialer.app.DialtactsActivity</string>
+    <string name="unread_default_sms_cn" translatable="false">com.android.messaging/com.android.messaging.ui.conversationlist.ConversationListActivity</string>
+    <string name="unread_default_email_cn" translatable="false">com.android.email/com.android.email.activity.Welcome</string>
+    <string name="unread_default_calendar_cn" translatable="false">com.android.calendar/com.android.calendar.AllInOneActivity</string>
+
+    <!--Add for dynamic icon feature: start-->
+    <string name="original_calendar_pkg" translatable="false">com.android.calendar</string>
+    <string name="google_calendar_pkg" translatable="false">com.google.android.calendar</string>
+    <string name="original_clock_pkg" translatable="false">com.android.deskclock</string>
+    <string name="google_clock_pkg" translatable="false">com.google.android.deskclock</string>
+    <!-- The default state of the dynamic icon, true: open, false: closed -->
+    <bool name="dynamic_calendar_default_state">false</bool>
+    <bool name="dynamic_clock_default_state">false</bool>
+    <!--Add for dynamic icon feature: end-->
+
+    <!--default value of circle slide-->
+    <bool name="default_circle_slide">true</bool>
+
+    <!--default value of pull down action -->
+    <string name="default_pull_down_value" translatable="false">notification</string>
+
+    <!--default value of launcher style allapps or singlelayer-->
+    <bool name="show_home_screen_style_settings">true</bool>
+    <!--The value must be dual or single-->
+    <string name="default_home_screen_style" translatable="false">dual</string>
+
+
+    <!--add for folder icon Model-->
+    <bool name="show_folder_icon_model_settings">true</bool>
+    <!--the value from the array folder_icon_model_values-->
+    <string name="default_folder_icon_model" translatable="false">auto</string>
+    <!-- Out of 100,  the percent to the app icon siz in folder icon. -->
+    <integer name="grid_folder_app_icon_size_percentage">26</integer>
+    <integer name="grid_folder_icon_rows">3</integer>
+    <integer name="grid_folder_icon_columns">3</integer>
+    <integer name="grid_folder_page_rows">4</integer>
+    <integer name="grid_folder_page_columns">3</integer>
+    <!-- Alpha must be between 0 and 255. Suggest between 0 and 120 .-->
+    <integer name="grid_folder_page_alpha">80</integer>
+
+    <!-- Add for desktop grid feature. start-->
+    <!-- The configured value must be one of the grid-option name in device_profile.xml.
+         For example, 4_by_4, 4_by_5, 5_by_5. If 3_by_3 is considered, please remove 3_by_3
+         from the following grid_options_ignored -->
+    <string name="default_desktop_grid_name" translatable="false"></string>
+    <!-- The grid options that will not shown in the desktop grid option list. -->
+    <string-array name="grid_options_ignored" translatable="false">
+        <item>3_by_3</item>
+    </string-array>
+    <!-- Add for desktop grid feature. end-->
+
+    <!-- add for app icon label display double lines -->
+    <bool name="enable_icon_label_show_double_lines">false</bool>
+
+    <!--default value of if show dot number-->
+    <bool name="show_notification_dots_num">false</bool>
+
+    <!--add for use custom search widget-->
+    <string name="custom_search_component" translatable="false"></string>
+
+    <!--Debug custom search widget-->
+    <string name="chrome_search_component" translatable="false">
+        com.android.chrome/org.chromium.chrome.browser.searchwidget.SearchWidgetProvider</string>
+    <string name="chromium_search_component" translatable="false">
+        org.chromium.chrome/org.chromium.chrome.browser.searchwidget.SearchWidgetProvider</string>
+
+    <!--All apps background transparent alpha value should 0 ~ 200-->
+    <integer name="allapps_bg_alpha">64</integer>
+</resources>

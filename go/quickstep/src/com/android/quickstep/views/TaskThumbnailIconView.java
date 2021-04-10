@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.launcher3.R;
+import com.sprd.ext.FeatureOption;
 
 /**
  * Square view that holds thumbnail and icon and shrinks them appropriately so that both fit nicely
@@ -37,6 +38,7 @@ final class TaskThumbnailIconView extends ViewGroup {
     private final Rect mTmpChildRect = new Rect();
     private View mThumbnailView;
     private View mIconView;
+    private View mLockIconView;
     private static final float SUBITEM_FRAME_RATIO = .6f;
 
     public TaskThumbnailIconView(Context context, AttributeSet attrs) {
@@ -48,6 +50,9 @@ final class TaskThumbnailIconView extends ViewGroup {
         super.onFinishInflate();
         mThumbnailView = findViewById(R.id.task_thumbnail);
         mIconView = findViewById(R.id.task_icon);
+        if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+            mLockIconView = findViewById(R.id.lock_icon);
+        }
     }
 
     @Override
@@ -70,6 +75,11 @@ final class TaskThumbnailIconView extends ViewGroup {
             int iconHeightSpec = makeMeasureSpec(subItemSize, MeasureSpec.EXACTLY);
             int iconWidthSpec = makeMeasureSpec(subItemSize, MeasureSpec.EXACTLY);
             measureChild(mIconView, iconWidthSpec, iconHeightSpec);
+        }
+        if (mLockIconView != null && mLockIconView.getVisibility() != GONE) {
+            int iconHeightSpec = makeMeasureSpec(height-subItemSize, MeasureSpec.EXACTLY);
+            int iconWidthSpec = makeMeasureSpec(height-subItemSize, MeasureSpec.EXACTLY);
+            measureChild(mLockIconView, iconWidthSpec, iconHeightSpec);
         }
     }
 
@@ -101,6 +111,21 @@ final class TaskThumbnailIconView extends ViewGroup {
             Gravity.apply(thumbnailGravity, width, height, mTmpFrameRect, mTmpChildRect);
 
             mIconView.layout(mTmpChildRect.left, mTmpChildRect.top,
+                    mTmpChildRect.right, mTmpChildRect.bottom);
+        }
+
+        // Layout the lock icon to the top-end corner of the view
+        if (mLockIconView != null && mLockIconView.getVisibility() != GONE) {
+            final int width = mLockIconView.getMeasuredWidth();
+            final int height = mLockIconView.getMeasuredHeight();
+
+            boolean isPortrait =
+                    (getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT);
+            final int gravity = isPortrait
+                    ? (Gravity.TOP | Gravity.END) : (Gravity.BOTTOM | Gravity.START);
+            Gravity.apply(gravity, width, height, mTmpFrameRect, mTmpChildRect);
+
+            mLockIconView.layout(mTmpChildRect.left, mTmpChildRect.top,
                     mTmpChildRect.right, mTmpChildRect.bottom);
         }
     }

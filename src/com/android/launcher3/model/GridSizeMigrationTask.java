@@ -1,8 +1,11 @@
 package com.android.launcher3.model;
 
+import static com.android.launcher3.LauncherProvider.SCHEMA_VERSION;
 import static com.android.launcher3.LauncherSettings.Settings.EXTRA_VALUE;
 import static com.android.launcher3.Utilities.getPointString;
 import static com.android.launcher3.Utilities.parsePoint;
+
+import android.annotation.SuppressLint;
 
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -14,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -34,9 +38,15 @@ import com.android.launcher3.provider.LauncherDbUtils.SQLiteTransaction;
 import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.IntArray;
 import com.android.launcher3.util.IntSparseArrayMap;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.UtilitiesExt;
+import com.sprd.ext.multimode.MultiModeController;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import androidx.annotation.VisibleForTesting;
@@ -52,6 +62,7 @@ public class GridSizeMigrationTask {
 
     private static final String KEY_MIGRATION_SRC_WORKSPACE_SIZE = "migration_src_workspace_size";
     private static final String KEY_MIGRATION_SRC_HOTSEAT_COUNT = "migration_src_hotseat_count";
+    private static final String KEY_MIGRATION_SRC_DENSITY_DPI = "migration_src_density_dpi";
 
     // These are carefully selected weights for various item types (Math.random?), to allow for
     // the least absurd migration experience.
@@ -71,11 +82,25 @@ public class GridSizeMigrationTask {
     private final HashSet<String> mValidPackages;
 
     private final int mSrcX, mSrcY;
-    private final int mTrgX, mTrgY;
+    private int mTrgX, mTrgY;
     private final boolean mShouldRemoveX, mShouldRemoveY;
 
     private final int mSrcHotseatSize;
     private final int mDestHotseatSize;
+
+    private final HashMap<DbEntry, Point> mSpanUpdatedWidgets = new HashMap<>();
+    private final ArrayList<DbEntry> mRepositionEntries = new ArrayList<>();
+
+    @SuppressWarnings("ComparatorNotSerializable")
+    private static class PositionComparator implements Comparator<ItemInfo> {
+        public int compare(ItemInfo left, ItemInfo right) {
+            if (left.cellY == right.cellY) {
+                return left.cellX - right.cellX;
+            } else {
+                return left.cellY - right.cellY;
+            }
+        }
+    }
 
     protected GridSizeMigrationTask(Context context, SQLiteDatabase db,
             HashSet<String> validPackages, Point sourceSize, Point targetSize) {
@@ -109,6 +134,73 @@ public class GridSizeMigrationTask {
         // Non-used variables
         mSrcX = mSrcY = mTrgX = mTrgY = -1;
         mShouldRemoveX = mShouldRemoveY = false;
+    }
+
+    public void setTargetSize(Point targetSize) {
+        mTrgX = targetSize.x;
+        mTrgY = targetSize.y;
+    }
+
+    protected boolean migrateItemsFormHotseatToWorkspace() throws Exception {
+        if (mCarryOver.isEmpty()) {
+            return false;
+        }
+
+        mUpdateOperations.clear();
+        mEntryToRemove.clear();
+
+        IntArray allScreens = getWorkspaceScreenIds(mDb);
+        if (allScreens.isEmpty()) {
+            throw new Exception("Unable to get workspace screens");
+        }
+
+        int index = 0;
+        int screenCount = allScreens.size();
+        while (!mCarryOver.isEmpty()) {
+            int screenId = index < screenCount ? allScreens.get(index) :
+                    LauncherSettings.Settings.call(mContext.getContentResolver(),
+                    LauncherSettings.Settings.METHOD_NEW_SCREEN_ID)
+                    .getInt(EXTRA_VALUE);
+            migrateItemsToWorkspaceScreen(screenId);
+            index++;
+        }
+
+        return applyOperations();
+    }
+
+    private void migrateItemsToWorkspaceScreen(int screenId) {
+        int startY = (FeatureFlags.QSB_ON_FIRST_SCREEN && screenId == Workspace.FIRST_SCREEN_ID)
+                ? 1 : 0;
+
+        // init the grid occupancy
+        GridOccupancy occupied = new GridOccupancy(mTrgX, mTrgY);
+        occupied.markCells(0, 0, mTrgX, startY, true);
+        ArrayList<DbEntry> items = loadWorkspaceEntries(screenId);
+        for (DbEntry item : items) {
+            occupied.markCells(item, true);
+        }
+
+        for (int y = startY; y < mTrgY; y++) {
+            int x = 0;
+            for (; x < mTrgX; x++) {
+                if (!occupied.cells[x][y]) {
+                    DbEntry entry = mCarryOver.remove(0);
+                    entry.cellX = x;
+                    entry.cellY = y;
+                    entry.updateContainerAndScreenId(Favorites.CONTAINER_DESKTOP, screenId);
+                    update(entry);
+                    if (DEBUG) {
+                        LogUtils.d(TAG, "Migrate to workspace: [" + entry.screenId + ", "
+                                + entry.cellX + ", " + entry.cellY + "].");
+                    }
+
+                    if (mCarryOver.isEmpty()) {
+                        break;
+                    }
+                }
+            }
+            if (x < mTrgX) break;
+        }
     }
 
     /**
@@ -157,7 +249,11 @@ public class GridSizeMigrationTask {
                 }
             }
 
-            mEntryToRemove.add(toRemove.id);
+            if (FeatureOption.SPRD_DESKTOP_GRID_SUPPORT.get()) {
+                mCarryOver.add(toRemove);
+            } else {
+                mEntryToRemove.add(toRemove.id);
+            }
             items.remove(toRemove);
         }
 
@@ -183,9 +279,15 @@ public class GridSizeMigrationTask {
 
     @VisibleForTesting
     static IntArray getWorkspaceScreenIds(SQLiteDatabase db) {
-        return LauncherDbUtils.queryIntArray(db, Favorites.TABLE_NAME, Favorites.SCREEN,
+        IntArray allScreens = LauncherDbUtils.queryIntArray(db, Favorites.TABLE_NAME, Favorites.SCREEN,
                 Favorites.CONTAINER + " = " + Favorites.CONTAINER_DESKTOP,
                 Favorites.SCREEN, Favorites.SCREEN);
+
+        // Make sure that the default screen(id: Workspace.FIRST_SCREEN_ID) is always contained.
+        if (!allScreens.contains(Workspace.FIRST_SCREEN_ID)) {
+            allScreens.add(0, Workspace.FIRST_SCREEN_ID);
+        }
+        return allScreens;
     }
 
     /**
@@ -205,6 +307,10 @@ public class GridSizeMigrationTask {
             migrateScreen(screenId);
         }
 
+        if (!mRepositionEntries.isEmpty()) {
+            mCarryOver.addAll(mRepositionEntries);
+            mRepositionEntries.clear();
+        }
         if (!mCarryOver.isEmpty()) {
             IntSparseArrayMap<DbEntry> itemMap = new IntSparseArrayMap<>();
             for (DbEntry e : mCarryOver) {
@@ -257,6 +363,19 @@ public class GridSizeMigrationTask {
                 ? 1 : 0;
 
         ArrayList<DbEntry> items = loadWorkspaceEntries(screenId);
+        if (LogUtils.DEBUG_LOADER) {
+            LogUtils.d(TAG, "migrateScreen: mShouldRemoveX = " + mShouldRemoveX + ", mShouldRemoveY = "
+                    + mShouldRemoveY + ", mSpanUpdatedWidgets.size() = " + mSpanUpdatedWidgets.size()
+                    + ", mRepositionEntries.size() = " + mRepositionEntries.size());
+        }
+        if (mSpanUpdatedWidgets.size() > 0 || mRepositionEntries.size() > 0) {
+            // Some widgets spans had changed, So update them.
+            updateWidgetSpans(startY, screenId, items);
+        }
+        if (!mShouldRemoveX && !mShouldRemoveY) {
+            // The source size is smaller than the target one. Just return.
+            return;
+        }
 
         int removedCol = Integer.MAX_VALUE;
         int removedRow = Integer.MAX_VALUE;
@@ -348,6 +467,119 @@ public class GridSizeMigrationTask {
                 mCarryOver.clear();
             }
         }
+    }
+
+    private void updateWidgetSpans(int startY, int screenId, ArrayList<DbEntry> items) {
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        int countX = mShouldRemoveX ? mSrcX : mTrgX;
+        int countY = mShouldRemoveY ? mSrcY : mTrgY;
+        GridOccupancy occupied = new GridOccupancy(countX, countY);
+        occupied.markCells(0, 0, countX, startY, true);
+        ArrayList<DbEntry> widgets = new ArrayList<>(mSpanUpdatedWidgets.keySet());
+        PositionComparator comparator = new PositionComparator();
+        Collections.sort(widgets, comparator);
+        for (DbEntry item : items) {
+            if (!widgets.contains(item)) {
+                occupied.markCells(item, true);
+            }
+        }
+
+        for (DbEntry entry : widgets) {
+            Point spans = mSpanUpdatedWidgets.get(entry);
+            if (mRepositionEntries.contains(entry)) {
+                entry.spanX = spans.x;
+                entry.spanY = spans.y;
+                continue;
+            }
+
+            if (spans.x <= entry.spanX && spans.y <= entry.spanY) {
+                entry.spanX = spans.x;
+                entry.spanY = spans.y;
+                occupied.markCells(entry, true);
+                update(entry);
+                if (DEBUG) {
+                    LogUtils.d(TAG, "The item (" + entry.cellX + ", " + entry.cellY + ") spans become smaller.");
+                }
+                continue;
+            }
+
+            int col = countX - 1;
+            int row = countY - 1;
+            if (entry.cellX > col || entry.cellY > row
+                    || (entry.cellX <= col && (spans.x + entry.cellX) > col)
+                    || (entry.cellY <= row && (spans.y + entry.cellY) > row)) {
+                entry.spanX = spans.x;
+                entry.spanY = spans.y;
+                mRepositionEntries.add(entry);
+            } else {
+                entry.spanX = spans.x;
+                entry.spanY = spans.y;
+                update(entry);
+
+                ArrayList<DbEntry> intersectItems = findIntersectItems(entry, items);
+                for (DbEntry dbEntry : intersectItems) {
+                    occupied.markCells(dbEntry, false);
+                    mRepositionEntries.add(dbEntry);
+                }
+                occupied.markCells(entry, true);
+
+                if (DEBUG) {
+                    LogUtils.d(TAG, "updateWidgetSpans: intersectItems.size = " + intersectItems.size());
+                }
+            }
+        }
+
+        if (!mRepositionEntries.isEmpty()) {
+            IntSparseArrayMap<DbEntry> itemMap = new IntSparseArrayMap<>();
+            for (DbEntry e : mRepositionEntries) {
+                itemMap.put(e.id, e);
+            }
+
+            OptimalPlacementSolution placement = new OptimalPlacementSolution(occupied,
+                    deepCopy(mRepositionEntries), startY, true);
+            placement.find();
+            if (placement.finalPlacedItems.size() > 0) {
+                for (DbEntry item : placement.finalPlacedItems) {
+                    if (mRepositionEntries.remove(itemMap.get(item.id))) {
+                        item.screenId = screenId;
+                        update(item);
+                    } else {
+                        LogUtils.e(TAG, "There is no item: " + item.id
+                                + " in the reposition entry list.");
+                    }
+                }
+            } else {
+                LogUtils.w(TAG, "No reposition item can be put in this screen: " + screenId
+                        + ". So try to put them in the next screen later.");
+            }
+        }
+
+        for (DbEntry dbEntry : mRepositionEntries) {
+            items.remove(dbEntry);
+        }
+        mSpanUpdatedWidgets.clear();
+    }
+
+    private ArrayList<DbEntry> findIntersectItems(DbEntry entry, ArrayList<DbEntry> items) {
+        ArrayList<DbEntry> intersectItems = new ArrayList<>();
+        if (entry == null || items == null || items.isEmpty()) {
+            return intersectItems;
+        }
+
+        Rect r0 =new Rect(entry.cellX, entry.cellY, entry.cellX + entry.spanX,
+                entry.cellY + entry.spanY);
+        Rect r1 = new Rect();
+        for (DbEntry item : items) {
+            if (item.id == entry.id) continue;
+            r1.set(item.cellX, item.cellY, item.cellX + item.spanX, item.cellY + item.spanY);
+            if (Rect.intersects(r0, r1)) {
+                intersectItems.add(item);
+            }
+        }
+        return intersectItems;
     }
 
     /**
@@ -601,6 +833,61 @@ public class GridSizeMigrationTask {
         }
     }
 
+    /**
+     * Loads all widgets to check if need update.
+     */
+    protected boolean hasWidgetSpanUpdatedEntry() {
+        // Go version disable widgets
+        if (FeatureFlags.GO_DISABLE_WIDGETS) {
+            return false;
+        }
+        boolean isNeedUpdate = false;
+        Cursor c = queryWorkspace(
+                new String[]{
+                        Favorites._ID,                  // 0
+                        Favorites.SPANX,                // 1
+                        Favorites.SPANY,                // 2
+                        Favorites.APPWIDGET_ID},        // 4
+                Favorites.ITEM_TYPE + " = " + Favorites.ITEM_TYPE_APPWIDGET, null);
+
+        final int indexId = c.getColumnIndexOrThrow(Favorites._ID);
+        final int indexSpanX = c.getColumnIndexOrThrow(Favorites.SPANX);
+        final int indexSpanY = c.getColumnIndexOrThrow(Favorites.SPANY);
+        final int indexAppWidgetId = c.getColumnIndexOrThrow(Favorites.APPWIDGET_ID);
+
+        while (c.moveToNext()) {
+            DbEntry entry = new DbEntry();
+            entry.id = c.getInt(indexId);
+            entry.spanX = c.getInt(indexSpanX);
+            entry.spanY = c.getInt(indexSpanY);
+
+            try {
+                int widgetId = c.getInt(indexAppWidgetId);
+                LauncherAppWidgetProviderInfo pInfo = AppWidgetManagerCompat.getInstance(
+                        mContext).getLauncherAppWidgetInfo(widgetId);
+                if (pInfo != null) {
+                    Point pMinSpans = pInfo.getMinSpans();
+                    if (pMinSpans.y != -1 && pMinSpans.x != -1) {
+                        isNeedUpdate = entry.spanX < pMinSpans.x || entry.spanY < pMinSpans.y;
+                    } else {
+                        isNeedUpdate = entry.spanX != pInfo.spanX || entry.spanY != pInfo.spanY;
+                    }
+                    if (isNeedUpdate) {
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                LogUtils.e(TAG, "Can't load widgets from Db.", e);
+            }
+        }
+        UtilitiesExt.closeCursorSilently(c);
+
+        if (LogUtils.DEBUG_WIDGET) {
+            LogUtils.d(TAG, "Widget span need update:" + isNeedUpdate);
+        }
+        return isNeedUpdate;
+    }
+
     private ArrayList<DbEntry> loadHotseatEntries() {
         Cursor c =  queryWorkspace(
                 new String[]{
@@ -608,7 +895,7 @@ public class GridSizeMigrationTask {
                         Favorites.ITEM_TYPE,            // 1
                         Favorites.INTENT,               // 2
                         Favorites.SCREEN},              // 3
-                Favorites.CONTAINER + " = " + Favorites.CONTAINER_HOTSEAT);
+                Favorites.CONTAINER + " = " + Favorites.CONTAINER_HOTSEAT, Favorites.SCREEN);
 
         final int indexId = c.getColumnIndexOrThrow(Favorites._ID);
         final int indexItemType = c.getColumnIndexOrThrow(Favorites.ITEM_TYPE);
@@ -679,7 +966,7 @@ public class GridSizeMigrationTask {
                         Favorites.APPWIDGET_PROVIDER,   // 7
                         Favorites.APPWIDGET_ID},        // 8
                 Favorites.CONTAINER + " = " + Favorites.CONTAINER_DESKTOP
-                        + " AND " + Favorites.SCREEN + " = " + screen);
+                        + " AND " + Favorites.SCREEN + " = " + screen, null);
 
         final int indexId = c.getColumnIndexOrThrow(Favorites._ID);
         final int indexItemType = c.getColumnIndexOrThrow(Favorites.ITEM_TYPE);
@@ -724,12 +1011,13 @@ public class GridSizeMigrationTask {
                         LauncherAppWidgetProviderInfo pInfo = AppWidgetManagerCompat.getInstance(
                                 mContext).getLauncherAppWidgetInfo(widgetId);
                         Point spans = null;
+                        Point targetSpan = getWidgetTargetSpan(entry, pInfo);
                         if (pInfo != null) {
                             spans = pInfo.getMinSpans();
                         }
                         if (spans != null) {
-                            entry.minSpanX = spans.x > 0 ? spans.x : entry.spanX;
-                            entry.minSpanY = spans.y > 0 ? spans.y : entry.spanY;
+                            entry.minSpanX = spans.x > 0 ? spans.x : targetSpan.x;
+                            entry.minSpanY = spans.y > 0 ? spans.y : targetSpan.y;
                         } else {
                             // Assume that the widget be resized down to 2x2
                             entry.minSpanX = entry.minSpanY = 2;
@@ -737,6 +1025,11 @@ public class GridSizeMigrationTask {
 
                         if (entry.minSpanX > mTrgX || entry.minSpanY > mTrgY) {
                             throw new Exception("Widget can't be resized down to fit the grid");
+                        }
+                        // Make the spanX and spanY of DbEntry to be equal to or larger than
+                        // the minSpanX and minSpanY of its {@link LauncherAppWidgetProviderInfo}
+                        if (!targetSpan.equals(new Point(entry.spanX, entry.spanY))) {
+                            mSpanUpdatedWidgets.put(entry, targetSpan);
                         }
                         break;
                     }
@@ -764,13 +1057,31 @@ public class GridSizeMigrationTask {
         return entries;
     }
 
+    private Point getWidgetTargetSpan(DbEntry entry, LauncherAppWidgetProviderInfo info) {
+        Point targetSpans = new Point(entry.spanX, entry.spanY);
+        if (info == null) {
+            return targetSpans;
+        }
+        if (info.supportResize()) {
+            Point minSpans = info.getMinSpans();
+            int minSpanX = minSpans != null && minSpans.x > 0 ? minSpans.x : info.spanX;
+            int minSpanY = minSpans != null && minSpans.y > 0 ? minSpans.y : info.spanY;
+            targetSpans.x = targetSpans.x < minSpanX ? minSpanX : targetSpans.x;
+            targetSpans.y = targetSpans.y < minSpanY ? minSpanY : targetSpans.y;
+        } else {
+            targetSpans.x = info.spanX;
+            targetSpans.y = info.spanY;
+        }
+        return targetSpans;
+    }
+
     /**
      * @return the number of valid items in the folder.
      */
     private int getFolderItemsCount(int folderId) {
         Cursor c = queryWorkspace(
                 new String[]{Favorites._ID, Favorites.INTENT},
-                Favorites.CONTAINER + " = " + folderId);
+                Favorites.CONTAINER + " = " + folderId, null);
 
         int total = 0;
         while (c.moveToNext()) {
@@ -785,8 +1096,8 @@ public class GridSizeMigrationTask {
         return total;
     }
 
-    protected Cursor queryWorkspace(String[] columns, String where) {
-        return mDb.query(Favorites.TABLE_NAME, columns, where, null, null, null, null);
+    protected Cursor queryWorkspace(String[] columns, String where, String orderBy) {
+        return mDb.query(Favorites.TABLE_NAME, columns, where, null, null, null, orderBy);
     }
 
     /**
@@ -814,6 +1125,8 @@ public class GridSizeMigrationTask {
     protected static class DbEntry extends ItemInfo implements Comparable<DbEntry> {
 
         public float weight;
+
+        private boolean mIsContainerChanged;
 
         public DbEntry() {
         }
@@ -853,11 +1166,20 @@ public class GridSizeMigrationTask {
         }
 
         public void addToContentValues(ContentValues values) {
+            if (mIsContainerChanged) {
+                values.put(Favorites.CONTAINER, container);
+            }
             values.put(Favorites.SCREEN, screenId);
             values.put(Favorites.CELLX, cellX);
             values.put(Favorites.CELLY, cellY);
             values.put(Favorites.SPANX, spanX);
             values.put(Favorites.SPANY, spanY);
+        }
+
+        public void updateContainerAndScreenId(int container, int screenId) {
+            this.container = container;
+            this.screenId = screenId;
+            mIsContainerChanged = true;
         }
     }
 
@@ -871,10 +1193,58 @@ public class GridSizeMigrationTask {
 
     public static void markForMigration(
             Context context, int gridX, int gridY, int hotseatSize) {
+        String workspaceGridKey =
+                MultiModeController.getKeyByMode(context, KEY_MIGRATION_SRC_WORKSPACE_SIZE);
+        String hotseatGridKey =
+                MultiModeController.getKeyByMode(context, KEY_MIGRATION_SRC_HOTSEAT_COUNT);
+        String densityKey =
+                MultiModeController.getKeyByMode(context, KEY_MIGRATION_SRC_DENSITY_DPI);
+
         Utilities.getPrefs(context).edit()
-                .putString(KEY_MIGRATION_SRC_WORKSPACE_SIZE, getPointString(gridX, gridY))
-                .putInt(KEY_MIGRATION_SRC_HOTSEAT_COUNT, hotseatSize)
+                .putString(workspaceGridKey, getPointString(gridX, gridY))
+                .putInt(hotseatGridKey, hotseatSize)
+                .putInt(densityKey, context.getResources().getConfiguration().densityDpi)
                 .apply();
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private static void markForMigrationOnDbUpdate(
+            Context context, int oldVersion, boolean isSingleLayerMode) {
+        String oldworkspaceGridKey = MultiModeController.getKeyByMode(
+                context, KEY_MIGRATION_SRC_WORKSPACE_SIZE, oldVersion, isSingleLayerMode);
+        String oldHotseatGridKey = MultiModeController.getKeyByMode(
+                context, KEY_MIGRATION_SRC_HOTSEAT_COUNT, oldVersion, isSingleLayerMode);
+
+        String workspaceGridKey = MultiModeController.getKeyByMode(
+                context, KEY_MIGRATION_SRC_WORKSPACE_SIZE, SCHEMA_VERSION, isSingleLayerMode);
+        String hotseatGridKey = MultiModeController.getKeyByMode(
+                context, KEY_MIGRATION_SRC_HOTSEAT_COUNT, SCHEMA_VERSION, isSingleLayerMode);
+        String densityKey = MultiModeController.getKeyByMode(
+                context, KEY_MIGRATION_SRC_DENSITY_DPI, SCHEMA_VERSION, isSingleLayerMode);
+
+        InvariantDeviceProfile idp = LauncherAppState.getIDP(context);
+        String gridSizeString = getPointString(idp.numColumns, idp.numRows);
+
+        SharedPreferences prefs = Utilities.getPrefs(context);
+        prefs.edit().putString(workspaceGridKey, prefs.getString(oldworkspaceGridKey, gridSizeString))
+                .putInt(hotseatGridKey, prefs.getInt(oldHotseatGridKey, idp.numHotseatIcons))
+                .putInt(densityKey, context.getResources().getConfiguration().densityDpi)
+                .commit();
+    }
+
+    public static void onDbUpgrade(Context context, int oldVersion, int newVersion) {
+        switch (oldVersion) {
+            case 27:
+                boolean isSingleLayerMode = MultiModeController.isSingleLayerMode();
+                markForMigrationOnDbUpdate(context, oldVersion, isSingleLayerMode);
+                if (MultiModeController.isSupportDynamicChange()) {
+                    markForMigrationOnDbUpdate(context, oldVersion, !isSingleLayerMode);
+                }
+                break;
+            default:
+                // do nothing
+                break;
+        }
     }
 
     /**
@@ -886,12 +1256,23 @@ public class GridSizeMigrationTask {
         SharedPreferences prefs = Utilities.getPrefs(context);
         InvariantDeviceProfile idp = LauncherAppState.getIDP(context);
 
-        String gridSizeString = getPointString(idp.numColumns, idp.numRows);
 
-        if (gridSizeString.equals(prefs.getString(KEY_MIGRATION_SRC_WORKSPACE_SIZE, "")) &&
-                idp.numHotseatIcons == prefs.getInt(KEY_MIGRATION_SRC_HOTSEAT_COUNT,
-                        idp.numHotseatIcons)) {
-            // Skip if workspace and hotseat sizes have not changed.
+        int curDensity = context.getResources().getConfiguration().densityDpi;
+        String gridSizeString = getPointString(idp.numColumns, idp.numRows);
+        String workspaceSizeKey =
+                MultiModeController.getKeyByMode(context, KEY_MIGRATION_SRC_WORKSPACE_SIZE);
+        String hotseatSizeKey =
+                MultiModeController.getKeyByMode(context, KEY_MIGRATION_SRC_HOTSEAT_COUNT);
+        String densityKey =
+                MultiModeController.getKeyByMode(context, KEY_MIGRATION_SRC_DENSITY_DPI);
+
+        boolean shouldCheckWidget = !FeatureFlags.GO_DISABLE_WIDGETS &&
+                curDensity != prefs.getInt(densityKey, curDensity);
+
+        if (gridSizeString.equals(prefs.getString(workspaceSizeKey, "")) &&
+                idp.numHotseatIcons == prefs.getInt(hotseatSizeKey, idp.numHotseatIcons)
+                && !shouldCheckWidget) {
+            // Skip if workspace sizes, hotseat sizes, density have not changed.
             return true;
         }
 
@@ -900,10 +1281,8 @@ public class GridSizeMigrationTask {
                 context.getContentResolver(), Settings.METHOD_NEW_TRANSACTION)
                 .getBinder(Settings.EXTRA_VALUE)) {
 
-            int srcHotseatCount = prefs.getInt(KEY_MIGRATION_SRC_HOTSEAT_COUNT,
-                    idp.numHotseatIcons);
-            Point sourceSize = parsePoint(prefs.getString(
-                    KEY_MIGRATION_SRC_WORKSPACE_SIZE, gridSizeString));
+            int srcHotseatCount = prefs.getInt(hotseatSizeKey, idp.numHotseatIcons);
+            Point sourceSize = parsePoint(prefs.getString(workspaceSizeKey, gridSizeString));
 
             boolean dbChanged = false;
 
@@ -916,10 +1295,12 @@ public class GridSizeMigrationTask {
 
             HashSet<String> validPackages = getValidPackages(context);
             // Hotseat
+            GridSizeMigrationTask hotseatMigrationTask = null;
             if (srcHotseatCount != idp.numHotseatIcons) {
                 // Migrate hotseat.
-                dbChanged = new GridSizeMigrationTask(context, transaction.getDb(),
-                        validPackages, srcHotseatCount, idp.numHotseatIcons).migrateHotseat();
+                hotseatMigrationTask = new GridSizeMigrationTask(context, transaction.getDb(),
+                        validPackages, srcHotseatCount, idp.numHotseatIcons);
+                dbChanged = hotseatMigrationTask.migrateHotseat();
             }
 
             // Grid size
@@ -927,6 +1308,20 @@ public class GridSizeMigrationTask {
             if (new MultiStepMigrationTask(validPackages, context, transaction.getDb())
                     .migrate(sourceSize, targetSize)) {
                 dbChanged = true;
+            }
+
+            // Density size, If Grid size changed, no need to redo migrate
+            if (sourceSize.equals(targetSize) && shouldCheckWidget) {
+                if (new WidgetMigrationTask(context, transaction.getDb(),
+                        validPackages).migrateIfNeeded(targetSize)) {
+                    dbChanged = true;
+                }
+            }
+
+            // Migrate the dropped items from hotseat to workspace.
+            if (FeatureOption.SPRD_DESKTOP_GRID_SUPPORT.get() && null != hotseatMigrationTask) {
+                hotseatMigrationTask.setTargetSize(targetSize);
+                dbChanged |= hotseatMigrationTask.migrateItemsFormHotseatToWorkspace();
             }
 
             if (dbChanged) {
@@ -953,8 +1348,9 @@ public class GridSizeMigrationTask {
 
             // Save current configuration, so that the migration does not run again.
             prefs.edit()
-                    .putString(KEY_MIGRATION_SRC_WORKSPACE_SIZE, gridSizeString)
-                    .putInt(KEY_MIGRATION_SRC_HOTSEAT_COUNT, idp.numHotseatIcons)
+                    .putString(workspaceSizeKey, gridSizeString)
+                    .putInt(hotseatSizeKey, idp.numHotseatIcons)
+                    .putInt(densityKey, curDensity)
                     .apply();
         }
     }
@@ -1020,14 +1416,14 @@ public class GridSizeMigrationTask {
         public boolean migrate(Point sourceSize, Point targetSize) throws Exception {
             boolean dbChanged = false;
             if (!targetSize.equals(sourceSize)) {
-                if (sourceSize.x < targetSize.x) {
-                    // Source is smaller that target, just expand the grid without actual migration.
-                    sourceSize.x = targetSize.x;
-                }
-                if (sourceSize.y < targetSize.y) {
-                    // Source is smaller that target, just expand the grid without actual migration.
-                    sourceSize.y = targetSize.y;
-                }
+//                if (sourceSize.x < targetSize.x) {
+//                    // Source is smaller that target, just expand the grid without actual migration.
+//                    sourceSize.x = targetSize.x;
+//                }
+//                if (sourceSize.y < targetSize.y) {
+//                    // Source is smaller that target, just expand the grid without actual migration.
+//                    sourceSize.y = targetSize.y;
+//                }
 
                 // Migrate the workspace grid, such that the points differ by max 1 in x and y
                 // each on every step.
@@ -1036,9 +1432,13 @@ public class GridSizeMigrationTask {
                     Point nextSize = new Point(sourceSize);
                     if (targetSize.x < nextSize.x) {
                         nextSize.x--;
+                    } else if (targetSize.x > nextSize.x) {
+                        nextSize.x = targetSize.x;
                     }
                     if (targetSize.y < nextSize.y) {
                         nextSize.y--;
+                    } else if (targetSize.y > nextSize.y) {
+                        nextSize.y = targetSize.y;
                     }
                     if (runStepTask(sourceSize, nextSize)) {
                         dbChanged = true;
@@ -1052,6 +1452,34 @@ public class GridSizeMigrationTask {
         protected boolean runStepTask(Point sourceSize, Point nextSize) throws Exception {
             return new GridSizeMigrationTask(mContext, mDb,
                     mValidPackages, sourceSize, nextSize).migrateWorkspace();
+        }
+    }
+
+    /**
+     * Task to run widget migration in multiple steps when the span size is difference.
+     */
+    protected static class WidgetMigrationTask {
+        private final HashSet<String> mValidPackages;
+        private final Context mContext;
+        private final SQLiteDatabase mDb;
+
+        public WidgetMigrationTask(Context context,
+                                   SQLiteDatabase db, HashSet<String> validPackages) {
+            mValidPackages = validPackages;
+            mContext = context;
+            mDb = db;
+        }
+
+        public boolean migrateIfNeeded(Point gridSize) throws Exception {
+            boolean dbChanged = false;
+            GridSizeMigrationTask migrationTask = new GridSizeMigrationTask(mContext, mDb,
+                    mValidPackages, gridSize, gridSize);
+            if (migrationTask.hasWidgetSpanUpdatedEntry()) {
+                if (migrationTask.migrateWorkspace()) {
+                    dbChanged = true;
+                }
+            }
+            return dbChanged;
         }
     }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">Ongelezen badge</string>
+<string name="unread_call">"Telefoon"</string>
+<string name="unread_sms">"Sms"</string>
+<string name="unread_email">"E-mail"</string>
+<string name="unread_calendar">"kalender"</string>
+<string name="unread_hint">Vereiste <xliff:g id="unread_type">%1$s</xliff:g>-machtiging ontbreekt. Vraag eerst machtiging aan.</string>
+<string name="pref_missed_call_count_title">"Gemiste oproep"</string>
+<string name="pref_missed_call_count_summary">Selecteer een Telefoon-app, het aantal gemiste oproepen weergeven</string>
+<string name="pref_unread_sms_count_title">Ongelezen bericht</string>
+<string name="pref_unread_sms_count_summary">Selecteer een Sms-app, het aantal ongelezen berichten weergeven</string>
+<string name="pref_unread_email_count_title">Ongelezen e-mail</string>
+<string name="pref_unread_email_count_summary">Selecteer een E-mail-app, het aantal ongelezen mails weergeven</string>
+<string name="pref_unread_calendar_count_title">Ongelezen agenda</string>
+<string name="pref_unread_calendar_count_summary">Selecteer een Agenda-app, het aantal ongelezen agenda-items weergeven</string>
+<string name="selected_text">"Geselecteerd"</string>
+<string name="dynamic_icon_title">Dynamisch pictogram</string>
+<string name="allow_circular_sliding_title">Startschermlus</string>
+<string name="allow_circular_sliding_summary">Als er een aangepaste linkerpagina is, kan de Startschermlus niet worden toegepast</string>
+<string name="pull_down_action_pref_title">Pull-down-actie</string>
+<string name="pull_down_do_nothing">"Niets doen"</string>
+<string name="pull_down_notification">"Meldingen weergeven"</string>
+<string name="pull_down_search">Zoekfunctie openen</string>
+<string name="home_screen_style_title">Startschermstijl</string>
+<string name="home_screen_style_single">Enkele laag</string>
+<string name="home_screen_style_dual">Dubbele laag</string>
+<string name="home_screen_style_notification">Wijzigen van de startschermstijl</string>
+<string name="folder_icon_model_pref_title">Map-pictogramstijl</string>
+<string name="auto_model">"Automatisch"</string>
+<string name="annular_model">Ringvormig</string>
+<string name="grid_model">"rooster"</string>
+<string name="desktop_grid">Bureaubladraster</string>
+<string name="notification_dots_ext_title">"Aantal meldingstippen weergeven"</string>
+<string name="notification_dots_ext_summary">"Wanneer meldingstippen aan staan"</string>
+</resources>

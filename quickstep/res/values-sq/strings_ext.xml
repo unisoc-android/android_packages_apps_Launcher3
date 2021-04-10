@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"<xliff:g id="count">%1$s</xliff:g> në dispozicion"</string>
+<string name="recents_clean_finished_toast">"Liro memorien <xliff:g id="count">%1$s</xliff:g>, <xliff:g id="count">%2$s</xliff:g> në dispozicion tani."</string>
+<string name="recents_nothing_to_clear">"Asgjë për të fshirë në memorien specifike"</string>
+</resources>

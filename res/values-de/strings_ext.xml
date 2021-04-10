@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"Ungelesenes Abzeichen"</string>
+<string name="unread_call">"Telefon"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">"E-Mail-Adresse"</string>
+<string name="unread_calendar">"Kalender"</string>
+<string name="unread_hint">"Fehlende erforderliche <xliff:g id="unread_type">%1$s</xliff:g> Berechtigung. Bitte beantragen Sie zuerst eine Berechtigung."</string>
+<string name="pref_missed_call_count_title">"Entgangener Anruf"</string>
+<string name="pref_missed_call_count_summary">"Wählen Sie eine Telefonanwendung aus, zeigen Sie damit die Anzahl verpasster Anrufe an"</string>
+<string name="pref_unread_sms_count_title">"Ungelesene Nachricht"</string>
+<string name="pref_unread_sms_count_summary">"Wählen Sie eine SMS-App aus, zeigen Sie damit die Anzahl ungelesener Nachrichten an"</string>
+<string name="pref_unread_email_count_title">"Ungelesene E-Mail"</string>
+<string name="pref_unread_email_count_summary">"Wählen Sie eine E-Mail-App aus, zeigen Sie damit die Anzahl ungelesener Nachrichten an"</string>
+<string name="pref_unread_calendar_count_title">"Ungelesener Kalendereintrag"</string>
+<string name="pref_unread_calendar_count_summary">"Wählen Sie eine Kalender-App aus, zeigen Sie damit die Anzahl ungelesener Kalenderereignisse an"</string>
+<string name="selected_text">"Ausgewählt"</string>
+<string name="dynamic_icon_title">"Dynamisches Symbol"</string>
+<string name="allow_circular_sliding_title">"Startseitenschleife"</string>
+<string name="allow_circular_sliding_summary">"Einstellung für benutzerdefinierten Inhalt der linken Seite erlaubt keine Startseitenschleife"</string>
+<string name="pull_down_action_pref_title">Herunterziehen</string>
+<string name="pull_down_do_nothing">"Nichts tun"</string>
+<string name="pull_down_notification">"Benachrichtigungen zeigen"</string>
+<string name="pull_down_search">Suche öffnen</string>
+<string name="home_screen_style_title">"Startbildschirmstil"</string>
+<string name="home_screen_style_single">"Einzelne Ebene"</string>
+<string name="home_screen_style_dual">"Doppelte Ebene"</string>
+<string name="home_screen_style_notification">"Änderungen für Startbildschirmstil werden angewendet"</string>
+<string name="folder_icon_model_pref_title">"Ordnersymbolstil"</string>
+<string name="auto_model">"Autom."</string>
+<string name="annular_model">"Kreisförmig"</string>
+<string name="grid_model">"Raster"</string>
+<string name="desktop_grid">"Desktopraster"</string>
+<string name="notification_dots_ext_title">"Nummer von Notification Dots anzeigen"</string>
+<string name="notification_dots_ext_summary">"Wenn Notification Dots aktiviert ist"</string>
+</resources>

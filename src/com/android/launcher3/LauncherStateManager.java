@@ -34,6 +34,7 @@ import com.android.launcher3.anim.PropertySetter.AnimatedPropertySetter;
 import com.android.launcher3.compat.AccessibilityManagerCompat;
 import com.android.launcher3.testing.TestProtocol;
 import com.android.launcher3.uioverrides.UiFactory;
+import com.sprd.ext.LogUtils;
 
 import java.io.PrintWriter;
 import java.lang.annotation.Retention;
@@ -142,6 +143,10 @@ public class LauncherStateManager {
         writer.println(prefix + "\tmState:" + mState);
         writer.println(prefix + "\tmRestState:" + mRestState);
         writer.println(prefix + "\tisInTransition:" + (mConfig.mCurrentAnimation != null));
+    }
+
+    public boolean isInTransition() {
+        return mConfig.mCurrentAnimation != null;
     }
 
     public StateHandler[] getStateHandlers() {
@@ -253,6 +258,7 @@ public class LauncherStateManager {
         LauncherState fromState = mState;
         mConfig.reset();
 
+        LogUtils.d(TAG, "goToState:[" + fromState+ " -> " + state + "] animated:" + animated);
         if (!animated) {
             cancelAllStateElementAnimation();
             onStateTransitionStart(state);
@@ -407,6 +413,7 @@ public class LauncherStateManager {
             android.util.Log.d(TestProtocol.NO_DRAG_TAG,
                     "onStateTransitionStart");
         }
+        if (LogUtils.DEBUG_ALL) LogUtils.d(TAG, "goToState, onStateTransitionStart:" + state);
         if (mState != state) {
             mState.onStateDisabled(mLauncher);
         }
@@ -447,6 +454,7 @@ public class LauncherStateManager {
 
         UiFactory.onLauncherStateOrResumeChanged(mLauncher);
 
+        if (LogUtils.DEBUG_ALL) LogUtils.d(TAG, "goToState, onStateTransitionEnd:" + state);
         for (int i = mListeners.size() - 1; i >= 0; i--) {
             mListeners.get(i).onStateTransitionComplete(state);
         }

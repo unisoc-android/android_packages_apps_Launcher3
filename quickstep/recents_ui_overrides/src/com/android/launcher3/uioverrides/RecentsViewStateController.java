@@ -77,6 +77,7 @@ public final class RecentsViewStateController extends
             updateAnim.setDuration(config.duration);
             builder.play(updateAnim);
             mRecentsView.updateEmptyMessage();
+            mRecentsView.resetTaskVisualsIfNeeded();
         }
 
         PropertySetter propertySetter = config.getPropertySetter(builder);

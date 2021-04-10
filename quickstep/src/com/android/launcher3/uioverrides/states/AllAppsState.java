@@ -23,6 +23,7 @@ import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.allapps.AllAppsContainerView;
 import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
+import com.sprd.ext.multimode.MultiModeController;
 import com.android.quickstep.SysUINavigationMode;
 
 /**
@@ -40,7 +41,9 @@ public class AllAppsState extends LauncherState {
     };
 
     public AllAppsState(int id) {
-        super(id, ContainerType.ALLAPPS, ALL_APPS_TRANSITION_MS, STATE_FLAGS);
+        super(id, ContainerType.ALLAPPS, ALL_APPS_TRANSITION_MS,
+                MultiModeController.isSingleLayerMode() ?
+                        (STATE_FLAGS | FLAG_DISABLE_RESTORE) : STATE_FLAGS);
     }
 
     @Override

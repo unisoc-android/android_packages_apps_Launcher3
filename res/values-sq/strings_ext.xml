@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"Simboli i palexuar"</string>
+<string name="unread_call">telefon</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">Email</string>
+<string name="unread_calendar">Kalendari</string>
+<string name="unread_hint">"Mungon leja e nevojshme <xliff:g id="unread_type">%1$s</xliff:g>, fillimisht apliko për leje."</string>
+<string name="pref_missed_call_count_title">Telefonatë e humbur</string>
+<string name="pref_missed_call_count_summary">"Zgjedh një aplikacion telefoni, shfaq mbi të numrat e thirrjeve të humbura"</string>
+<string name="pref_unread_sms_count_title">"Mesazh i palexuar"</string>
+<string name="pref_unread_sms_count_summary">"Zgjedh një aplikacion SMS, shfaq mbi të numrat e mesazheve të palexuar"</string>
+<string name="pref_unread_email_count_title">"Email i palexuar"</string>
+<string name="pref_unread_email_count_summary">"Zgjedh një aplikacion emaili, shfaq mbi të numrat e emaileve të palexuara"</string>
+<string name="pref_unread_calendar_count_title">"Kalendar i palexuar"</string>
+<string name="pref_unread_calendar_count_summary">"Zgjedh një aplikacion kalendari, shfaq mbi të ngjarjet e palexuara të kalendarit"</string>
+<string name="selected_text">U zgjodh</string>
+<string name="dynamic_icon_title">"Ikona dinamike"</string>
+<string name="allow_circular_sliding_title">"Qarku i ekranit Home"</string>
+<string name="allow_circular_sliding_summary">"Nëse ka faqen e zakonshme të majtë, nuk lejohet qarku i ekrani Home"</string>
+<string name="pull_down_action_pref_title">"Veprimi i tërheqjes poshtë"</string>
+<string name="pull_down_do_nothing">Mos bëj asgjë</string>
+<string name="pull_down_notification">Shfaq njoftimet</string>
+<string name="pull_down_search">"Hap kërkimin"</string>
+<string name="home_screen_style_title">"Stili i ekranit Home"</string>
+<string name="home_screen_style_single">"Shtresë teke"</string>
+<string name="home_screen_style_dual">"Shtresë e dyfishtë"</string>
+<string name="home_screen_style_notification">"Duke aplikuar ndryshimet në stilin e ekranit Home"</string>
+<string name="folder_icon_model_pref_title">"Stili i ikonës së dosjeve"</string>
+<string name="auto_model">Auto</string>
+<string name="annular_model">"E rrumbullakët"</string>
+<string name="grid_model">"rrjet"</string>
+<string name="desktop_grid">"Rrjetë desktopi"</string>
+<string name="notification_dots_ext_title">"Shfaq numrin e pikave të njoftimit"</string>
+<string name="notification_dots_ext_summary">"Kur pikat e njoftimit është ndezur"</string>
+</resources>

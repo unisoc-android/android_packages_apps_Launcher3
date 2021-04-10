@@ -37,6 +37,7 @@ import android.view.View;
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.DragSource;
 import com.android.launcher3.DropTarget;
+import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
@@ -290,6 +291,12 @@ public class DragController implements DragDriver.EventListener, TouchController
             if (dragInfo instanceof WorkspaceItemInfo) {
                 ComponentName cn = dragInfo.getTargetComponent();
                 if (cn != null && matcher.matches(dragInfo, cn)) {
+                    mDragObject.dragItemRemoved = true;
+                    cancelDrag();
+                }
+            } else if (dragInfo instanceof FolderInfo) {
+                if (((FolderInfo) dragInfo).contents.size() <= 1) {
+                    mDragObject.dragItemRemoved = true;
                     cancelDrag();
                 }
             }

@@ -96,6 +96,16 @@ public class WallpaperOffsetInterpolator extends BroadcastReceiver {
             return;
         }
 
+        // Circle slide wallpaper offset
+        if (mWorkspace.enableLoop()) {
+            if (scroll < 0) {
+                // Here we assume that one page occupied width is equals to view port's width.
+                scroll = Math.abs(scroll * (numScrollingPages - 1));
+            } else if (scroll > scrollRange) {
+                scroll = scrollRange - (scroll - scrollRange) * (numScrollingPages - 1);
+            }
+        }
+
         // Sometimes the left parameter of the pages is animated during a layout transition;
         // this parameter offsets it to keep the wallpaper from animating as well
         int adjustedScroll = scroll - leftPageScrollX -
@@ -118,7 +128,7 @@ public class WallpaperOffsetInterpolator extends BroadcastReceiver {
         return ((float) sTempInt[0]) / sTempInt[1];
     }
 
-    private int getNumScreensExcludingEmpty() {
+    public int getNumScreensExcludingEmpty() {
         int numScrollingPages = mWorkspace.getChildCount();
         if (numScrollingPages >= MIN_PARALLAX_PAGE_SPAN && mWorkspace.hasExtraEmptyScreen()) {
             return numScrollingPages - 1;

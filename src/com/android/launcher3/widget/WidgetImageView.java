@@ -92,8 +92,11 @@ public class WidgetImageView extends View {
         float myWidth = getWidth();
         float myHeight = getHeight();
         float bitmapWidth = mBitmap.getWidth();
+        float bitmapHeight = mBitmap.getHeight();
 
-        final float scale = bitmapWidth > myWidth ? myWidth / bitmapWidth : 1;
+        final float wScale = bitmapWidth > myWidth ? myWidth / bitmapWidth : 1;
+        final float hScale = bitmapHeight > myHeight ? myHeight / bitmapHeight : 1;
+        final float scale = Math.min(wScale, hScale);
         float scaledWidth = bitmapWidth * scale;
         float scaledHeight = mBitmap.getHeight() * scale;
 

@@ -56,6 +56,7 @@ public final class TaskHolder extends ViewHolder {
      */
     public void bindTask(@NonNull Task task, boolean willAnimate) {
         mTask = task;
+        mTaskItemView.initLockedStatus(mTaskItemView.getContext(), task);
         if (willAnimate) {
             mTaskItemView.startContentAnimation(task.icon, task.thumbnail, task.titleDescription);
         } else {

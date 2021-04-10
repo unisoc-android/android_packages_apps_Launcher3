@@ -708,8 +708,10 @@ public class TouchInteractionService extends Service implements
             pw.println("  assistantAvailable=" + mAssistantAvailable);
             pw.println("  assistantDisabled="
                     + QuickStepContract.isAssistantGestureDisabled(mSystemUiStateFlags));
-            pw.println("  resumed="
-                    + mOverviewComponentObserver.getActivityControlHelper().isResumed());
+            if (null != mOverviewComponentObserver) {
+                pw.println("  resumed="
+                        + mOverviewComponentObserver.getActivityControlHelper().isResumed());
+            }
             pw.println("  useSharedState=" + mConsumer.useSharedSwipeState());
             if (mConsumer.useSharedSwipeState()) {
                 sSwipeSharedState.dump("    ", pw);

@@ -117,4 +117,32 @@ public class BaseOverview extends LauncherInstrumentation.VisibleContainer {
             return new OverviewTask(mLauncher, widestTask, this);
         }
     }
+
+    /**
+     * Dismissed all tasks by scrolling to Clear-all button and pressing it.
+     */
+    public void flingForwardToEnd(int taskCount) {
+        try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
+                "fling forward to end")) {
+            for (int i = 0;i < taskCount;++i) {
+                flingForward();
+            }
+        }
+    }
+
+    /**
+     * Dismissed all tasks by bottom Clear-all button and pressing it.
+     */
+    public Workspace dismissAllTasksByBottomButton() {
+        try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
+                "dismissing all tasks")) {
+
+            final UiObject2 clearAllSelector = mLauncher.waitForLauncherObject("clear_all_button");
+            clearAllSelector.click();
+            try (LauncherInstrumentation.Closable c1 = mLauncher.addContextLayer(
+                    "dismissed all tasks")) {
+                return new Workspace(mLauncher);
+            }
+        }
+    }
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"ใช้ได้ <xliff:g id="count">%1$s</xliff:g>"</string>
+<string name="recents_clean_finished_toast">"คืนหน่วยความจำ <xliff:g id="count">%1$s</xliff:g> ตอนนี้ใช้ได้ <xliff:g id="count">%2$s</xliff:g>"</string>
+<string name="recents_nothing_to_clear">"ไม่มีข้อมูลที่จะล้างในแคช"</string>
+</resources>

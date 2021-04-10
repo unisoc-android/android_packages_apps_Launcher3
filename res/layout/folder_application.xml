@@ -19,5 +19,4 @@
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
     style="@style/BaseIcon"
     android:textColor="?attr/folderTextColor"
-    android:includeFontPadding="false"
     launcher:iconDisplay="folder" />

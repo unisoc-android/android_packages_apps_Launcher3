@@ -36,6 +36,7 @@ import com.android.launcher3.LauncherStateManager.AnimationConfig;
 import com.android.launcher3.LauncherStateManager.StateHandler;
 import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.anim.PropertySetter;
+import com.sprd.ext.FeatureOption;
 
 import androidx.annotation.NonNull;
 
@@ -109,7 +110,8 @@ public abstract class BaseRecentsViewStateController<T extends View>
         setter.setFloat(mRecentsView, View.TRANSLATION_Y, scaleAndTranslation.translationY,
                 translateYInterpolator);
         setter.setFloat(mRecentsView, getContentAlphaProperty(), toState.overviewUi ? 1 : 0,
-                builder.getInterpolator(ANIM_OVERVIEW_FADE, AGGRESSIVE_EASE_IN_OUT));
+                FeatureOption.SPRD_ALLAPP_BG_TRANSPARENT_SUPPORT.get() ? LINEAR
+                        : builder.getInterpolator(ANIM_OVERVIEW_FADE, AGGRESSIVE_EASE_IN_OUT));
     }
 
     /**

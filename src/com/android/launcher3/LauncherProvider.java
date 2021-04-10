@@ -18,6 +18,7 @@ package com.android.launcher3;
 
 import static com.android.launcher3.provider.LauncherDbUtils.dropTable;
 import static com.android.launcher3.provider.LauncherDbUtils.tableExists;
+import static com.sprd.ext.FeatureOption.SPRD_DESKTOP_GRID_SUPPORT;
 
 import android.annotation.TargetApi;
 import android.app.backup.BackupManager;
@@ -32,8 +33,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ProviderInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -50,7 +49,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import android.os.UserHandle;
-import android.os.UserManager;
 import android.provider.BaseColumns;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -72,12 +70,14 @@ import com.android.launcher3.util.IntSet;
 import com.android.launcher3.util.NoLocaleSQLiteHelper;
 import com.android.launcher3.util.Preconditions;
 import com.android.launcher3.util.Thunk;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.multimode.MultiModeController;
 
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -88,7 +88,7 @@ import java.util.Locale;
 
 public class LauncherProvider extends ContentProvider {
     private static final String TAG = "LauncherProvider";
-    private static final boolean LOGD = false;
+    private static final boolean LOGD = LogUtils.DEBUG;
 
     private static final String DOWNGRADE_SCHEMA_FILE = "downgrade_schema.json";
 
@@ -121,9 +121,7 @@ public class LauncherProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        if (FeatureFlags.IS_DOGFOOD_BUILD) {
-            Log.d(TAG, "Launcher process started");
-        }
+        if (LOGD) LogUtils.d(TAG, "Launcher process started");
         mListenerHandler = new Handler(mListenerWrapper);
 
         // The content provider exists for the entire duration of the launcher main process and
@@ -155,7 +153,12 @@ public class LauncherProvider extends ContentProvider {
      */
     protected synchronized void createDbIfNotExists() {
         if (mOpenHelper == null) {
+            // we must init app monitor before call the DatabaseHelper constructor function
+            // when multi mode feature is supported.
+            MultiModeController.initControllerIfNeeded(getContext());
             mOpenHelper = new DatabaseHelper(getContext(), mListenerHandler);
+            // Restore cur mode Shortcut.
+            MultiModeController.restoreShortcutsIfNeeded(getContext());
 
             if (RestoreDbTask.isPending(getContext())) {
                 if (!RestoreDbTask.performRestore(getContext(), mOpenHelper,
@@ -345,7 +348,14 @@ public class LauncherProvider extends ContentProvider {
         addModifiedTime(values);
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count = db.update(args.table, values, args.where, args.args);
-        if (count > 0) notifyListeners();
+        if (count > 0) {
+            if (SPRD_DESKTOP_GRID_SUPPORT.get()) {
+                // Delete the backup database once the item updates. Make sure that the backup database
+                // is always consistent with the favorite database that before the grid size changed.
+                mOpenHelper.onAddOrDeleteOp(db);
+            }
+            notifyListeners();
+        }
 
         reloadLauncherIfExternal();
         return count;
@@ -360,13 +370,13 @@ public class LauncherProvider extends ContentProvider {
 
         switch (method) {
             case LauncherSettings.Settings.METHOD_CLEAR_EMPTY_DB_FLAG: {
-                clearFlagEmptyDbCreated();
+                clearFlagEmptyDbCreated(getContext(), mOpenHelper.getDatabaseName());
                 return null;
             }
             case LauncherSettings.Settings.METHOD_WAS_EMPTY_DB_CREATED : {
                 Bundle result = new Bundle();
                 result.putBoolean(LauncherSettings.Settings.EXTRA_VALUE,
-                        Utilities.getPrefs(getContext()).getBoolean(EMPTY_DATABASE_CREATED, false));
+                        getFlagEmptyDbCreated(getContext(), mOpenHelper.getDatabaseName()));
                 return result;
             }
             case LauncherSettings.Settings.METHOD_DELETE_EMPTY_FOLDERS: {
@@ -451,27 +461,40 @@ public class LauncherProvider extends ContentProvider {
         values.put(LauncherSettings.Favorites.MODIFIED, System.currentTimeMillis());
     }
 
-    private void clearFlagEmptyDbCreated() {
-        Utilities.getPrefs(getContext()).edit().remove(EMPTY_DATABASE_CREATED).commit();
+    private void clearFlagEmptyDbCreated(Context context, String dbName) {
+        Utilities.getPrefs(getContext()).edit().remove(getEmptyDbCreatedPrefKey(context, dbName)).commit();
+    }
+
+    private static void setFlagEmptyDbCreated(Context context, boolean flag, String dbName) {
+        Utilities.getPrefs(context).edit().putBoolean(getEmptyDbCreatedPrefKey(context, dbName), flag).commit();
+    }
+
+    private static boolean getFlagEmptyDbCreated(Context context, String dbName) {
+        return Utilities.getPrefs(context).getBoolean(getEmptyDbCreatedPrefKey(context, dbName), false);
+    }
+
+    private static String getEmptyDbCreatedPrefKey(Context context, String dbName) {
+        return LauncherFiles.getLauncherDb(context).equals(dbName)
+                ? MultiModeController.getKeyByMode(context, EMPTY_DATABASE_CREATED)
+                : MultiModeController.getKeyByPreMode(context, EMPTY_DATABASE_CREATED);
     }
 
     /**
      * Loads the default workspace based on the following priority scheme:
-     *   1) From the app restrictions
-     *   2) From a package provided by play store
-     *   3) From a partner configuration APK, already in the system image
-     *   4) The default configuration for the particular device
+     * 1) From the app restrictions
+     * 2) From a package provided by play store
+     * 3) From a partner configuration APK, already in the system image
+     * 4) The default configuration for the particular device
      */
     synchronized private void loadDefaultFavoritesIfNecessary() {
-        SharedPreferences sp = Utilities.getPrefs(getContext());
 
-        if (sp.getBoolean(EMPTY_DATABASE_CREATED, false)) {
+        if (getFlagEmptyDbCreated(getContext(), mOpenHelper.getDatabaseName())) {
             Log.d(TAG, "loading default workspace");
 
             AppWidgetHost widgetHost = mOpenHelper.newLauncherWidgetHost();
             AutoInstallsLayout loader = createWorkspaceLoaderFromAppRestriction(widgetHost);
             if (loader == null) {
-                loader = AutoInstallsLayout.get(getContext(),widgetHost, mOpenHelper);
+                loader = AutoInstallsLayout.get(getContext(), widgetHost, mOpenHelper);
             }
             if (loader == null) {
                 final Partner partner = Partner.get(getContext().getPackageManager());
@@ -502,7 +525,7 @@ public class LauncherProvider extends ContentProvider {
                 mOpenHelper.loadFavorites(mOpenHelper.getWritableDatabase(),
                         getDefaultLayoutParser(widgetHost));
             }
-            clearFlagEmptyDbCreated();
+            clearFlagEmptyDbCreated(getContext(), mOpenHelper.getDatabaseName());
         }
     }
 
@@ -574,7 +597,7 @@ public class LauncherProvider extends ContentProvider {
         private boolean mBackupTableExists;
 
         DatabaseHelper(Context context, Handler widgetHostResetHandler) {
-            this(context, widgetHostResetHandler, LauncherFiles.LAUNCHER_DB);
+            this(context, widgetHostResetHandler, LauncherFiles.getLauncherDb(context));
             // Table creation sometimes fails silently, which leads to a crash loop.
             // This way, we will try to create a table every time after crash, so the device
             // would eventually be able to recover.
@@ -612,7 +635,7 @@ public class LauncherProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            if (LOGD) Log.d(TAG, "creating new launcher database");
+            if (LOGD) Log.d(TAG, "creating new launcher database:" + getDatabaseName());
 
             mMaxItemId = 1;
             mMaxScreenId = 0;
@@ -636,14 +659,15 @@ public class LauncherProvider extends ContentProvider {
          */
         protected void onEmptyDbCreated() {
             // Database was just created, so wipe any previous widgets
-            if (mWidgetHostResetHandler != null) {
+            if (mWidgetHostResetHandler != null && getPreModeSavedWidgets().isEmpty()) {
                 newLauncherWidgetHost().deleteHost();
                 mWidgetHostResetHandler.sendEmptyMessage(
                         ChangeListenerWrapper.MSG_APP_WIDGET_HOST_RESET);
+                LogUtils.d(TAG, "Wipe any previous widgets");
             }
 
             // Set the flag for empty DB
-            Utilities.getPrefs(mContext).edit().putBoolean(EMPTY_DATABASE_CREATED, true).commit();
+            setFlagEmptyDbCreated(mContext, true, getDatabaseName());
         }
 
         public long getSerialNumberForUser(UserHandle user) {
@@ -690,6 +714,8 @@ public class LauncherProvider extends ContentProvider {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (LOGD) Log.d(TAG, "onUpgrade triggered: " + oldVersion);
+            LauncherAppMonitor.getInstance(mContext).onLauncherDbUpgrade(db, oldVersion, newVersion);
+
             switch (oldVersion) {
                 // The version cannot be lower that 12, as Launcher3 never supported a lower
                 // version of the DB.
@@ -830,11 +856,10 @@ public class LauncherProvider extends ContentProvider {
                 Log.e(TAG, "getAppWidgetIds not supported", e);
                 return;
             }
-            final IntSet validWidgets = IntSet.wrap(LauncherDbUtils.queryIntArray(db,
-                    Favorites.TABLE_NAME, Favorites.APPWIDGET_ID,
-                    "itemType=" + Favorites.ITEM_TYPE_APPWIDGET, null, null));
+            final IntSet validWidgets = queryWidgetsFromeDb(db);
+            final IntSet preModeValidWidgets = getPreModeSavedWidgets();
             for (int widgetId : allWidgets) {
-                if (!validWidgets.contains(widgetId)) {
+                if (!validWidgets.contains(widgetId) && !preModeValidWidgets.contains(widgetId)) {
                     try {
                         FileLog.d(TAG, "Deleting invalid widget " + widgetId);
                         host.deleteAppWidgetId(widgetId);
@@ -843,6 +868,27 @@ public class LauncherProvider extends ContentProvider {
                     }
                 }
             }
+        }
+
+        private IntSet getPreModeSavedWidgets() {
+            IntSet validWidgets = new IntSet();
+            if (MultiModeController.isSupportDynamicChange()) {
+                DatabaseHelper dbHelper = new DatabaseHelper(mContext, null,
+                        LauncherFiles.getLauncherNonCurModeDb(mContext));
+                validWidgets = queryWidgetsFromeDb(dbHelper.getWritableDatabase());
+                dbHelper.close();
+
+                if (LogUtils.DEBUG_WIDGET) {
+                    LogUtils.d(TAG, "getPreModeSavedWidgets:" + validWidgets);
+                }
+            }
+            return validWidgets;
+        }
+
+        private IntSet queryWidgetsFromeDb(SQLiteDatabase db) {
+            return IntSet.wrap(LauncherDbUtils.queryIntArray(
+                    db, Favorites.TABLE_NAME, Favorites.APPWIDGET_ID,
+                    "itemType=" + Favorites.ITEM_TYPE_APPWIDGET, null, null));
         }
 
         /**

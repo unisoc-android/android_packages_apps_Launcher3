@@ -30,6 +30,9 @@ import com.android.launcher3.CellLayout.ContainerType;
 import com.android.launcher3.graphics.IconShape;
 import com.android.launcher3.icons.DotRenderer;
 import com.android.launcher3.icons.IconNormalizer;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.icon.IconLabelController;
+import com.sprd.ext.navigationbar.NavigationBarController;
 
 public class DeviceProfile {
 
@@ -81,6 +84,8 @@ public class DeviceProfile {
     public int iconTextSizePx;
     public int iconDrawablePaddingPx;
     public int iconDrawablePaddingOriginalPx;
+
+    public int maxIconLabelLines;
 
     public int cellWidthPx;
     public int cellHeightPx;
@@ -188,6 +193,10 @@ public class DeviceProfile {
         verticalDragHandleOverlapWorkspace =
                 res.getDimensionPixelSize(R.dimen.vertical_drag_handle_overlap_workspace);
 
+        IconLabelController ilc = LauncherAppMonitor.getInstance(context).getIconLabelController();
+        maxIconLabelLines = ilc != null ?
+                ilc.getIconLabelLine() : IconLabelController.MIN_ICON_LABEL_LINE;
+
         iconDrawablePaddingOriginalPx =
                 res.getDimensionPixelSize(R.dimen.dynamic_grid_icon_drawable_padding);
         dropTargetBarSizePx = res.getDimensionPixelSize(R.dimen.dynamic_grid_drop_target_size);
@@ -290,7 +299,7 @@ public class DeviceProfile {
         // All Apps cell height.
         int topBottomPadding = allAppsIconDrawablePaddingPx * (isVerticalBarLayout() ? 2 : 1);
         allAppsCellHeightPx = allAppsIconSizePx + allAppsIconDrawablePaddingPx
-                + Utilities.calculateTextHeight(allAppsIconTextSizePx)
+                + Utilities.calculateTextHeight(allAppsIconTextSizePx) * maxIconLabelLines
                 + topBottomPadding * 2;
     }
 
@@ -315,16 +324,35 @@ public class DeviceProfile {
         iconTextSizePx = (int) (Utilities.pxFromSp(inv.iconTextSize, dm) * scale);
         iconDrawablePaddingPx = (int) (iconDrawablePaddingOriginalPx * scale);
 
-        cellHeightPx = iconSizePx + iconDrawablePaddingPx
-                + Utilities.calculateTextHeight(iconTextSizePx);
+        int cellHeightPxWithoutPadding = iconSizePx
+                + Utilities.calculateTextHeight(iconTextSizePx) * maxIconLabelLines;
+        cellHeightPx = cellHeightPxWithoutPadding + iconDrawablePaddingPx;
         int cellYPadding = (getCellSize().y - cellHeightPx) / 2;
+        boolean isLabelHasCut = false;
         if (iconDrawablePaddingPx > cellYPadding && !isVerticalLayout
                 && !isMultiWindowMode) {
             // Ensures that the label is closer to its corresponding icon. This is not an issue
             // with vertical bar layout or multi-window mode since the issue is handled separately
             // with their calls to {@link #adjustToHideWorkspaceLabels}.
-            cellHeightPx -= (iconDrawablePaddingPx - cellYPadding);
-            iconDrawablePaddingPx = cellYPadding;
+            if (maxIconLabelLines == 1 && cellYPadding > 0) {
+                cellHeightPx -= (iconDrawablePaddingPx - cellYPadding);
+                iconDrawablePaddingPx = cellYPadding;
+            } else {
+                // If there is not enough space to display the icon label,
+                // need to adjust iconDrawablePaddingPx, iconTextSizePx and iconSizePx.
+                int adjustPadding = (getCellSize().y - cellHeightPxWithoutPadding) / 2;
+                if (adjustPadding > 0) {
+                    iconDrawablePaddingPx = adjustPadding / 2;
+                    cellHeightPx = cellHeightPxWithoutPadding + iconDrawablePaddingPx;
+                } else {
+                    isLabelHasCut = true;
+                    cellHeightPx = cellHeightPxWithoutPadding + adjustPadding * 2;
+                    iconDrawablePaddingPx = 0;
+                    float iconScale = (float) cellHeightPx / cellHeightPxWithoutPadding;
+                    iconTextSizePx = (int) (iconTextSizePx * iconScale);
+                    iconSizePx = (int)(iconSizePx * iconScale);
+                }
+            }
         }
         cellWidthPx = iconSizePx + iconDrawablePaddingPx;
 
@@ -332,7 +360,7 @@ public class DeviceProfile {
         allAppsIconTextSizePx = iconTextSizePx;
         allAppsIconSizePx = iconSizePx;
         allAppsIconDrawablePaddingPx = iconDrawablePaddingPx;
-        allAppsCellHeightPx = getCellSize().y;
+        allAppsCellHeightPx = isLabelHasCut ? cellHeightPx : getCellSize().y;
 
         if (isVerticalLayout) {
             // Always hide the Workspace text with vertical bar layout.
@@ -375,8 +403,8 @@ public class DeviceProfile {
         Point totalWorkspacePadding = getTotalWorkspacePadding();
 
         // Check if the icons fit within the available height.
-        float usedHeight = folderCellHeightPx * inv.numFolderRows + folderBottomPanelSize;
-        int maxHeight = availableHeightPx - totalWorkspacePadding.y - folderMargin;
+        float usedHeight = folderCellHeightPx * inv.numFolderRows;
+        int maxHeight = availableHeightPx - totalWorkspacePadding.y - folderMargin - folderBottomPanelSize;
         float scaleY = maxHeight / usedHeight;
 
         // Check if the icons fit within the available width.
@@ -395,7 +423,7 @@ public class DeviceProfile {
         folderChildTextSizePx =
                 (int) (res.getDimensionPixelSize(R.dimen.folder_child_text_size) * scale);
 
-        int textHeight = Utilities.calculateTextHeight(folderChildTextSizePx);
+        int textHeight = Utilities.calculateTextHeight(folderChildTextSizePx) * maxIconLabelLines;
         int cellPaddingX = (int) (res.getDimensionPixelSize(R.dimen.folder_cell_x_padding) * scale);
         int cellPaddingY = (int) (res.getDimensionPixelSize(R.dimen.folder_cell_y_padding) * scale);
 
@@ -445,11 +473,22 @@ public class DeviceProfile {
         if (isVerticalBarLayout()) {
             padding.top = 0;
             padding.bottom = edgeMarginPx;
+
+            int offset = 0;
+            if (isMultiWindowMode) {
+                LauncherAppMonitor monitor = LauncherAppMonitor.getInstanceNoCreate();
+                if (null != monitor) {
+                    NavigationBarController nbc = monitor.getNavigationBarController();
+                    if (null != nbc && nbc.isDynamicNavigationBarShowing()) {
+                        offset = mInsets.top;
+                    }
+                }
+            }
             if (isSeascape()) {
                 padding.left = hotseatBarSizePx;
-                padding.right = verticalDragHandleSizePx;
+                padding.right = verticalDragHandleSizePx + offset;
             } else {
-                padding.left = verticalDragHandleSizePx;
+                padding.left = verticalDragHandleSizePx + offset;
                 padding.right = hotseatBarSizePx;
             }
         } else {

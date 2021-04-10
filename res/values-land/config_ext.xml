@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--add for folder icon Model-->
+    <integer name="grid_folder_page_rows">3</integer>
+    <integer name="grid_folder_page_columns">3</integer>
+</resources>

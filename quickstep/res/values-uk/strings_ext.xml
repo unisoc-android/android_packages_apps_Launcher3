@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"Доступно <xliff:g id="count">%1$s</xliff:g>"</string>
+<string name="recents_clean_finished_toast">"Звільніть <xliff:g id="count">%1$s</xliff:g> пам\'яті, зараз доступно <xliff:g id="count">%2$s</xliff:g>."</string>
+<string name="recents_nothing_to_clear">"Кеш не містить даних для видалення"</string>
+</resources>

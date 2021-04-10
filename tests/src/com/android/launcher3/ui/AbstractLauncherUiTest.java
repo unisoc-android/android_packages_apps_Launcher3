@@ -60,6 +60,7 @@ import com.android.launcher3.util.Wait;
 import com.android.launcher3.util.rule.FailureWatcher;
 import com.android.launcher3.util.rule.LauncherActivityRule;
 import com.android.launcher3.util.rule.ShellCommandRule;
+import com.sprd.ext.multimode.MultiModeController;
 
 import org.junit.After;
 import org.junit.Before;
@@ -96,6 +97,7 @@ public abstract class AbstractLauncherUiTest {
             new LauncherInstrumentation(getInstrumentation());
     protected Context mTargetContext;
     protected String mTargetPackage;
+    protected boolean isInSingleMode;
 
     protected AbstractLauncherUiTest() {
         try {
@@ -144,6 +146,8 @@ public abstract class AbstractLauncherUiTest {
 
         mTargetContext = InstrumentationRegistry.getTargetContext();
         mTargetPackage = mTargetContext.getPackageName();
+        isInSingleMode = MultiModeController.isSingleLayerMode(mTargetContext);
+
         // Unlock the phone
         mDevice.executeShellCommand("input keyevent 82");
     }
@@ -347,7 +351,7 @@ public abstract class AbstractLauncherUiTest {
         final Intent intent = instrumentation.getContext().getPackageManager().
                 getLaunchIntentForPackage(packageName);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setComponent(new ComponentName(packageName,
                 "com.android.launcher3.tests.Activity" + activityNumber));
         instrumentation.getTargetContext().startActivity(intent);

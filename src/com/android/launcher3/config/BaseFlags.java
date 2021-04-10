@@ -26,16 +26,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 
-import androidx.annotation.GuardedBy;
-import androidx.annotation.Keep;
-import androidx.annotation.VisibleForTesting;
-
 import com.android.launcher3.Utilities;
+import com.sprd.ext.FeatureOption;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import androidx.annotation.GuardedBy;
+import androidx.annotation.Keep;
+import androidx.annotation.VisibleForTesting;
 
 /**
  * Defines a set of flags used to control various launcher behaviors.
@@ -45,7 +47,7 @@ import java.util.TreeMap;
  * <p>This class is kept package-private to prevent direct access.
  */
 @Keep
-abstract class BaseFlags {
+public abstract class BaseFlags {
 
     private static final Object sLock = new Object();
     @GuardedBy("sLock")
@@ -58,7 +60,7 @@ abstract class BaseFlags {
     }
 
     public static boolean showFlagTogglerUi(Context context) {
-        return Utilities.IS_DEBUG_DEVICE && Utilities.isDevelopersOptionsEnabled(context);
+        return ENABLE_DEBUG && Utilities.isDevelopersOptionsEnabled(context);
     }
 
     public static final boolean IS_DOGFOOD_BUILD = false;
@@ -73,7 +75,7 @@ abstract class BaseFlags {
             "An example flag that doesn't do anything. Useful for testing");
 
     //Feature flag to enable pulling down navigation shade from workspace.
-    public static final boolean PULL_DOWN_STATUS_BAR = true;
+    public static final boolean PULL_DOWN_STATUS_BAR = !FeatureOption.SPRD_GESTURE_ENABLE;
 
     // When true, custom widgets are loaded using CustomWidgetParser.
     public static final boolean ENABLE_CUSTOM_WIDGETS = false;
@@ -112,9 +114,11 @@ abstract class BaseFlags {
             "FAKE_LANDSCAPE_UI", false,
             "Rotate launcher UI instead of using transposed layout");
 
+    public static boolean ENABLE_DEBUG = (FeatureOption.enableDebugFeatures() || Utilities.IS_DEBUG_DEVICE);
+
     public static void initialize(Context context) {
         // Avoid the disk read for user builds
-        if (Utilities.IS_DEBUG_DEVICE) {
+        if (ENABLE_DEBUG) {
             synchronized (sLock) {
                 for (TogglableFlag flag : sFlags) {
                     flag.initialize(context);
@@ -144,7 +148,7 @@ abstract class BaseFlags {
         private final String description;
         private boolean currentValue;
 
-        TogglableFlag(
+        public TogglableFlag(
                 String key,
                 boolean defaultValue,
                 String description) {
@@ -158,7 +162,7 @@ abstract class BaseFlags {
 
         /** Set the value of this flag. This should only be used in tests. */
         @VisibleForTesting
-        void setForTests(boolean value) {
+        public void setForTests(boolean value) {
             currentValue = value;
         }
 
@@ -202,6 +206,7 @@ abstract class BaseFlags {
         public String toString() {
             return "TogglableFlag{"
                     + "key=" + key + ", "
+                    + "currentValue =" + currentValue + ", "
                     + "defaultValue=" + defaultValue + ", "
                     + "description=" + description
                     + "}";
@@ -275,6 +280,18 @@ abstract class BaseFlags {
                 return defaultValue;
             }
             return Settings.Global.getInt(contentResolver, getKey(), defaultValue ? 1 : 0) == 1;
+        }
+    }
+
+    public static void dumpState(PrintWriter writer, boolean dumpAll) {
+        if (dumpAll) {
+            synchronized (sLock) {
+                writer.println();
+                for (TogglableFlag flag : sFlags) {
+                    writer.println("Features Flags:" + flag);
+                }
+                writer.println();
+            }
         }
     }
 }

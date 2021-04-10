@@ -1,0 +1,14 @@
+# Model data used by CustomizeAppSortTest
+
+classMap s com.android.launcher3.WorkspaceItemInfo
+
+allApps componentName=app1/class1 intent=component=app1/class1
+allApps componentName=app1/class2 intent=component=app1/class2
+allApps componentName=app2/class1 intent=component=app2/class1
+allApps componentName=app2/class2 intent=component=app2/class2
+
+# App Sort configs
+appSort app1/class2#0
+appSort app2/class2#1
+appSort app1/class1#2
+appSort app2/class1#1024

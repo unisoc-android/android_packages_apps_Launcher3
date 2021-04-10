@@ -425,6 +425,7 @@ public class OtherActivityInputConsumer extends ContextWrapper implements InputC
         Preconditions.assertUIThread();
         removeListener();
         mInteractionHandler = null;
+        mMotionPauseDetector.clear();
         mOnCompleteCallback.accept(this);
     }
 

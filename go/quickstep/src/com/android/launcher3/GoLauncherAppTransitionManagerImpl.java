@@ -81,7 +81,7 @@ public final class GoLauncherAppTransitionManagerImpl extends QuickstepAppTransi
                     && (mLauncher.getStateManager().getState() == LauncherState.OVERVIEW);
             if (isGoingToRecents) {
                 IconRecentsView recentsView = mLauncher.getOverviewPanel();
-                if (!recentsView.isReadyForRemoteAnim()) {
+                if (recentsView != null && !recentsView.isReadyForRemoteAnim()) {
                     recentsView.setOnReadyForRemoteAnimCallback(() ->
                         postAsyncCallback(mHandler, () -> onCreateAnimation(targetCompats, result))
                     );

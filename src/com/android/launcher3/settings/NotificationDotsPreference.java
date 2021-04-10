@@ -33,6 +33,7 @@ import android.view.View;
 import com.android.launcher3.R;
 import com.android.launcher3.notification.NotificationListener;
 import com.android.launcher3.util.SecureSettingsObserver;
+import com.sprd.ext.notificationdots.NotifyDotsNumUtils;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
@@ -106,6 +107,7 @@ public class NotificationDotsPreference extends Preference
         setWidgetFrameVisible(!serviceEnabled);
         setFragment(serviceEnabled ? null : NotificationAccessConfirmation.class.getName());
         setSummary(summary);
+        NotifyDotsNumUtils.setNotifyDotsExtPrefEnabled(getContext(), enabled && !mWidgetFrameVisible);
     }
 
     public static class NotificationAccessConfirmation

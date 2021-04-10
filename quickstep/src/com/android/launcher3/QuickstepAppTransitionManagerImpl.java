@@ -176,7 +176,9 @@ public abstract class QuickstepAppTransitionManagerImpl extends LauncherAppTrans
         mClosingWindowTransY = res.getDimensionPixelSize(R.dimen.closing_window_trans_y);
 
         mLauncher.addOnDeviceProfileChangeListener(this);
-        registerRemoteAnimations();
+        if (com.sprd.ext.FeatureOption.SPRD_APP_REMOTE_ANIM_SUPPORT.get()) {
+            registerRemoteAnimations();
+        }
     }
 
     @Override

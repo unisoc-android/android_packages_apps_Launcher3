@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="unread_notifier_title">"Непрочитанная карточка"</string>
+    <string name="unread_call">"Телефон"</string>
+    <string name="unread_sms">"SMS"</string>
+    <string name="unread_email">"Эл. почта"</string>
+    <string name="unread_calendar">"Календарь"</string>
+    <string name="unread_hint">"Отсутствует обязательное право доступа <xliff:g id="unread_type">%1$s</xliff:g> - пожалуйста, сначала получите право доступа."</string>
+    <string name="pref_missed_call_count_title">"Пропущенный вызов"</string>
+    <string name="pref_missed_call_count_summary">"Выберите телефонное приложение, просмотрите в нем число пропущенных звонков"</string>
+    <string name="pref_unread_sms_count_title">"Непрочитанное сообщение"</string>
+    <string name="pref_unread_sms_count_summary">"Выберите SMS-приложение, просмотрите в нем число непрочитанных сообщений"</string>
+    <string name="pref_unread_email_count_title">"Непрочитанные письма"</string>
+    <string name="pref_unread_email_count_summary">"Выберите почтовую программу, просмотрите в ней число непрочитанных сообщений"</string>
+    <string name="pref_unread_calendar_count_title">"Непрочитанный календарь"</string>
+    <string name="pref_unread_calendar_count_summary">"Выберите программу-календарь, просмотрите в ней непрочитанные календарные события"</string>
+    <string name="selected_text">"Избранное"</string>
+    <string name="dynamic_icon_title">"Динамический значок"</string>
+    <string name="allow_circular_sliding_title">"Цикл начального экрана"</string>
+    <string name="allow_circular_sliding_summary">"Настройка левой страницы пользовательского контента не допускает цикл начального экрана"</string>
+    <string name="pull_down_action_pref_title">"Протяжка вниз"</string>
+    <string name="pull_down_do_nothing">"Не менять настройки"</string>
+    <string name="pull_down_notification">"Включить уведомления"</string>
+    <string name="pull_down_search">"Открыть поиск"</string>
+    <string name="home_screen_style_title">"Стиль главного экрана"</string>
+    <string name="home_screen_style_single">"Один слой"</string>
+    <string name="home_screen_style_dual">"Два слоя"</string>
+    <string name="home_screen_style_notification">"Применение изменения стиля главного экрана"</string>
+    <string name="folder_icon_model_pref_title">"Стиль значка папки"</string>
+    <string name="auto_model">Авто</string>
+    <string name="annular_model">"Кольцевой"</string>
+    <string name="grid_model">"шкала"</string>
+    <string name="desktop_grid">"Сетка рабочего стола"</string>
+    <string name="notification_dots_ext_title">"Показать количество значков уведомлений"</string>
+    <string name="notification_dots_ext_summary">"Если значки уведомлений включены"</string>
+</resources>

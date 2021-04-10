@@ -44,6 +44,9 @@ public interface DropTarget {
          */
         public boolean dragComplete = false;
 
+        /** Indicates that the drag object was remove */
+        public boolean dragItemRemoved = false;
+
         /** The view that moves around while you drag.  */
         public DragView dragView = null;
 

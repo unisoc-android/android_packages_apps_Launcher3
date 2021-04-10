@@ -16,6 +16,7 @@
 
 package com.android.launcher3.model;
 
+import android.app.ActivityManager;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -27,6 +28,7 @@ import android.util.Log;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
+import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherAppWidgetHost;
 import com.android.launcher3.LauncherAppWidgetInfo;
@@ -42,6 +44,9 @@ import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.util.ContentWriter;
 import com.android.launcher3.util.ItemInfoMatcher;
 import com.android.launcher3.util.LooperExecutor;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.grid.HotseatController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,8 +93,16 @@ public class ModelWriter {
         // We store hotseat items in canonical form which is this orientation invariant position
         // in the hotseat
         if (container == Favorites.CONTAINER_HOTSEAT) {
-            item.screenId = mHasVerticalHotseat
-                    ? LauncherAppState.getIDP(mContext).numHotseatIcons - cellY - 1 : cellX;
+            LauncherAppMonitor monitor = LauncherAppMonitor.getInstance(mContext);
+            HotseatController hc = monitor.getHotseatController();
+            Launcher launcher = monitor.getLauncher();
+            // if hc is not null means hotseat feature is on, we need to get screenId from cellX or cellY.
+            if (hc != null && launcher != null) {
+                item.screenId = hc.getOrderInHotseat(launcher, cellX, cellY);
+            } else {
+                item.screenId = mHasVerticalHotseat
+                        ? LauncherAppState.getIDP(mContext).numHotseatIcons - cellY - 1 : cellX;
+            }
         } else {
             item.screenId = screenId;
         }
@@ -141,6 +154,16 @@ public class ModelWriter {
             RuntimeException e = new RuntimeException(msg);
             if (stackTrace != null) {
                 e.setStackTrace(stackTrace);
+            }
+
+            if (item instanceof LauncherAppWidgetInfo) {
+                LogUtils.w(TAG, "This item is a widget", e);
+                return;
+            }
+
+            if (ActivityManager.isUserAMonkey()) {
+                LogUtils.w(TAG, "This item is diff with mBgDataModel", e);
+                return;
             }
             throw e;
         }
@@ -367,9 +390,11 @@ public class ModelWriter {
         @Override
         public void run() {
             Uri uri = Favorites.getContentUri(mItemId);
-            mContext.getContentResolver().update(uri, mWriter.get().getValues(mContext),
-                    null, null);
-            updateItemArrays(mItem, mItemId);
+            if (mWriter.get() != null) {
+                mContext.getContentResolver().update(uri, mWriter.get().getValues(mContext),
+                        null, null);
+                updateItemArrays(mItem, mItemId);
+            }
         }
     }
 

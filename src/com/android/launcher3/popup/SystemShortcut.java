@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.BaseDraggingActivity;
@@ -138,6 +139,10 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity> extends Ite
                 return null;
             }
             return (view) -> {
+                if (launcher.getPackageManager().isSafeMode()) {
+                    Toast.makeText(launcher, R.string.safemode_widget_error, Toast.LENGTH_SHORT).show();
+                    return ;
+                }
                 AbstractFloatingView.closeAllOpenViews(launcher);
                 WidgetsBottomSheet widgetsBottomSheet =
                         (WidgetsBottomSheet) launcher.getLayoutInflater().inflate(

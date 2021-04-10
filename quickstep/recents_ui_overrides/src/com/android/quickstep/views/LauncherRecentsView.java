@@ -105,6 +105,9 @@ public class LauncherRecentsView extends RecentsView<Launcher> implements StateL
     protected void onTaskStackUpdated() {
         // Lazily update the empty message only when the task stack is reapplied
         updateEmptyMessage();
+        if (mClearAllController != null) {
+            mClearAllController.onTaskStackUpdated(getTaskViewCount() > 0);
+        }
     }
 
     /**
@@ -147,7 +150,8 @@ public class LauncherRecentsView extends RecentsView<Launcher> implements StateL
     @Override
     protected void onTaskLaunchAnimationUpdate(float progress, TaskView tv) {
         if (ENABLE_QUICKSTEP_LIVE_TILE.get()) {
-            if (mRecentsAnimationWrapper.targetSet != null && tv.isRunningTask()) {
+            if (mRecentsAnimationWrapper != null && mRecentsAnimationWrapper.targetSet != null
+                    && tv.isRunningTask()) {
                 mTransformParams.setProgress(1 - progress)
                         .setSyncTransactionApplier(mSyncTransactionApplier)
                         .setForLiveTile(true);

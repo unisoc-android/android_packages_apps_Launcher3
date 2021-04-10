@@ -23,6 +23,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 import androidx.test.filters.LargeTest;
 import androidx.test.runner.AndroidJUnit4;
@@ -34,7 +35,6 @@ import com.android.launcher3.tapl.AllApps;
 import com.android.launcher3.tapl.AppIcon;
 import com.android.launcher3.tapl.AppIconMenu;
 import com.android.launcher3.tapl.AppIconMenuItem;
-import com.android.launcher3.tapl.TestHelpers;
 import com.android.launcher3.tapl.Widgets;
 import com.android.launcher3.tapl.Workspace;
 import com.android.launcher3.views.OptionsPopupView;
@@ -104,6 +104,7 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
     @Test
     @Ignore
     public void testPressHomeOnAllAppsContextMenu() throws Exception {
+        assumeFalse(isInSingleMode);
         final AllApps allApps = mLauncher.getWorkspace().switchToAllApps();
         allApps.freeze();
         try {
@@ -147,7 +148,7 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
                     flingBackwardY < flingForwardY));
 
             // Test scrolling down to YouTube.
-            assertNotNull("All apps: can't fine YouTube", allApps.getAppIcon("YouTube"));
+            assertNotNull("All apps: can't fine Settings", allApps.getAppIcon("Settings"));
             // Test scrolling up to Camera.
             assertNotNull("All apps: can't fine Camera", allApps.getAppIcon("Camera"));
             // Test failing to find a non-existing app.
@@ -166,6 +167,9 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
     @Test
     @PortraitLandscape
     public void testWorkspaceSwitchToAllApps() {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         assertNotNull("switchToAllApps() returned null",
                 mLauncher.getWorkspace().switchToAllApps());
         assertTrue("Launcher internal state is not All Apps", isInState(LauncherState.ALL_APPS));
@@ -173,6 +177,9 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
 
     @Test
     public void testWorkspace() throws Exception {
+        // Workspace pages > 1 in single mode, fail in {@link isWorkspaceScrollable}, so ignore.
+        assumeFalse(isInSingleMode);
+
         final Workspace workspace = mLauncher.getWorkspace();
 
         // Test that ensureWorkspaceIsScrollable adds a page by dragging an icon there.
@@ -227,6 +234,9 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
     @Test
     @PortraitLandscape
     public void testAppIconLaunchFromAllAppsFromHome() throws Exception {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         final AllApps allApps = mLauncher.getWorkspace().switchToAllApps();
         assertTrue("Launcher internal state is not All Apps", isInState(LauncherState.ALL_APPS));
 
@@ -275,6 +285,9 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
     @Test
     @PortraitLandscape
     public void testLaunchMenuItem() throws Exception {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         final AllApps allApps = mLauncher.
                 getWorkspace().
                 switchToAllApps();
@@ -297,6 +310,9 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
     @Test
     @PortraitLandscape
     public void testDragAppIcon() throws Throwable {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         // 1. Open all apps and wait for load complete.
         // 2. Drag icon to homescreen.
         // 3. Verify that the icon works on homescreen.
@@ -321,6 +337,9 @@ public class TaplTestsLauncher3 extends AbstractLauncherUiTest {
     @Test
     @PortraitLandscape
     public void testDragShortcut() throws Throwable {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         // 1. Open all apps and wait for load complete.
         // 2. Find the app and long press it to show shortcuts.
         // 3. Press icon center until shortcuts appear

@@ -47,6 +47,11 @@ import com.android.launcher3.util.ConfigMonitor;
 import com.android.launcher3.util.IntArray;
 import com.android.launcher3.util.MainThreadInitializedObject;
 import com.android.launcher3.util.Themes;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.folder.FolderIconController;
+import com.sprd.ext.grid.DesktopGridController;
+import com.sprd.ext.multimode.MultiModeController;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -55,6 +60,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
@@ -65,7 +71,7 @@ public class InvariantDeviceProfile {
     public static final MainThreadInitializedObject<InvariantDeviceProfile> INSTANCE =
             new MainThreadInitializedObject<>(InvariantDeviceProfile::new);
 
-    private static final String KEY_IDP_GRID_NAME = "idp_grid_name";
+    public static final String KEY_IDP_GRID_NAME = "idp_grid_name";
 
     private static final float ICON_SIZE_DEFINED_IN_APP_DP = 48;
 
@@ -119,9 +125,14 @@ public class InvariantDeviceProfile {
     public Point defaultWallpaperSize;
     public Rect defaultWidgetPadding;
 
+    private String mIdpGridKey;
+
+    private LauncherAppMonitor mMonitor;
     private final ArrayList<OnIDPChangeListener> mChangeListeners = new ArrayList<>();
     private ConfigMonitor mConfigMonitor;
     private OverlayMonitor mOverlayMonitor;
+    private String mGridName;
+    private String mDisplayOptionName;
 
     @VisibleForTesting
     public InvariantDeviceProfile() {}
@@ -140,11 +151,16 @@ public class InvariantDeviceProfile {
         demoModeLayoutId = p.demoModeLayoutId;
         mExtraAttrs = p.mExtraAttrs;
         mOverlayMonitor = p.mOverlayMonitor;
+        mGridName = p.mGridName;
+        mDisplayOptionName = p.mDisplayOptionName;
     }
 
     @TargetApi(23)
     private InvariantDeviceProfile(Context context) {
-        initGrid(context, Utilities.getPrefs(context).getString(KEY_IDP_GRID_NAME, null));
+        mMonitor = LauncherAppMonitor.getInstance(context);
+        mIdpGridKey = MultiModeController.getKeyByMode(context, KEY_IDP_GRID_NAME);
+        initGrid(context,
+                Utilities.getPrefs(context).getString(mIdpGridKey, getDefaultGridName(context)));
         mConfigMonitor = new ConfigMonitor(context,
                 APPLY_CONFIG_AT_RUNTIME.get() ? this::onConfigChanged : this::killProcess);
         mOverlayMonitor = new OverlayMonitor(context);
@@ -204,7 +220,10 @@ public class InvariantDeviceProfile {
 
         if (!closestProfile.name.equals(gridName)) {
             Utilities.getPrefs(context).edit()
-                    .putString(KEY_IDP_GRID_NAME, closestProfile.name).apply();
+                    .putString(mIdpGridKey, closestProfile.name).apply();
+        }
+        if (mMonitor.getSRController() != null) {
+            mMonitor.getSRController().saveGridNameIntoStorage(context, closestProfile.name);
         }
 
         iconSize = interpolatedDisplayOption.iconSize;
@@ -230,6 +249,12 @@ public class InvariantDeviceProfile {
         portraitProfile = new DeviceProfile(context, this, smallestSize, largestSize,
                 smallSide, largeSide, false /* isLandscape */, false /* isMultiWindowMode */);
 
+        FolderIconController fic = mMonitor.getFolderIconController();
+        if (fic != null) {
+            fic.backupOriginalFolderRowAndColumns(numFolderRows, numFolderColumns);
+            fic.updateFolderRowAndColumns(this);
+        }
+
         // We need to ensure that there is enough extra space in the wallpaper
         // for the intended parallax effects
         if (context.getResources().getConfiguration().smallestScreenWidthDp >= 720) {
@@ -243,6 +268,8 @@ public class InvariantDeviceProfile {
         ComponentName cn = new ComponentName(context.getPackageName(), getClass().getName());
         defaultWidgetPadding = AppWidgetHostView.getDefaultPaddingForWidget(context, cn, null);
 
+        mDisplayOptionName = interpolatedDisplayOption.name;
+        mGridName = closestProfile.name;
         return closestProfile.name;
     }
 
@@ -277,20 +304,55 @@ public class InvariantDeviceProfile {
         }
     }
 
+    private String getDefaultGridName(Context context) {
+        String defaultGridName = "";
+
+        DesktopGridController gridController = mMonitor.getDesktopGridController();
+        if (gridController != null) {
+            defaultGridName = gridController.getDefaultGridName();
+
+            if (mMonitor.getSRController() != null
+                    && !gridController.isGridNameValid(defaultGridName)) {
+                if (LogUtils.DEBUG) {
+                    LogUtils.d(TAG, "The default grid name configured is invalid:" + defaultGridName);
+                }
+                defaultGridName = mMonitor.getSRController().getGridNameFromStorage(context);
+            }
+
+            if (LogUtils.DEBUG) {
+                LogUtils.d(TAG, "getDefaultGridName: defaultGridName = " + defaultGridName);
+            }
+        }
+
+        return defaultGridName;
+    }
+
     public void setCurrentGrid(Context context, String gridName) {
         Context appContext = context.getApplicationContext();
-        Utilities.getPrefs(appContext).edit().putString(KEY_IDP_GRID_NAME, gridName).apply();
-        new MainThreadExecutor().execute(() -> onConfigChanged(appContext));
+        Utilities.getPrefs(appContext).edit().putString(mIdpGridKey, gridName).apply();
+        new MainThreadExecutor().execute(() -> {
+            AppWidgetResizeFrame.resetWidgetCellSize();
+            onConfigChanged(appContext);
+        });
+    }
+
+    public void applyConfigChanged(Context context) {
+        new MainThreadExecutor().execute(() -> onConfigChanged(context.getApplicationContext()));
     }
 
     private void onConfigChanged(Context context) {
         // Config changes, what shall we do?
         InvariantDeviceProfile oldProfile = new InvariantDeviceProfile(this);
 
-        // Re-init grid
-        // TODO(b/131867841): We pass in null here so that we can calculate the closest profile
-        // without the bias of the grid name.
-        initGrid(context, null);
+        if (mMonitor.getDesktopGridController() != null) {
+            // Re-init grid by using the new grid name
+            initGrid(context,
+                    Utilities.getPrefs(context).getString(mIdpGridKey, getDefaultGridName(context)));
+        } else {
+            // TODO(b/131867841): We pass in null here so that we can calculate the closest profile
+            // without the bias of the grid name.
+            initGrid(context, null);
+        }
 
         int changeFlags = 0;
         if (numRows != oldProfile.numRows ||
@@ -309,6 +371,10 @@ public class InvariantDeviceProfile {
             IconShape.init(context);
         }
 
+        if (LogUtils.DEBUG_EXTERNAL_MSG) {
+            LogUtils.d(TAG, "onConfigChanged:oldProfile:\t" + oldProfile);
+            LogUtils.d(TAG, "onConfigChanged:newProfile:\t" + this);
+        }
         apply(context, changeFlags);
     }
 
@@ -422,11 +488,16 @@ public class InvariantDeviceProfile {
         }
 
         DisplayOption out = new DisplayOption();
+        out.name = "";
         for (int i = 0; i < points.size() && i < KNEARESTNEIGHBOR; ++i) {
             p = points.get(i);
             float w = weight(width, height, p.minWidthDps, p.minHeightDps, WEIGHT_POWER);
             weights += w;
             out.add(new DisplayOption().add(p).multiply(w));
+            if (!TextUtils.isEmpty(out.name)) {
+                out.name += "&";
+            }
+            out.name += "<" + (p.grid != null ? p.grid.name : "not found") + "," + p.name + ">";
         }
         return out.multiply(1.0f / weights);
     }
@@ -524,7 +595,7 @@ public class InvariantDeviceProfile {
     private static final class DisplayOption {
         private final GridOption grid;
 
-        private final String name;
+        private String name;
         private final float minWidthDps;
         private final float minHeightDps;
         private final boolean canBeDefault;
@@ -573,6 +644,17 @@ public class InvariantDeviceProfile {
             iconTextSize += p.iconTextSize;
             return this;
         }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "IDP [mGridName:" + mGridName + " mDisplayOptionName:" + mDisplayOptionName +
+                " numRows:" + numRows + " numColumns:" + numColumns +
+                " numHotseatIcons:" + numHotseatIcons + " numFolderRows:" + numFolderRows +
+                " numFolderColumns" + numFolderColumns + " iconSize:" + iconSize +
+                " iconShapePath:" + iconShapePath + " landscapeIconSize:" + landscapeIconSize +
+                " iconTextSize:" + iconTextSize + "]";
     }
 
     private class OverlayMonitor extends BroadcastReceiver {

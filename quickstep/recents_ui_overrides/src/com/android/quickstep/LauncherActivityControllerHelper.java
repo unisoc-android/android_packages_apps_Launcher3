@@ -55,6 +55,7 @@ import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherInitListenerEx;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.LauncherStateManager;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.allapps.DiscoveryBounce;
 import com.android.launcher3.anim.AnimatorPlaybackController;
 import com.android.launcher3.anim.AnimatorSetBuilder;
@@ -186,7 +187,9 @@ public final class LauncherActivityControllerHelper implements ActivityControlHe
                 // Stop scrolling so that it doesn't interfere with the translation offscreen.
                 recentsView.getScroller().forceFinished(true);
 
-                new StaggeredWorkspaceAnim(activity, workspaceView, velocity).start();
+                if (canUseWorkspaceView) {
+                    new StaggeredWorkspaceAnim(activity, workspaceView, velocity).start();
+                }
             }
         };
     }
@@ -219,8 +222,13 @@ public final class LauncherActivityControllerHelper implements ActivityControlHe
             private boolean mIsAttachedToWindow;
 
             @Override
-            public void createActivityController(long transitionLength) {
+            public void createActivityControllerWithoutAttachedToWindow(long transitionLength) {
                 createActivityControllerInternal(activity, fromState, transitionLength, callback);
+            }
+
+            @Override
+            public void createActivityController(long transitionLength) {
+                createActivityControllerWithoutAttachedToWindow(transitionLength);
                 // Creating the activity controller animation sometimes reapplies the launcher state
                 // (because we set the animation as the current state animation), so we reapply the
                 // attached state here as well to ensure recents is shown/hidden appropriately.
@@ -277,9 +285,9 @@ public final class LauncherActivityControllerHelper implements ActivityControlHe
                 }
                 mIsAttachedToWindow = attached;
                 LauncherRecentsView recentsView = activity.getOverviewPanel();
-                Animator fadeAnim = activity.getStateManager()
-                        .createStateElementAnimation(
-                        INDEX_RECENTS_FADE_ANIM, attached ? 1 : 0);
+                Animator fadeAnim = activity.getStateManager().createStateElementAnimation(
+                        INDEX_RECENTS_FADE_ANIM,
+                        attached && activity.getStateManager().getState().overviewUi ? 1 : 0);
 
                 int runningTaskIndex = recentsView.getRunningTaskIndex();
                 if (runningTaskIndex == 0) {

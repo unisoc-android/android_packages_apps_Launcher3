@@ -21,10 +21,9 @@ import static android.util.Log.isLoggable;
 import android.os.SystemClock;
 import android.os.Trace;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.util.MutableLong;
 
-import com.android.launcher3.config.FeatureFlags;
+import com.sprd.ext.LogUtils;
 
 /**
  * A wrapper around {@link Trace} with some utility information.
@@ -35,7 +34,8 @@ import com.android.launcher3.config.FeatureFlags;
  */
 public class TraceHelper {
 
-    private static final boolean ENABLED = isLoggable("LAUNCHER_TRACE", VERBOSE);
+    private static final boolean ENABLED = isLoggable("LAUNCHER_TRACE", VERBOSE) ||
+            LogUtils.DEBUG || LogUtils.DEBUG_PERFORMANCE;
 
     private static final boolean SYSTEM_TRACE = ENABLED;
     private static final ArrayMap<String, MutableLong> sUpTimes = ENABLED ? new ArrayMap<>() : null;
@@ -45,7 +45,8 @@ public class TraceHelper {
             synchronized (sUpTimes) {
                 MutableLong time = sUpTimes.get(sectionName);
                 if (time == null) {
-                    time = new MutableLong(isLoggable(sectionName, VERBOSE) ? 0 : -1);
+                    time = new MutableLong((isLoggable(sectionName, VERBOSE)
+                            || LogUtils.DEBUG || LogUtils.DEBUG_PERFORMANCE) ? 0 : -1);
                     sUpTimes.put(sectionName, time);
                 }
                 if (time.value >= 0) {
@@ -70,7 +71,7 @@ public class TraceHelper {
                     }
 
                     long now = SystemClock.uptimeMillis();
-                    Log.d(sectionName, partition + " : " + (now - time.value));
+                    LogUtils.d(sectionName, partition + " : " + (now - time.value));
                     time.value = now;
                 }
             }
@@ -91,7 +92,7 @@ public class TraceHelper {
                     if (SYSTEM_TRACE) {
                         Trace.endSection();
                     }
-                    Log.d(sectionName, msg + " : " + (SystemClock.uptimeMillis() - time.value));
+                    LogUtils.d(sectionName, msg + " : " + (SystemClock.uptimeMillis() - time.value));
                 }
             }
         }

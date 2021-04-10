@@ -35,6 +35,8 @@ import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragController.DragListener;
 import com.android.launcher3.dragndrop.DragOptions;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.navigationbar.NavigationBarController;
 
 /*
  * The top bar containing various drop targets: Delete/App Info/Uninstall.
@@ -90,6 +92,18 @@ public class DropTargetBar extends FrameLayout
         int tooltipLocation = TOOLTIP_DEFAULT;
 
         if (grid.isVerticalBarLayout()) {
+            if (grid.isMultiWindowMode) {
+                NavigationBarController nbc =
+                        LauncherAppMonitor.getInstance(getContext()).getNavigationBarController();
+                if (null != nbc && nbc.isDynamicNavigationBarShowing()) {
+                    int offset = insets.top;
+                    if (grid.isSeascape()) {
+                        lp.rightMargin += offset;
+                    } else {
+                        lp.leftMargin += offset;
+                    }
+                }
+            }
             lp.width = grid.dropTargetBarSizePx;
             lp.height = grid.availableHeightPx - 2 * grid.edgeMarginPx;
             lp.gravity = grid.isSeascape() ? Gravity.RIGHT : Gravity.LEFT;
@@ -143,7 +157,7 @@ public class DropTargetBar extends FrameLayout
             }
         } else {
             int visibleCount = getVisibleButtonsCount();
-            int availableWidth = width / visibleCount;
+            int availableWidth = visibleCount == 0 ? 0 :  width / visibleCount;
             boolean textVisible = true;
             for (ButtonDropTarget buttons : mDropTargets) {
                 if (buttons.getVisibility() != GONE) {
@@ -179,7 +193,7 @@ public class DropTargetBar extends FrameLayout
             }
         } else {
             int visibleCount = getVisibleButtonsCount();
-            int frameSize = (right - left) / visibleCount;
+            int frameSize = visibleCount == 0 ? 0 : (right - left) / visibleCount;
 
             int start = frameSize / 2;
             int halfWidth;

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="activity_not_found">"Aplicativo não está instalado."</string>
+<string name="activity_not_available">"O aplicativo não está disponivel"</string>
+<string name="safemode_shortcut_error">"Aplicativo baixado desativada no modo de Segurança"</string>
+<string name="safemode_widget_error">"Ferramentas desativadas no modo de Segurança"</string>
+<string name="shortcut_not_available">"O atalho não está disponível"</string>
+<string name="home_screen">"Tela inicial"</string>
+<string name="custom_actions">"Ações personalizadas"</string>
+<string name="long_press_widget_to_add">"Toque em e &amp; segure para pegar um widget."</string>
+<string name="long_accessible_way_to_add">"Toque duas vezes &amp; e segure para pegar um widget ou fazer uma ação personalizada."</string>
+<string name="widget_dims_format">"%1$d \u00d7 %2$d"</string>
+<string name="widget_accessible_dims_format">"%1$d altura por %2$d largura"</string>
+<string name="add_item_request_drag_hint">"Toque em &amp; e segure para posicionar manualmente"</string>
+<string name="place_automatically">"Adicionar automaticamente"</string>
+<string name="all_apps_search_bar_hint">"Buscar aplicativos"</string>
+<string name="all_apps_loading_message">"Carregando apps&#8230;"</string>
+<string name="all_apps_no_search_results">"Nenhum aplicativo corresponde a \"<xliff:g id="query" example="Android">%1$s</xliff:g>\""</string>
+<string name="all_apps_search_market_message">"Pesquisar por mais apps"</string>
+<string name="label_application">"App"</string>
+<string name="notifications_header">"Notificações"</string>
+<string name="long_press_shortcut_to_add">"Toque e mantenha pressionado para selecionar um atalho."</string>
+<string name="long_accessible_way_to_add_shortcut">"Toque duas vezes e mantenha pressionado para selecionar um atalho, ou use ações personalizadas."</string>
+<string name="out_of_space">"Sem mais espaço nesta Tela principal."</string>
+<string name="hotseat_out_of_space">Não há mais espaço na barra de Favoritos</string>
+<string name="all_apps_button_label">"Lista de apps"</string>
+<string name="all_apps_button_personal_label">"Lista de aplicativos pessoais"</string>
+<string name="all_apps_button_work_label">"Lista de aplicativos de trabalho"</string>
+<string name="all_apps_home_button_label">"Residencial"</string>
+<string name="remove_drop_target_label">"Remover"</string>
+<string name="uninstall_drop_target_label">"Desinstalar"</string>
+<string name="app_info_drop_target_label">"Informações do app"</string>
+<string name="install_drop_target_label">"Instalar"</string>
+<string name="permlab_install_shortcut">"instalar atalhos"</string>
+<string name="permdesc_install_shortcut">"Permite um aplicativo adicionar atalhos sem a intervenção do usuário."</string>
+<string name="permlab_read_settings">"ler as definições e atalhos da Tela principal"</string>
+<string name="permdesc_read_settings">"Permite o aplicativo ler as definições e atalhos da Tela principal."</string>
+<string name="permlab_write_settings">"escrever as definições e atalhos da Tela principal"</string>
+<string name="permdesc_write_settings">"Permite o aplicativo alterar as definições e atalhos da Tela principal."</string>
+<string name="msg_no_phone_permission">"<xliff:g id="app_name" example="Launcher3">%1$s</xliff:g> não tem permissão para fazer chamadas telefônicas"</string>
+<string name="gadget_error_text">"Problema ao carregar widget"</string>
+<string name="gadget_setup_text">"Ajuste"</string>
+<string name="uninstall_system_app_text">"Este é um aplicativo do sistema e não pode ser desinstalado."</string>
+<string name="folder_hint_text">"Pasta Sem Nome"</string>
+<string name="disabled_app_label">"Desativado <xliff:g id="app_name" example="Messenger">%1$s</xliff:g>"</string>
+<plurals name="dotted_app_label">
+<item quantity="one">"O <xliff:g id="app_name" example="Messenger">%1$s</xliff:g> possui <xliff:g id="notification_count" example="1">%2$d</xliff:g> notificação"</item>
+<item quantity="other">"O <xliff:g id="app_name" example="Messenger">%1$s</xliff:g> possui <xliff:g id="notification_count" example="3">%2$d</xliff:g> notificações"</item>
+</plurals>
+<string name="default_scroll_format">"Página %1$d de %2$d"</string>
+<string name="workspace_scroll_format">"Tela principal %1$d de %2$d"</string>
+<string name="workspace_new_page">"Nova página de tela principal"</string>
+<string name="folder_opened">"Pasta aberta, <xliff:g id="width" example="5">%1$d</xliff:g> por <xliff:g id="height" example="3">%2$d</xliff:g>"</string>
+<string name="folder_tap_to_close">"Toque para fechar a pasta"</string>
+<string name="folder_tap_to_rename">"Toque para salvar o novo nome"</string>
+<string name="folder_closed">"Pasta fechada"</string>
+<string name="folder_renamed">"Pasta renomeada para <xliff:g id="name" example="Games">%1$s</xliff:g>"</string>
+<string name="folder_name_format">"Pasta: <xliff:g id="name" example="Games">%1$s</xliff:g>"</string>
+<string name="widget_button_text">"Widgets"</string>
+<string name="wallpaper_button_text">"Planos de fundo"</string>
+<string name="styles_wallpaper_button_text">"Estilos e planos de fundo"</string>
+<string name="settings_button_text">"Configurações da tela inicial"</string>
+<string name="msg_disabled_by_admin">"Desativado pelo seu admin"</string>
+<string name="allow_rotation_title">"Permitir a rotação da tela inicial"</string>
+<string name="allow_rotation_desc">"Quando o telefone é girado"</string>
+<string name="notification_dots_title">"Pontos de notificação"</string>
+<string name="notification_dots_desc_on">"LIGA"</string>
+<string name="notification_dots_desc_off">"Desativado"</string>
+<string name="title_missing_notification_access">"É necessário ter acesso à notificação"</string>
+<string name="msg_missing_notification_access">"Para exibir os pontos de notificação, ative as notificações de app para <xliff:g id="name" example="My App">%1$s</xliff:g>"</string>
+<string name="title_change_settings">"Alterar as configurações"</string>
+<string name="notification_dots_service_title">"Mostrar pontos de notificação"</string>
+<string name="auto_add_shortcuts_label">"Adicionar ícone à tela inicial"</string>
+<string name="auto_add_shortcuts_description">"Para novos aplicativos"</string>
+<string name="package_state_unknown">"Desconhecido"</string>
+<string name="abandoned_clean_this">"Remover"</string>
+<string name="abandoned_search">"Pesquisar"</string>
+<string name="abandoned_promises_title">"Esta aplicação não está instalada"</string>
+<string name="abandoned_promise_explanation">"O aplicativo para este ícone não está instalado. Você pode remover, ou buscar para o aplicativo e instalá-lo manualmente."</string>
+<string name="app_downloading_title">"<xliff:g id="name" example="Messenger">%1$s</xliff:g> baixando, <xliff:g id="progress" example="30%">%2$s</xliff:g> completo"</string>
+<string name="app_waiting_download_title">"<xliff:g id="name" example="Messenger">%1$s</xliff:g> aguardando para instalar"</string>
+<string name="widgets_bottom_sheet_title">"<xliff:g id="name" example="Messenger">%1$s</xliff:g> widgets"</string>
+<string name="widgets_list">"Lista de widgets"</string>
+<string name="widgets_list_closed">"Lista de widgets fechados"</string>
+<string name="action_add_to_workspace">"Adicionar à Tela principal"</string>
+<string name="action_move_here">"Mover item aqui"</string>
+<string name="item_added_to_workspace">"Item adicionado para tela principal"</string>
+<string name="item_removed">"Item removido"</string>
+<string name="undo">"Desfazer"</string>
+<string name="action_move">"Mover item"</string>
+<string name="move_to_empty_cell">"Mover para a linha <xliff:g id="number" example="1">%1$s</xliff:g> coluna <xliff:g id="number" example="1">%2$s</xliff:g>"</string>
+<string name="move_to_position">"Mover para a posição <xliff:g id="number" example="1">%1$s</xliff:g>"</string>
+<string name="move_to_hotseat_position">"Mover para a posição de favoritos <xliff:g id="number" example="1">%1$s</xliff:g>"</string>
+<string name="item_moved">"Item movido"</string>
+<string name="add_to_folder">"Adicionar para a pasta: <xliff:g id="name" example="Games">%1$s</xliff:g>"</string>
+<string name="add_to_folder_with_app">"Adicionar a pasta com <xliff:g id="name" example="Messenger">%1$s</xliff:g>"</string>
+<string name="added_to_folder">"Item adicionado para pasta"</string>
+<string name="create_folder_with">"Criar pasta com: <xliff:g id="name" example="Game">%1$s</xliff:g>"</string>
+<string name="folder_created">"Pasta criada"</string>
+<string name="action_move_to_workspace">"Mover para Tela Principal"</string>
+<string name="action_resize">"Redimensionar"</string>
+<string name="action_increase_width">"Aumentar largura"</string>
+<string name="action_increase_height">"Aumentar altura"</string>
+<string name="action_decrease_width">"Reduzir largura"</string>
+<string name="action_decrease_height">"Reduzir altura"</string>
+<string name="widget_resized">"Widget redimensionado para a largura <xliff:g id="number" example="2">%1$s</xliff:g> e altura <xliff:g id="number" example="1">%2$s</xliff:g>"</string>
+<string name="action_deep_shortcut">"Atalhos"</string>
+<string name="shortcuts_menu_with_notifications_description">"Atalhos e notificações"</string>
+<string name="action_dismiss_notification">"Dispensar"</string>
+<string name="notification_dismissed">"Notificação dispensada"</string>
+<string name="all_apps_personal_tab">"Pessoal"</string>
+<string name="all_apps_work_tab">"Trabalho"</string>
+<string name="work_profile_toggle_label">"Perfil de trabalho"</string>
+<string name="bottom_work_tab_user_education_title">"Encontre aplicativos de trabalho aqui"</string>
+<string name="bottom_work_tab_user_education_body">"Cada aplicativo de trabalho possui um selo e é mantido seguro por sua organização. Transfira aplicativos para a Tela inicial e facilite o acesso."</string>
+<string name="work_mode_on_label">"Gerenciados pela sua organização"</string>
+<string name="work_mode_off_label">"Notificações e aplicativos estão desativados"</string>
+<string name="bottom_work_tab_user_education_close_button">"Fechar"</string>
+<string name="bottom_work_tab_user_education_closed">"Fechados"</string>
+<string name="remote_action_failed">"Falha: <xliff:g id="what" example="Pause">%1$s</xliff:g>"</string>
+</resources>

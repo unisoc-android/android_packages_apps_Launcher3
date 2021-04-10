@@ -7,21 +7,26 @@ buildscript {
         classpath GRADLE_CLASS_PATH
         classpath PROTOBUF_CLASS_PATH
     }
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs.add('-Xbootclasspath/p:studio_libs/prebuilts/framework_intermediates/framework/framework.jar')
+        }
+    }
 }
 
-final String ANDROID_TOP = "${rootDir}/../../.."
+final String ANDROID_TOP = "${rootDir}/studio_libs"
 final String FRAMEWORK_PREBUILTS_DIR = "${ANDROID_TOP}/prebuilts/framework_intermediates/"
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.protobuf'
 
 android {
-    compileSdkVersion COMPILE_SDK
+    compileSdkVersion COMPILE_SDK.toInteger()
     buildToolsVersion BUILD_TOOLS_VERSION
 
     defaultConfig {
         minSdkVersion 25
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
@@ -85,6 +90,11 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+
+
     sourceSets {
         main {
             res.srcDirs = ['res']
@@ -102,12 +112,18 @@ android {
 
         androidTest {
             res.srcDirs = ['tests/res']
-            java.srcDirs = ['tests/src', 'tests/tapl']
+            java.srcDirs = ['tests/src', 'quickstep/tests/src', 'tests/tapl']
             manifest.srcFile "tests/AndroidManifest-common.xml"
         }
 
         androidTestDebug {
             manifest.srcFile "tests/AndroidManifest.xml"
+        }
+
+        test {
+            res.srcDirs = ['robolectric_tests/res']
+            java.srcDirs = ['robolectric_tests/src']
+            resources.srcDirs = ["${FRAMEWORK_PREBUILTS_DIR}/robotest/",'robolectric_tests/resources']
         }
 
         aosp {
@@ -144,13 +160,17 @@ repositories {
     maven { url "../../../prebuilts/fullsdk-linux/extras/android/m2repository" }
     mavenCentral()
     google()
+    flatDir {
+        dirs "${FRAMEWORK_PREBUILTS_DIR}/libs"
+    }
 }
 
 dependencies {
     implementation "androidx.dynamicanimation:dynamicanimation:${ANDROID_X_VERSION}"
     implementation "androidx.recyclerview:recyclerview:${ANDROID_X_VERSION}"
     implementation "androidx.preference:preference:${ANDROID_X_VERSION}"
-    implementation project(':IconLoader')
+    //implementation project(':IconLoader')
+    implementation(name: 'IconLoader', ext: 'aar')
     implementation fileTree(dir: "${FRAMEWORK_PREBUILTS_DIR}/libs", include: 'launcher_protos.jar')
 
     // Recents lib dependency
@@ -162,6 +182,14 @@ dependencies {
     // Required for AOSP to compile. This is already included in the sysui_shared.jar
     withoutQuickstepImplementation fileTree(dir: "${FRAMEWORK_PREBUILTS_DIR}/libs", include: 'plugin_core.jar')
 
+    // Recents lib dependency
+    withQuickstepCompileOnly fileTree(dir: "${FRAMEWORK_PREBUILTS_DIR}/framework", include: 'framework.jar')
+
+    testImplementation 'androidx.test:core:1.2.0'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'org.robolectric:robolectric:4.3.1'
+    testImplementation 'com.google.android:android:4.0.1.2'
+    testImplementation "com.google.truth:truth:0.40"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation "org.mockito:mockito-core:1.9.5"
     androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'

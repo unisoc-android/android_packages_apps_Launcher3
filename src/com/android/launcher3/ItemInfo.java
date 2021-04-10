@@ -108,6 +108,9 @@ public class ItemInfo {
 
     public UserHandle user;
 
+    // SPRD:Added for unread feature
+    public int unreadNum = 0;
+
     public ItemInfo() {
         user = Process.myUserHandle();
     }
@@ -122,11 +125,14 @@ public class ItemInfo {
         cellY = info.cellY;
         spanX = info.spanX;
         spanY = info.spanY;
+        minSpanX = info.minSpanX;
+        minSpanY = info.minSpanY;
         rank = info.rank;
         screenId = info.screenId;
         itemType = info.itemType;
         container = info.container;
         user = info.user;
+        unreadNum = info.unreadNum;
         contentDescription = info.contentDescription;
     }
 
@@ -193,6 +199,7 @@ public class ItemInfo {
                 + " minSpan(" + minSpanX + "," + minSpanY + ")"
                 + " rank=" + rank
                 + " user=" + user
+                + " unreadNum=" + unreadNum
                 + " title=" + title;
     }
 

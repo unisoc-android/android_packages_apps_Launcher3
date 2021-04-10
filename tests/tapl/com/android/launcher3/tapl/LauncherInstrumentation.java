@@ -20,6 +20,7 @@ import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
 import static android.content.pm.PackageManager.DONT_KILL_APP;
 import static android.content.pm.PackageManager.MATCH_ALL;
 import static android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS;
+import static android.view.WindowManagerPolicyConstants.NAV_BAR_MODE_3BUTTON;
 
 import static com.android.launcher3.tapl.TestHelpers.getOverviewPackageName;
 import static com.android.launcher3.testing.TestProtocol.BACKGROUND_APP_STATE_ORDINAL;
@@ -40,6 +41,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,6 +50,7 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
+import android.view.WindowManagerGlobal;
 import android.view.accessibility.AccessibilityEvent;
 
 import androidx.annotation.NonNull;
@@ -317,13 +320,14 @@ public final class LauncherInstrumentation {
 
     public String getNavigationModeMismatchError() {
         final NavigationModel navigationModel = getNavigationModel();
+        final boolean hasNavBar = hasNavigationBar(getContext());
         final boolean hasRecentsButton = hasSystemUiObject("recent_apps");
         final boolean hasHomeButton = hasSystemUiObject("home");
-        if ((navigationModel == NavigationModel.THREE_BUTTON) != hasRecentsButton) {
+        if ((hasNavBar && navigationModel == NavigationModel.THREE_BUTTON) != hasRecentsButton) {
             return "Presence of recents button doesn't match the interaction mode, mode="
                     + navigationModel.name() + ", hasRecents=" + hasRecentsButton;
         }
-        if ((navigationModel != NavigationModel.ZERO_BUTTON) != hasHomeButton) {
+        if ((hasNavBar && navigationModel != NavigationModel.ZERO_BUTTON) != hasHomeButton) {
             return "Presence of home button doesn't match the interaction mode, mode="
                     + navigationModel.name() + ", hasHome=" + hasHomeButton;
         }
@@ -425,6 +429,7 @@ public final class LauncherInstrumentation {
         // otherwise waitForIdle may return immediately in case when there was a big enough pause in
         // accessibility events prior to pressing Home.
         final String action;
+        final boolean hasNavBar = hasNavigationBar(getContext());
         if (getNavigationModel() == NavigationModel.ZERO_BUTTON) {
             final Point displaySize = getRealDisplaySize();
 
@@ -448,7 +453,7 @@ public final class LauncherInstrumentation {
                         displaySize.x / 2, 0,
                         ZERO_BUTTON_STEPS_FROM_BACKGROUND_TO_HOME, finalState);
             }
-        } else {
+        } else if (hasNavBar) {
             log(action = "clicking home button");
             executeAndWaitForEvent(
                     () -> {
@@ -457,6 +462,10 @@ public final class LauncherInstrumentation {
                     },
                     event -> true,
                     "Pressing Home didn't produce any events");
+            mDevice.waitForIdle();
+        } else {
+            log(action = "clicking physical home button");
+            mDevice.pressHome();
             mDevice.waitForIdle();
         }
         try (LauncherInstrumentation.Closable c = addContextLayer(
@@ -777,7 +786,24 @@ public final class LauncherInstrumentation {
         return currentTime;
     }
 
+    public static boolean hasNavigationBar(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (wm != null) {
+            try {
+                int displayID = wm.getDefaultDisplay().getDisplayId();
+                return WindowManagerGlobal.getWindowManagerService().hasNavigationBar(displayID);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     public static int getCurrentInteractionMode(Context context) {
+        /** unisoc:no navigationBar devices use the legacy Mode{@link QuickStepContract#isLegacyMode}.*/
+        if (!hasNavigationBar(context)) {
+            return NAV_BAR_MODE_3BUTTON;
+        }
         return getSystemIntegerRes(context, "config_navBarInteractionMode");
     }
 
@@ -825,5 +851,38 @@ public final class LauncherInstrumentation {
         final Point size = new Point();
         getContext().getSystemService(WindowManager.class).getDefaultDisplay().getRealSize(size);
         return size;
+    }
+
+    void pressMenu() {
+        final boolean hasNavBar = hasNavigationBar(getContext());
+        if (hasNavBar) {
+            executeAndWaitForEvent(
+                    () -> {
+                        log("LauncherInstrumentation.pressMenu before clicking");
+                        waitForSystemUiObject("recent_apps").click();
+                    },
+                    event -> true,
+                    "Pressing menu didn't produce any events");
+            mDevice.waitForIdle();
+        } else {
+            try {
+                mDevice.pressRecentApps();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+            mDevice.waitForIdle();
+        }
+    }
+
+    int getStatusBarHeight() {
+        try {
+            final Context context = mInstrumentation.getTargetContext().createPackageContext(
+                    "android", 0);
+            return context.getResources().getDimensionPixelSize(
+                    getSystemDimensionResId(context, "status_bar_height"));
+        } catch (PackageManager.NameNotFoundException e) {
+            fail("Can't get edge sensitivity: " + e);
+            return 0;
+        }
     }
 }

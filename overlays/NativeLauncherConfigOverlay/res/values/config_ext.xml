@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Only applied for Launcher feature:ro.launcher.multimode-->
+    <string name="default_home_screen_style" translatable="false">single</string>
+</resources>

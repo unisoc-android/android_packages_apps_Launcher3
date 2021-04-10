@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"<xliff:g id="count">%1$s</xliff:g> உள்ளது"</string>
+<string name="recents_clean_finished_toast">"<xliff:g id="count">%1$s</xliff:g> மெமரியை ரிலீஸ் செய்,<xliff:g id="count">%2$s</xliff:g>  இப்போது கிடைக்கும்."</string>
+<string name="recents_nothing_to_clear">"கேச்சில் நீக்க எதுவுமில்லை"</string>
+</resources>

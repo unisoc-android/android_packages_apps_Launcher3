@@ -23,6 +23,8 @@ import android.os.Process;
 
 import com.android.launcher3.model.PackageItemInfo;
 import com.android.launcher3.util.ContentWriter;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.resolution.SRController;
 
 /**
  * Represents a widget (either instantiated or about to be) in the Launcher.
@@ -145,15 +147,18 @@ public class LauncherAppWidgetInfo extends ItemInfo {
      * done so already (only really for default workspace widgets).
      */
     void onBindAppWidget(Launcher launcher, AppWidgetHostView hostView) {
-        if (!mHasNotifiedInitialWidgetSizeChanged) {
-            AppWidgetResizeFrame.updateWidgetSizeRanges(hostView, launcher, spanX, spanY);
+        SRController sc = LauncherAppMonitor.getInstance(launcher).getSRController();
+        boolean isDensityChanged = sc != null && sc.isDensityChanged();
+        if (!mHasNotifiedInitialWidgetSizeChanged || isDensityChanged) {
+            AppWidgetResizeFrame.updateWidgetSizeRanges(
+                    hostView, launcher, spanX, spanY, isDensityChanged);
             mHasNotifiedInitialWidgetSizeChanged = true;
         }
     }
 
     @Override
     protected String dumpProperties() {
-        return super.dumpProperties() + " appWidgetId=" + appWidgetId;
+        return super.dumpProperties() + " appWidgetId=" + appWidgetId + " providerName = " + providerName;
     }
 
     public final boolean isWidgetIdAllocated() {

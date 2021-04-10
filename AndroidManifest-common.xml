@@ -40,9 +40,17 @@
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
     <uses-permission android:name="android.permission.BIND_APPWIDGET" />
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <!-- UNISOC Add for unreadNotifier Function  start-->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="com.android.email.permission.ACCESS_PROVIDER" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <!-- UNISOC Add for unreadNotifier Function  end-->
 
 
     <!--
@@ -99,6 +107,13 @@
         <receiver android:name="com.android.launcher3.AppWidgetsRestoredReceiver" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_HOST_RESTORED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- This isn't a real receiver, it's only used as a Launcher log interface -->
+        <receiver android:name="com.android.launcher3.LauncherDebugEnableReceiver" >
+            <intent-filter>
+                <action android:name="com.android.launcher.action.UNISOC_LAUNCHER3"/>
             </intent-filter>
         </receiver>
 
@@ -169,11 +184,26 @@
             android:name="com.android.launcher3.settings.SettingsActivity"
             android:label="@string/settings_button_text"
             android:theme="@android:style/Theme.DeviceDefault.Settings"
+            android:configChanges="orientation|screenLayout|smallestScreenSize"
             android:autoRemoveFromRecents="true">
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+
+        <activity android:name="com.sprd.ext.unreadnotifier.UnreadSettingsActivity"
+            android:theme="@style/BaseSettingsTheme"
+            android:label="@string/unread_notifier_title"
+            android:enabled="false"
+            android:autoRemoveFromRecents="true">
+        </activity>
+
+        <activity android:name="com.sprd.ext.dynamicicon.DynamicIconSettings"
+            android:label="@string/dynamic_icon_title"
+            android:theme="@style/BaseSettingsTheme"
+            android:enabled="false"
+            android:autoRemoveFromRecents="true">
         </activity>
 
         <provider

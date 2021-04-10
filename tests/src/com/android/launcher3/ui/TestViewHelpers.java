@@ -20,6 +20,7 @@ import static androidx.test.InstrumentationRegistry.getTargetContext;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -52,6 +53,11 @@ public class TestViewHelpers {
 
     private static UiDevice getDevice() {
         return UiDevice.getInstance(getInstrumentation());
+    }
+
+    public static UiObject2 findViewByEntryName(String entry) {
+        return getDevice().wait(Until.findObject(By.res(getTargetContext().getPackageName(), entry)),
+                AbstractLauncherUiTest.DEFAULT_UI_TIMEOUT);
     }
 
     public static UiObject2 findViewById(int id) {
@@ -102,12 +108,11 @@ public class TestViewHelpers {
         // Action Down
         final long downTime = SystemClock.uptimeMillis();
         sendPointer(downTime, MotionEvent.ACTION_DOWN, center);
-
-        UiObject2 dragLayer = findViewById(R.id.drag_layer);
+        UiObject2 dragLayer = findViewByEntryName("drag_layer");
 
         if (expectedToShowShortcuts) {
             // Make sure shortcuts show up, and then move a bit to hide them.
-            assertNotNull(findViewById(R.id.deep_shortcuts_container));
+            assertNotNull(findViewByEntryName("deep_shortcuts_container"));
 
             Point moveLocation = new Point(center);
             int distanceToMove =
@@ -119,14 +124,38 @@ public class TestViewHelpers {
                 moveLocation.y += distanceToMove;
             }
             movePointer(downTime, center, moveLocation);
-
-            assertNull(findViewById(R.id.deep_shortcuts_container));
+            assertNull(findViewByEntryName("deep_shortcuts_container"));
         }
 
         // Wait until Remove/Delete target is visible
-        assertNotNull(findViewById(R.id.delete_target_text));
+        assertNotNull(findViewByEntryName("delete_target_text"));
 
         Point moveLocation = dragLayer.getVisibleCenter();
+
+        // Move to center
+        movePointer(downTime, center, moveLocation);
+        sendPointer(downTime, MotionEvent.ACTION_UP, moveLocation);
+
+        // Wait until remove target is gone.
+        getDevice().wait(Until.gone(getSelectorForId(R.id.delete_target_text)),
+                AbstractLauncherUiTest.DEFAULT_UI_TIMEOUT);
+    }
+
+    public static void dragToHotseat(UiObject2 icon) {
+        Point center = icon.getVisibleCenter();
+
+        // Action Down
+        final long downTime = SystemClock.uptimeMillis();
+        sendPointer(downTime, MotionEvent.ACTION_DOWN, center);
+        UiObject2 dragLayer = findViewByEntryName("drag_layer");
+
+        // Wait until Remove/Delete target is visible
+        assertNotNull(findViewByEntryName("delete_target_text"));
+
+        Point moveLocation = dragLayer.getVisibleCenter();
+
+        // set y to bottom
+        moveLocation.y = getDevice().getDisplayHeight();
 
         // Move to center
         movePointer(downTime, center, moveLocation);
@@ -174,7 +203,17 @@ public class TestViewHelpers {
         final UiDevice device = getDevice();
         device.pressKeyCode(KeyEvent.KEYCODE_W, KeyEvent.META_CTRL_ON);
         device.waitForIdle();
-        return findViewById(R.id.widgets_list_view);
+        return findViewByEntryName("widgets_list_view");
+    }
+
+    public static void openLauncherSettings() {
+        final UiDevice device = getDevice();
+        device.pressKeyCode(KeyEvent.KEYCODE_MENU);
+        getDevice().wait(Until.findObject(By.text("Home settings")),
+                AbstractLauncherUiTest.DEFAULT_UI_TIMEOUT).click();
+        assertTrue("Can not open launcher settings : ", device.wait(Until.hasObject(
+                By.pkg(getTargetContext().getPackageName()).text("Home settings")),
+                3000));
     }
 
     public static View findChildView(ViewGroup parent, Function<View, Boolean> condition) {
@@ -183,5 +222,12 @@ public class TestViewHelpers {
             if (condition.apply(child)) return child;
         }
         return null;
+    }
+
+
+    public static Point getAppVisibleCenter(String appName) {
+        final UiDevice device = getDevice();
+        return device.wait(Until.findObject(By.text(appName)),
+                AbstractLauncherUiTest.DEFAULT_UI_TIMEOUT).getVisibleCenter();
     }
 }

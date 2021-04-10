@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- add for icon unread dot-->
+    <dimen name="unread_pref_customize_padding">8dp</dimen>
+    <dimen name="hotseat_dot_margin_x">0dp</dimen>
+    <dimen name="hotseat_dot_margin_y">4dp</dimen>
+    <dimen name="workspace_dot_margin_x">6dp</dimen>
+    <dimen name="workspace_dot_margin_y">6dp</dimen>
+    <dimen name="app_dot_margin_x">8dp</dimen>
+    <dimen name="app_dot_margin_y">8dp</dimen>
+    <dimen name="folder_dot_margin_x">8dp</dimen>
+    <dimen name="folder_dot_margin_y">8dp</dimen>
+
+    <!--add for folder icon Model-->
+    <dimen name="grid_folder_page_elevation">5dp</dimen>
+    <dimen name="grid_folder_page_radius">10dp</dimen>
+    <dimen name="grid_folder_tab_margin_bottom">10dp</dimen>
+    <dimen name="grid_folder_page_view_padding">12dp</dimen>
+</resources>

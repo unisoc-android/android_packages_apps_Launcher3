@@ -88,7 +88,7 @@ public final class FileLog {
         Message.obtain(getHandler(), LogWriterCallback.MSG_WRITE, out).sendToTarget();
     }
 
-    private static Handler getHandler() {
+    static Handler getHandler() {
         synchronized (DATE_FORMAT) {
             if (sHandler == null) {
                 HandlerThread thread = new HandlerThread("file-logger");

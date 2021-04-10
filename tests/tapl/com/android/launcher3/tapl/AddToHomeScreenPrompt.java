@@ -33,9 +33,6 @@ public class AddToHomeScreenPrompt {
     public void addAutomatically() {
         mLauncher.waitForObjectInContainer(
                 mWidgetCell.getParent().getParent().getParent().getParent(),
-                By.text(LauncherInstrumentation.isAvd()
-                        ? "ADD AUTOMATICALLY"
-                        : "Add automatically")).
-                click();
+                By.text("ADD AUTOMATICALLY")).click();
     }
 }

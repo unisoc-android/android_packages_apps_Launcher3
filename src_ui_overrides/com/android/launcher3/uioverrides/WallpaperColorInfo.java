@@ -16,19 +16,24 @@
 
 package com.android.launcher3.uioverrides;
 
+import static android.app.WallpaperManager.FLAG_SYSTEM;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Pair;
 
+import com.android.launcher3.util.Themes;
+import com.android.launcher3.uioverrides.dynamicui.ColorExtractionAlgorithm;
 import com.android.launcher3.uioverrides.dynamicui.WallpaperColorsCompat;
 import com.android.launcher3.uioverrides.dynamicui.WallpaperManagerCompat;
-import com.android.launcher3.uioverrides.dynamicui.ColorExtractionAlgorithm;
+import com.sprd.ext.LogUtils;
 
 import java.util.ArrayList;
 
-import static android.app.WallpaperManager.FLAG_SYSTEM;
+import androidx.annotation.NonNull;
 
 public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChangedListenerCompat {
+    private static final String TAG = "WallpaperColorInfo";
 
     private static final int MAIN_COLOR_LIGHT = 0xffdadce0;
     private static final int MAIN_COLOR_DARK = 0xff202124;
@@ -47,6 +52,7 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
         }
     }
 
+    private final Context mAppContext;
     private final ArrayList<OnChangeListener> mListeners = new ArrayList<>();
     private final WallpaperManagerCompat mWallpaperManager;
     private final ColorExtractionAlgorithm mExtractionType;
@@ -54,10 +60,12 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
     private int mSecondaryColor;
     private boolean mIsDark;
     private boolean mSupportsDarkText;
+    private boolean mIsDarkTheme;
 
     private OnChangeListener[] mTempListeners;
 
     private WallpaperColorInfo(Context context) {
+        mAppContext = context;
         mWallpaperManager = WallpaperManagerCompat.getInstance(context);
         mWallpaperManager.addOnColorsChangedListener(this);
         mExtractionType = new ColorExtractionAlgorithm();
@@ -86,9 +94,18 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
 
     @Override
     public void onColorsChanged(WallpaperColorsCompat colors, int which) {
+        if (LogUtils.DEBUG_EXTERNAL_MSG) {
+            LogUtils.d(TAG, "onColorsChanged, which:" + which + " colors:" + colors);
+        }
         if ((which & FLAG_SYSTEM) != 0) {
             update(colors);
             notifyChange();
+        }
+    }
+
+    public void updateIfNeeded() {
+        if (mIsDarkTheme != Themes.isDarkTheme(mAppContext, this)) {
+            update(mWallpaperManager.getWallpaperColors(FLAG_SYSTEM));
         }
     }
 
@@ -101,12 +118,16 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
             mMainColor = FALLBACK_COLOR;
             mSecondaryColor = FALLBACK_COLOR;
         }
-        mSupportsDarkText = wallpaperColors != null
-                ? (wallpaperColors.getColorHints()
-                & WallpaperColorsCompat.HINT_SUPPORTS_DARK_TEXT) > 0 : false;
-        mIsDark = wallpaperColors != null
-                ? (wallpaperColors.getColorHints()
-                & WallpaperColorsCompat.HINT_SUPPORTS_DARK_THEME) > 0 : false;
+        mSupportsDarkText = wallpaperColors != null && (wallpaperColors.getColorHints()
+                & WallpaperColorsCompat.HINT_SUPPORTS_DARK_TEXT) > 0;
+        mIsDark = wallpaperColors != null && (wallpaperColors.getColorHints()
+                & WallpaperColorsCompat.HINT_SUPPORTS_DARK_THEME) > 0;
+
+        mIsDarkTheme = Themes.isDarkTheme(mAppContext, this);
+
+        if (LogUtils.DEBUG_EXTERNAL_MSG) {
+            LogUtils.d(TAG, "update done, " + this);
+        }
     }
 
     public void addOnChangeListener(OnChangeListener listener) {
@@ -131,5 +152,15 @@ public class WallpaperColorInfo implements WallpaperManagerCompat.OnColorsChange
 
     public interface OnChangeListener {
         void onExtractedColorsChanged(WallpaperColorInfo wallpaperColorInfo);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "MainColor:" + Integer.toHexString(getMainColor()) +
+                " SecondaryColor:" + Integer.toHexString(getSecondaryColor()) +
+                " isDark:" + isDark() +
+                " supportsDarkText:" + supportsDarkText() +
+                " isMainColorDark:" + isMainColorDark();
     }
 }

@@ -8,14 +8,17 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Insets;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewDebug;
 import android.view.WindowInsets;
+
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.gestures.GesturesController;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +33,7 @@ public class LauncherRootView extends InsettableFrameLayout {
 
     @ViewDebug.ExportedProperty(category = "launcher")
     private final Rect mConsumedInsets = new Rect();
+    private Rect mOriginalInsets = new Rect();
 
     @ViewDebug.ExportedProperty(category = "launcher")
     private static final List<Rect> SYSTEM_GESTURE_EXCLUSION_RECT =
@@ -60,7 +64,14 @@ public class LauncherRootView extends InsettableFrameLayout {
         super.onFinishInflate();
     }
 
+    public Rect getOriginalInsets() {
+        return mOriginalInsets;
+    }
+
     private void handleSystemWindowInsets(Rect insets) {
+        mOriginalInsets.setEmpty();
+        mOriginalInsets.set(insets);
+
         mConsumedInsets.setEmpty();
         boolean drawInsetBar = false;
         if (mLauncher.isInMultiWindowMode()
@@ -85,6 +96,12 @@ public class LauncherRootView extends InsettableFrameLayout {
         mLauncher.updateInsets(insets);
         boolean resetState = !insets.equals(mInsets);
         setInsets(insets);
+
+        // In MultiWindowMode, views can not receive the window insets changed.
+        // Need update the search launcher search box.
+        if (mLauncher.getAppsView() != null) {
+            mLauncher.getAppsView().updateQsbOnWindowInsetsChanged(mOriginalInsets);
+        }
 
         if (mAlignedView != null) {
             // Apply margins on aligned view to handle consumed insets.
@@ -191,5 +208,17 @@ public class LauncherRootView extends InsettableFrameLayout {
         void onWindowFocusChanged(boolean hasFocus);
 
         void onWindowVisibilityChanged(int visibility);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        GesturesController controller =
+                LauncherAppMonitor.getInstance(mLauncher).getGesturesController();
+        boolean ret = false;
+        if (controller != null && controller.getGesture() != null) {
+            ret = controller.getGesture().onTouchEvent(ev);
+        }
+        if (ret) return true;
+        return super.onInterceptTouchEvent(ev);
     }
 }

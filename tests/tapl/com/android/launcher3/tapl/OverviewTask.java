@@ -74,4 +74,22 @@ public final class OverviewTask {
         mLauncher.getTestInfo(TestProtocol.REQUEST_DISABLE_DEBUG_TRACING);
         return new Background(mLauncher);
     }
+
+    /**
+     * lock or Unlock.
+     */
+    public void lockAndUnlock() {
+        try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
+                "want to dismiss a task")) {
+            verifyActiveContainer();
+            // Dismiss the task via flinging it up.
+            final Rect taskBounds = mTask.getVisibleBounds();
+            final int centerX = taskBounds.centerX();
+            final int centerY = taskBounds.centerY();
+            final int dragDownDistance = 100;
+            mLauncher.linearGesture(centerX, centerY, centerX, centerY + dragDownDistance, 10);
+            mLauncher.waitForIdle();
+        }
+    }
+
 }

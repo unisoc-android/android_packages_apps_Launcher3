@@ -109,7 +109,7 @@ public class Background extends LauncherInstrumentation.VisibleContainer {
             }
 
             case THREE_BUTTON:
-                mLauncher.waitForSystemUiObject("recent_apps").click();
+                mLauncher.pressMenu();
                 break;
         }
         mLauncher.getTestInfo(TestProtocol.REQUEST_DISABLE_DEBUG_TRACING);

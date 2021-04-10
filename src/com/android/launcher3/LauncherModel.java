@@ -35,6 +35,7 @@ import android.util.Pair;
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.PackageInstallerCompat.PackageInstallInfo;
 import com.android.launcher3.compat.UserManagerCompat;
+import com.android.launcher3.folder.Folder;
 import com.android.launcher3.icons.IconCache;
 import com.android.launcher3.icons.LauncherIcons;
 import com.android.launcher3.model.AddWorkspaceItemsTask;
@@ -57,6 +58,7 @@ import com.android.launcher3.util.Preconditions;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.util.ViewOnDrawExecutor;
 import com.android.launcher3.widget.WidgetListRowEntry;
+import com.sprd.ext.LauncherAppMonitor;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -108,6 +110,11 @@ public class LauncherModel extends BroadcastReceiver
         }
     }
 
+    private boolean mIsLanguageChanging;
+    public boolean isLanguageChanging() {
+        return mIsLanguageChanging;
+    }
+
     @Thunk WeakReference<Callbacks> mCallbacks;
 
     // < only access in worker thread >
@@ -136,6 +143,7 @@ public class LauncherModel extends BroadcastReceiver
     public interface Callbacks {
         public void rebindModel();
 
+        public IntArray getDropPendingScreens();
         public int getCurrentWorkspaceScreen();
         public void clearPendingBinds();
         public void startBinding();
@@ -165,6 +173,17 @@ public class LauncherModel extends BroadcastReceiver
         mBgAllAppsList = new AllAppsList(iconCache, appFilter);
     }
 
+    /** Runs the specified runnable immediately if called from the worker thread, otherwise it is
+     * posted on the worker thread handler. */
+    public static void runOnWorkerThread(Runnable r) {
+        if (sWorkerThread.getThreadId() == Process.myTid()) {
+            r.run();
+        } else {
+            // If we are not on the worker thread, then post to the worker handler
+            sWorker.post(r);
+        }
+    }
+
     public void setPackageState(PackageInstallInfo installInfo) {
         enqueueModelUpdateTask(new PackageInstallStateChangedTask(installInfo));
     }
@@ -183,11 +202,21 @@ public class LauncherModel extends BroadcastReceiver
      * Adds the provided items to the workspace.
      */
     public void addAndBindAddedWorkspaceItems(List<Pair<ItemInfo, Object>> itemList) {
+        addAndBindAddedWorkspaceItems(itemList, true, false);
+    }
+
+    /**
+     * Adds the provided items to the workspace.
+     */
+    public void addAndBindAddedWorkspaceItems(List<Pair<ItemInfo, Object>> itemList,
+                                              boolean animated, boolean ignoreLoaded) {
         Callbacks callbacks = getCallback();
         if (callbacks != null) {
             callbacks.preAddApps();
         }
-        enqueueModelUpdateTask(new AddWorkspaceItemsTask(itemList));
+        AddWorkspaceItemsTask awit = new AddWorkspaceItemsTask(itemList, ignoreLoaded);
+        awit.setEnableAnimated(animated);
+        enqueueModelUpdateTask(awit);
     }
 
     public ModelWriter getWriter(boolean hasVerticalHotseat, boolean verifyChanges) {
@@ -277,6 +306,8 @@ public class LauncherModel extends BroadcastReceiver
         final String action = intent.getAction();
         if (Intent.ACTION_LOCALE_CHANGED.equals(action)) {
             // If we have changed locale we need to clear out the labels in all apps/workspace.
+            mIsLanguageChanging = true;
+            Folder.setLocaleDependentFields(context.getResources(), true);
             forceReload();
         } else if (Intent.ACTION_MANAGED_PROFILE_ADDED.equals(action)
                 || Intent.ACTION_MANAGED_PROFILE_REMOVED.equals(action)) {
@@ -284,8 +315,13 @@ public class LauncherModel extends BroadcastReceiver
             forceReload();
         } else if (Intent.ACTION_MANAGED_PROFILE_AVAILABLE.equals(action) ||
                 Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE.equals(action) ||
-                Intent.ACTION_MANAGED_PROFILE_UNLOCKED.equals(action)) {
+                Intent.ACTION_MANAGED_PROFILE_UNLOCKED.equals(action) ||
+                Intent.ACTION_USER_UNLOCKED.equals(action)) {
             UserHandle user = intent.getParcelableExtra(Intent.EXTRA_USER);
+            // When receive user unlock, verify cur user's shortcut.
+            if (Intent.ACTION_USER_UNLOCKED.equals(action)) {
+                user = Process.myUserHandle();
+            }
             if (user != null) {
                 if (Intent.ACTION_MANAGED_PROFILE_AVAILABLE.equals(action) ||
                         Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE.equals(action)) {
@@ -296,7 +332,8 @@ public class LauncherModel extends BroadcastReceiver
                 // ACTION_MANAGED_PROFILE_UNAVAILABLE sends the profile back to locked mode, so
                 // we need to run the state change task again.
                 if (Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE.equals(action) ||
-                        Intent.ACTION_MANAGED_PROFILE_UNLOCKED.equals(action)) {
+                        Intent.ACTION_MANAGED_PROFILE_UNLOCKED.equals(action) ||
+                        Intent.ACTION_USER_UNLOCKED.equals(action)) {
                     enqueueModelUpdateTask(new UserLockStateChangedTask(user));
                 }
             }
@@ -304,6 +341,7 @@ public class LauncherModel extends BroadcastReceiver
             Launcher l = (Launcher) getCallback();
             l.reload();
         }
+        LauncherAppMonitor.getInstance(context).onModelReceive(intent);
     }
 
     public void forceReload() {
@@ -444,6 +482,7 @@ public class LauncherModel extends BroadcastReceiver
             synchronized (mLock) {
                 // Everything loaded bind the data.
                 mModelLoaded = true;
+                mIsLanguageChanging = false;
             }
         }
 
@@ -547,10 +586,12 @@ public class LauncherModel extends BroadcastReceiver
             @Override
             public void execute(LauncherAppState app, BgDataModel dataModel, AllAppsList apps) {
                 WorkspaceItemInfo info = itemProvider.get();
-                getModelWriter().updateItemInDatabase(info);
-                ArrayList<WorkspaceItemInfo> update = new ArrayList<>();
-                update.add(info);
-                bindUpdatedWorkspaceItems(update);
+                if (info != null) {
+                    getModelWriter().updateItemInDatabase(info);
+                    ArrayList<WorkspaceItemInfo> update = new ArrayList<>();
+                    update.add(info);
+                    bindUpdatedWorkspaceItems(update);
+                }
             }
         });
     }
@@ -570,7 +611,7 @@ public class LauncherModel extends BroadcastReceiver
             writer.println(prefix + "All apps list: size=" + mBgAllAppsList.data.size());
             for (AppInfo info : mBgAllAppsList.data) {
                 writer.println(prefix + "   title=\"" + info.title + "\" iconBitmap=" + info.iconBitmap
-                        + " componentName=" + info.componentName.getPackageName());
+                        + " componentName=" + info.componentName.flattenToShortString());
             }
         }
         sBgDataModel.dump(prefix, fd, writer, args);
@@ -589,5 +630,9 @@ public class LauncherModel extends BroadcastReceiver
 
     public static void setWorkerPriority(final int priority) {
         Process.setThreadPriority(sWorkerThread.getThreadId(), priority);
+    }
+
+    public static BgDataModel getBgDataModel() {
+        return sBgDataModel;
     }
 }

@@ -24,6 +24,7 @@ import static com.android.launcher3.util.SecureSettingsObserver.newNotificationS
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -39,6 +40,9 @@ import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.graphics.GridOptionsProvider;
 import com.android.launcher3.uioverrides.plugins.PluginManagerWrapper;
 import com.android.launcher3.util.SecureSettingsObserver;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.LauncherSettingsExtension;
+import com.sprd.ext.SettingsObserver;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
@@ -69,6 +73,10 @@ public class SettingsActivity extends Activity
 
     public static final String GRID_OPTIONS_PREFERENCE_KEY = "pref_grid_options";
 
+    private boolean mCurDevSetting;
+    private SettingsObserver mDevSettingObserver;
+    private boolean mNeedReload;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,16 +87,55 @@ public class SettingsActivity extends Activity
             if (!TextUtils.isEmpty(prefKey)) {
                 args.putString(EXTRA_FRAGMENT_ARG_KEY, prefKey);
             }
-
-            Fragment f = Fragment.instantiate(
-                    this, getString(R.string.settings_fragment_name), args);
-            // Display the fragment as the main content.
-            getFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, f)
-                    .commit();
+            startFragmentIfNeeded(this, getString(R.string.settings_fragment_name), args);
         }
         Utilities.getPrefs(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
+        if (mDevSettingObserver == null) {
+            mCurDevSetting = Utilities.isDevelopersOptionsEnabled(this);
+            mDevSettingObserver = new SettingsObserver.Global(getContentResolver()) {
+                @Override
+                public void onSettingChanged(boolean keySettingEnabled) {
+                    keySettingEnabled = Utilities.isDevelopersOptionsEnabled(getApplicationContext());
+                    if (mCurDevSetting != keySettingEnabled) {
+                        mCurDevSetting = keySettingEnabled;
+                        startFragmentIfNeeded(SettingsActivity.this, getString(R.string.settings_fragment_name), null);
+                    }
+                }
+            };
+            mDevSettingObserver.register(Settings.Global.DEVELOPMENT_SETTINGS_ENABLED);
+        }
     }
+
+    private void startFragmentIfNeeded(Context context, String fragment, Bundle args) {
+        FragmentManager fm = getFragmentManager();
+        if (fm.isStateSaved()) {
+            // Fragment can't commit when state saved, we need commit it when onResume.
+            mNeedReload = true;
+            return;
+        }
+        Fragment f = Fragment.instantiate(context, fragment, args);
+        fm.beginTransaction()
+                .replace(android.R.id.content, f)
+                .commit();
+        mNeedReload = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mNeedReload){
+            startFragmentIfNeeded(this, getString(R.string.settings_fragment_name), null);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mDevSettingObserver != null) {
+            mDevSettingObserver.unregister();
+        }
+    }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (GRID_OPTIONS_PREFERENCE_KEY.equals(key)) {
@@ -152,6 +199,7 @@ public class SettingsActivity extends Activity
 
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
+        private LauncherSettingsExtension mSettingExtension;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -175,12 +223,33 @@ public class SettingsActivity extends Activity
                     screen.removePreference(preference);
                 }
             }
+
+            //Sprd add custom settings
+            mSettingExtension = new LauncherSettingsExtension(this);
+            mSettingExtension.initPreferences(savedInstanceState);
+
+            //Unisoc: move developer options to last
+            Preference devPreference = screen.findPreference(DEVELOPER_OPTIONS_KEY);
+            if (devPreference != null) {
+                screen.removePreference(devPreference);
+            }
+            addPreferencesFromResource(R.xml.launcher_preferences_dev);
+            devPreference = findPreference(DEVELOPER_OPTIONS_KEY);
+            if (!initPreference(devPreference)) {
+                screen.removePreference(devPreference);
+            }
         }
 
         @Override
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
             outState.putBoolean(SAVE_HIGHLIGHTED_KEY, mPreferenceHighlighted);
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            mSettingExtension.onLauncherSettingStart();
         }
 
         protected String getParentKeyForPref(String key) {
@@ -214,8 +283,10 @@ public class SettingsActivity extends Activity
                     return Utilities.ATLEAST_OREO;
 
                 case ALLOW_ROTATION_PREFERENCE_KEY:
-                    if (getResources().getBoolean(R.bool.allow_rotation)) {
-                        // Launcher supports rotation by default. No need to show this setting.
+                    if (getResources().getBoolean(R.bool.allow_rotation)
+                            || FeatureOption.SPRD_DISABLE_ROTATION.get()) {
+                        // Launcher supports rotation by default or disable rotation.
+                        // No need to show this setting.
                         return false;
                     }
                     // Initialize the UI once

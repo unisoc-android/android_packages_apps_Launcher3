@@ -260,7 +260,7 @@ public abstract class BaseActivity extends Activity
 
     @Override
     public void dump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
-        if (!UiFactory.dumpActivity(this, writer)) {
+        if (!UiFactory.dumpActivity(this, writer, args)) {
             super.dump(prefix, fd, writer, args);
         }
     }

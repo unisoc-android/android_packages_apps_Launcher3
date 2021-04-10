@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"<xliff:g id="count">%1$s</xliff:g> उपलब्ध आहे"</string>
+<string name="recents_clean_finished_toast">"<xliff:g id="count">%1$s</xliff:g> मेमरी मोकळी करा, सध्या <xliff:g id="count">%2$s</xliff:g> एवढी उपलब्ध आहे."</string>
+<string name="recents_nothing_to_clear">"कॅशेमध्ये साफ करण्यासारखे काही नाही"</string>
+</resources>

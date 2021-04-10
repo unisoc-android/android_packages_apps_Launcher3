@@ -602,7 +602,7 @@ public class DragView extends View implements LauncherStateManager.StateListener
                     .setSpring(new SpringForce(0)
                             .setDampingRatio(DAMPENING_RATIO)
                             .setStiffness(STIFFNESS));
-            mDelta = view.getResources().getDisplayMetrics().density * PARALLAX_MAX_IN_DP;
+            mDelta = Math.min(view.getResources().getDisplayMetrics().density * PARALLAX_MAX_IN_DP, range);
         }
 
         public void animateToPos(float value) {

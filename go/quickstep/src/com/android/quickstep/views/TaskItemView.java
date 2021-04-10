@@ -32,11 +32,13 @@ import androidx.annotation.Nullable;
 import com.android.launcher3.R;
 import com.android.quickstep.ThumbnailDrawable;
 import com.android.systemui.shared.recents.model.ThumbnailData;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.lockicon.LockInfo;
 
 /**
  * View representing an individual task item with the icon + thumbnail adjacent to the task label.
  */
-public final class TaskItemView extends LinearLayout {
+public final class TaskItemView extends LinearLayout implements LockInfo {
 
     private static final String EMPTY_LABEL = "";
     private static final String DEFAULT_LABEL = "...";
@@ -44,12 +46,17 @@ public final class TaskItemView extends LinearLayout {
     private final Drawable mDefaultThumbnail;
     private final TaskLayerDrawable mIconDrawable;
     private final TaskLayerDrawable mThumbnailDrawable;
+    private final TaskLayerDrawable mLockIconDrawable;
     private View mTaskIconThumbnailView;
     private TextView mLabelView;
     private ImageView mIconView;
     private ImageView mThumbnailView;
+    private ImageView mLockIconView;
     private float mContentTransitionProgress;
     private int mDisplayedOrientation;
+
+    private String mStringKey;
+    private boolean mLocked;
 
     /**
      * Property representing the content transition progress of the view. 1.0f represents that the
@@ -75,6 +82,11 @@ public final class TaskItemView extends LinearLayout {
         mDefaultThumbnail = res.getDrawable(R.drawable.default_thumbnail, context.getTheme());
         mIconDrawable = new TaskLayerDrawable(context);
         mThumbnailDrawable = new TaskLayerDrawable(context);
+        if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+            mLockIconDrawable = new TaskLayerDrawable(context);
+        } else {
+            mLockIconDrawable = null;
+        }
     }
 
     @Override
@@ -87,7 +99,11 @@ public final class TaskItemView extends LinearLayout {
 
         mThumbnailView.setImageDrawable(mThumbnailDrawable);
         mIconView.setImageDrawable(mIconDrawable);
-
+        if (mLockIconDrawable != null) {
+            mLockIconView = findViewById(R.id.lock_icon);
+            mLockIconView.setVisibility(VISIBLE);
+            mLockIconView.setImageDrawable(mLockIconDrawable);
+        }
         resetToEmptyUi();
         CONTENT_TRANSITION_PROGRESS.setValue(this, 1.0f);
     }
@@ -99,6 +115,9 @@ public final class TaskItemView extends LinearLayout {
         mIconDrawable.resetDrawable();
         mThumbnailDrawable.resetDrawable();
         setLabel(EMPTY_LABEL);
+        if (mLockIconDrawable != null) {
+            mLockIconDrawable.resetDrawable();
+        }
     }
 
     /**
@@ -159,7 +178,6 @@ public final class TaskItemView extends LinearLayout {
         mIconDrawable.startNewTransition(getSafeIcon(endIcon));
         mThumbnailDrawable.startNewTransition(getSafeThumbnail(endThumbnail));
         // TODO: Animation for label
-
         setContentTransitionProgress(0.0f);
     }
 
@@ -212,5 +230,32 @@ public final class TaskItemView extends LinearLayout {
             }
         }
         mTaskIconThumbnailView.forceLayout();
+    }
+
+    @Override
+    public boolean isLocked() {
+        return mLocked;
+    }
+
+    @Override
+    public void setLocked(boolean isLocked) {
+        mLocked = isLocked;
+    }
+
+    @Override
+    public String getKey() {
+        return mStringKey;
+    }
+
+    @Override
+    public void setKey(String str) {
+        mStringKey = str;
+    }
+
+    @Override
+    public void setLockIcon(Drawable drawable) {
+        if (mLockIconDrawable != null) {
+            mLockIconDrawable.setCurrentDrawable(drawable);
+        }
     }
 }

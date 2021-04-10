@@ -475,12 +475,14 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
                 if (dragStarted) {
                     // Make sure we keep the original icon hidden while it is being dragged.
                     mOriginalIcon.setVisibility(INVISIBLE);
+                } else if (dragObject.dragItemRemoved) {
+                    handleClose(false);
                 } else {
                     mLauncher.getUserEventDispatcher().logDeepShortcutsOpen(mOriginalIcon);
                     if (!mIsAboveIcon) {
                         // Show the icon but keep the text hidden.
                         mOriginalIcon.setVisibility(VISIBLE);
-                        mOriginalIcon.setTextVisibility(false);
+                        mOriginalIcon.setTextVisibility(!mIsOpen && mOriginalIcon.shouldTextBeVisible());
                     }
                 }
             }
@@ -620,5 +622,15 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
      */
     public static PopupContainerWithArrow getOpen(Launcher launcher) {
         return getOpenView(launcher, TYPE_ACTION_POPUP);
+    }
+
+    @Override
+    public void closePopupWindowIfNeeded(PackageUserKey postedPackageUserKey) {
+        if (null != mOriginalIcon && mOriginalIcon.getTag() instanceof ItemInfo) {
+            ItemInfo itemInfo = (ItemInfo) mOriginalIcon.getTag();
+            if (PackageUserKey.fromItemInfo(itemInfo).equals(postedPackageUserKey)) {
+                closeComplete();
+            }
+        }
     }
 }

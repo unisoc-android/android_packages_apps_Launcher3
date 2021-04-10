@@ -17,7 +17,7 @@
 package com.android.quickstep.views;
 
 import static android.widget.Toast.LENGTH_SHORT;
-
+import static com.android.launcher3.LauncherState.OVERVIEW;
 import static com.android.launcher3.QuickstepAppTransitionManagerImpl.RECENTS_LAUNCH_DURATION;
 import static com.android.launcher3.anim.Interpolators.FAST_OUT_SLOW_IN;
 import static com.android.launcher3.anim.Interpolators.LINEAR;
@@ -28,7 +28,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.res.Resources;
@@ -42,13 +41,16 @@ import android.util.AttributeSet;
 import android.util.FloatProperty;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.launcher3.BaseDraggingActivity;
+import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.AnimatorPlaybackController;
@@ -73,6 +75,8 @@ import com.android.systemui.shared.recents.model.Task;
 import com.android.systemui.shared.system.ActivityManagerWrapper;
 import com.android.systemui.shared.system.ActivityOptionsCompat;
 import com.android.systemui.shared.system.QuickStepContract;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.lockicon.LockInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +85,7 @@ import java.util.function.Consumer;
 /**
  * A task in the Recents view.
  */
-public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
+public class TaskView extends FrameLayout implements PageCallbacks, Reusable, LockInfo {
 
     private static final String TAG = TaskView.class.getSimpleName();
 
@@ -172,6 +176,7 @@ public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
     private TaskThumbnailCache.ThumbnailLoadRequest mThumbnailLoadRequest;
     private TaskIconCache.IconLoadRequest mIconLoadRequest;
 
+
     // Order in which the footers appear. Lower order appear below higher order.
     public static final int INDEX_DIGITAL_WELLBEING_TOAST = 0;
     public static final int INDEX_PROACTIVE_SUGGEST = 1;
@@ -179,6 +184,10 @@ public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
     private float mFooterVerticalOffset = 0;
     private float mFooterAlpha = 1;
     private int mStackHeight;
+
+    private String mStringKey;
+    private boolean mLocked;
+    private ImageView mLockIconView;
 
     public TaskView(Context context) {
         this(context, null);
@@ -228,6 +237,12 @@ public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
         super.onFinishInflate();
         mSnapshotView = findViewById(R.id.snapshot);
         mIconView = findViewById(R.id.icon);
+        if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+            mLockIconView = (ImageView) LayoutInflater.from(getContext())
+                    .inflate(R.layout.lockicon_ext, this, false);
+            mLockIconView.setVisibility(VISIBLE);
+            addView(mLockIconView);
+        }
     }
 
     public TaskMenuView getMenuView() {
@@ -245,6 +260,7 @@ public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
         cancelPendingLoadTasks();
         mTask = task;
         mSnapshotView.bind(task);
+        initLockedStatus(getContext(), mTask);
     }
 
     public Task getTask() {
@@ -355,10 +371,20 @@ public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
             RecentsModel model = RecentsModel.INSTANCE.get(getContext());
             TaskThumbnailCache thumbnailCache = model.getThumbnailCache();
             TaskIconCache iconCache = model.getIconCache();
+            final Task.TaskKey originalKey = mTask.key;
             mThumbnailLoadRequest = thumbnailCache.updateThumbnailInBackground(
-                    mTask, thumbnail -> mSnapshotView.setThumbnail(mTask, thumbnail));
+                    mTask, thumbnail -> {
+                        if (mTask == null || mTask.key == null || !mTask.key.equals(originalKey)) {
+                            return;
+                        }
+                        mSnapshotView.setThumbnail(mTask, thumbnail);
+
+                    });
             mIconLoadRequest = iconCache.updateIconInBackground(mTask,
                     (task) -> {
+                        if (mTask == null || mTask.key == null || !mTask.key.equals(originalKey)) {
+                            return;
+                        }
                         setIcon(task.icon);
                         if (ENABLE_QUICKSTEP_LIVE_TILE.get() && isRunningTask()) {
                             getRecentsView().updateLiveTileIcon(task.icon);
@@ -386,6 +412,10 @@ public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
     }
 
     private boolean showTaskMenu(int action) {
+        if (mActivity instanceof Launcher
+                && !((Launcher) mActivity).isInState(OVERVIEW)) {
+            return false;
+        }
         getRecentsView().snapToPage(getRecentsView().indexOfChild(this));
         mMenuView = TaskMenuView.showForTask(this);
         UserEventDispatcher.newInstance(getContext()).logActionOnItem(action, Direction.NONE,
@@ -880,6 +910,42 @@ public class TaskView extends FrameLayout implements PageCallbacks, Reusable {
 
         public void setScale(float scale) {
             mScale = scale;
+        }
+    }
+
+    public Drawable getIcon() {
+        Drawable icon = mIconView != null ? mIconView.getDrawable() : null;
+        if (icon != null) {
+            return icon;
+        } else {
+            return mTask != null ? mTask.icon : null;
+        }
+    }
+
+    @Override
+    public boolean isLocked() {
+        return mLocked;
+    }
+
+    @Override
+    public void setLocked(boolean isLocked) {
+        mLocked = isLocked;
+    }
+
+    @Override
+    public String getKey() {
+        return mStringKey;
+    }
+
+    @Override
+    public void setKey(String str) {
+        mStringKey = str;
+    }
+
+    @Override
+    public void setLockIcon(Drawable drawable) {
+        if (mLockIconView != null) {
+            mLockIconView.setImageDrawable(drawable);
         }
     }
 }

@@ -24,19 +24,21 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.util.UiThreadHelper;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.LogUtils;
 
 /**
  * Utility class to manage launcher rotation
  */
 public class RotationHelper implements OnSharedPreferenceChangeListener {
 
+    private static final String TAG = "RotationHelper";
     public static final String ALLOW_ROTATION_PREFERENCE_KEY = "pref_allowRotation";
 
     public static boolean getAllowRotationDefaultValue() {
@@ -76,13 +78,14 @@ public class RotationHelper implements OnSharedPreferenceChangeListener {
     private boolean mDestroyed;
     private boolean mRotationHasDifferentUI;
 
-    private int mLastActivityFlags = -1;
+    private int mLastActivityFlags = -2;//SCREEN_ORIENTATION_UNSET = -2
 
     public RotationHelper(Launcher launcher) {
         mLauncher = launcher;
 
         // On large devices we do not handle auto-rotate differently.
-        mIgnoreAutoRotateSettings = mLauncher.getResources().getBoolean(R.bool.allow_rotation);
+        mIgnoreAutoRotateSettings = mLauncher.getResources().getBoolean(R.bool.allow_rotation)
+                || FeatureOption.SPRD_DISABLE_ROTATION.get();
         if (!mIgnoreAutoRotateSettings) {
             mPrefs = Utilities.getPrefs(mLauncher);
             mPrefs.registerOnSharedPreferenceChangeListener(this);
@@ -181,23 +184,28 @@ public class RotationHelper implements OnSharedPreferenceChangeListener {
         }
 
         final int activityFlags;
+        final int enableRotationFlag = FeatureOption.SPRD_DISABLE_ROTATION.get() ?
+                SCREEN_ORIENTATION_NOSENSOR : SCREEN_ORIENTATION_UNSPECIFIED;
         if (mStateHandlerRequest != REQUEST_NONE) {
             activityFlags = mStateHandlerRequest == REQUEST_LOCK ?
-                    SCREEN_ORIENTATION_LOCKED : SCREEN_ORIENTATION_UNSPECIFIED;
+                    SCREEN_ORIENTATION_LOCKED : enableRotationFlag;
         } else if (mCurrentTransitionRequest != REQUEST_NONE) {
             activityFlags = mCurrentTransitionRequest == REQUEST_LOCK ?
-                    SCREEN_ORIENTATION_LOCKED : SCREEN_ORIENTATION_UNSPECIFIED;
+                    SCREEN_ORIENTATION_LOCKED : enableRotationFlag;
         } else if (mCurrentStateRequest == REQUEST_LOCK) {
             activityFlags = SCREEN_ORIENTATION_LOCKED;
         } else if (mIgnoreAutoRotateSettings || mCurrentStateRequest == REQUEST_ROTATE
                 || mAutoRotateEnabled) {
-            activityFlags = SCREEN_ORIENTATION_UNSPECIFIED;
+            activityFlags = mCurrentStateRequest == REQUEST_ROTATE ?
+                    SCREEN_ORIENTATION_UNSPECIFIED : enableRotationFlag;
         } else {
             // If auto rotation is off, allow rotation on the activity, in case the user is using
             // forced rotation.
             activityFlags = SCREEN_ORIENTATION_NOSENSOR;
         }
         if (activityFlags != mLastActivityFlags) {
+            LogUtils.d(TAG, "notifyChange, activityFlags:" + activityFlags +
+                    " mLastActivityFlags:" + mLastActivityFlags);
             mLastActivityFlags = activityFlags;
             UiThreadHelper.setOrientationAsync(mLauncher, activityFlags);
         }

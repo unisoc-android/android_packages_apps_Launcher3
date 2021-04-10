@@ -29,4 +29,9 @@ public interface SearchAlgorithm {
      * Cancels any active request.
      */
     void cancel(boolean interruptActiveRequests);
+
+    /**
+     * Can search any character.
+     */
+    void setFuzzySearchEnable(boolean isFuzzySearch);
 }

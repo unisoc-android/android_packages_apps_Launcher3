@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.BaseDraggingActivity;
 import com.android.launcher3.LauncherAnimUtils;
+import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.AnimatorPlaybackController;
 import com.android.launcher3.anim.Interpolators;
@@ -41,6 +42,7 @@ import com.android.launcher3.views.BaseDragLayer;
 import com.android.quickstep.SysUINavigationMode;
 import com.android.quickstep.views.RecentsView;
 import com.android.quickstep.views.TaskView;
+import com.sprd.ext.FeatureOption;
 
 /**
  * Touch controller for handling task view card swipes
@@ -123,7 +125,10 @@ public abstract class TaskViewTouchController<T extends BaseDraggingActivity>
                     if (mRecentsView.isTaskViewVisible(view) && mActivity.getDragLayer()
                             .isEventOverView(view, ev)) {
                         mTaskBeingDragged = view;
-                        if (!SysUINavigationMode.getMode(mActivity).hasGestures) {
+                        // if support, allow swipe down to lock/unlock the task, instead of opening it
+                        if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+                            directionsToDetectScroll = SwipeDetector.DIRECTION_BOTH;
+                        } else if (!SysUINavigationMode.getMode(mActivity).hasGestures) {
                             // Don't allow swipe down to open if we don't support swipe up
                             // to enter overview.
                             directionsToDetectScroll = SwipeDetector.DIRECTION_POSITIVE;
@@ -183,18 +188,32 @@ public abstract class TaskViewTouchController<T extends BaseDraggingActivity>
         long maxDuration = (long) (2 * dl.getHeight());
 
         if (goingUp) {
-            mPendingAnimation = mRecentsView.createTaskDismissAnimation(mTaskBeingDragged,
-                    true /* animateTaskView */, true /* removeTask */, maxDuration);
-
-            mEndDisplacement = -mTaskBeingDragged.getHeight();
+            // if support, and the task is locked, don't swipe up to remove it
+            if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get() && mTaskBeingDragged.isLocked()) {
+                mEndDisplacement = -mTaskBeingDragged.getHeight()/2;
+                mPendingAnimation = mRecentsView.createSwipeAnimation(mTaskBeingDragged,
+                        mEndDisplacement, maxDuration, false);
+            } else {
+                mEndDisplacement = -mTaskBeingDragged.getHeight();
+                mPendingAnimation = mRecentsView.createTaskDismissAnimation(mTaskBeingDragged,
+                        true /* animateTaskView */, true /* removeTask */, maxDuration);
+            }
         } else {
-            mPendingAnimation = mRecentsView.createTaskLauncherAnimation(
-                    mTaskBeingDragged, maxDuration);
-            mPendingAnimation.anim.setInterpolator(Interpolators.ZOOM_IN);
-
             mTempCords[1] = mTaskBeingDragged.getHeight();
             dl.getDescendantCoordRelativeToSelf(mTaskBeingDragged, mTempCords);
-            mEndDisplacement = dl.getHeight() - mTempCords[1];
+
+            // if support, drag down to lock/unlock the task, instead of opening it
+            if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+                mEndDisplacement =  mActivity.getResources()
+                        .getDimension(R.dimen.recents_tasklock_enddisplacement);
+                mPendingAnimation = mRecentsView.createSwipeAnimation(mTaskBeingDragged,
+                        mEndDisplacement, maxDuration, true);
+            } else {
+                mEndDisplacement = dl.getHeight() - mTempCords[1];
+                mPendingAnimation = mRecentsView.createTaskLauncherAnimation(
+                        mTaskBeingDragged, maxDuration);
+                mPendingAnimation.anim.setInterpolator(Interpolators.ZOOM_IN);
+            }
         }
 
         if (mCurrentAnimation != null) {

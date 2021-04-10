@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">Irakurri gabeko bereizgarria</string>
+<string name="unread_call">Telefonoa</string>
+<string name="unread_sms">SMS</string>
+<string name="unread_email">Posta elektronikoa</string>
+<string name="unread_calendar">"Egutegia"</string>
+<string name="unread_hint">Behar den <xliff:g id="unread_type">%1$s</xliff:g> baimena falta da, eskatu baimena lehenik.</string>
+<string name="pref_missed_call_count_title">Dei galduta</string>
+<string name="pref_missed_call_count_summary">Hautatu telefono aplikazio bat, erakutsi dei galduen kopurua bertan</string>
+<string name="pref_unread_sms_count_title">Irakurri gabeko mezua</string>
+<string name="pref_unread_sms_count_summary">Hautatu SMS aplikazio bat, erakutsi irakurri gabeko mezuen kopurua bertan</string>
+<string name="pref_unread_email_count_title">Irakurri mezu elektronikoa</string>
+<string name="pref_unread_email_count_summary">Hautatu Posta elektroniko aplikazio bat, erakutsi irakurri gabeko mezu elektronikoen kopurua bertan</string>
+<string name="pref_unread_calendar_count_title">Irakurri gabeko egutegia</string>
+<string name="pref_unread_calendar_count_summary">Hautatu Egutegi aplikazio bat, erakutsi irakurri gabeko egutegiko gertaeren kopurua bertan</string>
+<string name="selected_text">Hautatuta</string>
+<string name="dynamic_icon_title">Ikono dinamikoa</string>
+<string name="allow_circular_sliding_title">Hasierako pantailaren begizta</string>
+<string name="allow_circular_sliding_summary">"Ezkerreko orri pertsonalizatua badu, ez da onartzen hasierako pantailaren errepikapena"</string>
+<string name="pull_down_action_pref_title">Ekintza hedagarria</string>
+<string name="pull_down_do_nothing">Ezer ez egin</string>
+<string name="pull_down_notification">Erakutsi jakinarazpenak</string>
+<string name="pull_down_search">Ireki bilaketa</string>
+<string name="home_screen_style_title">"Hasierako pantailaren estiloa"</string>
+<string name="home_screen_style_single">"Geruza bakarra"</string>
+<string name="home_screen_style_dual">"Bi geruza"</string>
+<string name="home_screen_style_notification">"Estiloarekin loturiko aldaketak aplikatzen hasierako pantailan"</string>
+<string name="folder_icon_model_pref_title">"Karpetaren ikonoaren estiloa"</string>
+<string name="auto_model">AUTOMATIKOA</string>
+<string name="annular_model">"Eraztun-itxurakoa"</string>
+<string name="grid_model">"sareta"</string>
+<string name="desktop_grid">"Mahaigaineko sareta"</string>
+<string name="notification_dots_ext_title">"Erakutsi jakinarazpen burbuilen zenbakia"</string>
+<string name="notification_dots_ext_summary">"Jakinarazpen burbuilak gaituta daudenean"</string>
+</resources>

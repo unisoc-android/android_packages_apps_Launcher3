@@ -32,6 +32,8 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm {
     private final List<AppInfo> mApps;
     protected final Handler mResultHandler;
 
+    private boolean mIsFuzzySearch;
+
     public DefaultAppSearchAlgorithm(List<AppInfo> apps) {
         mApps = apps;
         mResultHandler = new Handler();
@@ -42,6 +44,11 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm {
         if (interruptActiveRequests) {
             mResultHandler.removeCallbacksAndMessages(null);
         }
+    }
+
+    @Override
+    public void setFuzzySearchEnable(boolean isFuzzySearch) {
+        mIsFuzzySearch = isFuzzySearch;
     }
 
     @Override
@@ -64,14 +71,22 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm {
         final ArrayList<ComponentKey> result = new ArrayList<>();
         StringMatcher matcher = StringMatcher.getInstance();
         for (AppInfo info : mApps) {
-            if (matches(info, queryTextLower, matcher)) {
+            if (matches(info, queryTextLower, matcher, mIsFuzzySearch)) {
                 result.add(info.toComponentKey());
             }
         }
         return result;
     }
 
+    /**
+     * This is only used for test {@link DefaultAppSearchAlgorithmTest}
+     */
     public static boolean matches(AppInfo info, String query, StringMatcher matcher) {
+        // TODO: need to override DefaultAppSearchAlgorithmTest
+        return matches(info, query, matcher, false);
+    }
+
+    public static boolean matches(AppInfo info, String query, StringMatcher matcher, boolean isFuzzySearch) {
         int queryLength = query.length();
 
         String title = info.title.toString();
@@ -91,7 +106,7 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm {
             thisType = nextType;
             nextType = i < (titleLength - 1) ?
                     Character.getType(title.codePointAt(i + 1)) : Character.UNASSIGNED;
-            if (isBreak(thisType, lastType, nextType) &&
+            if ((isFuzzySearch || isBreak(thisType, lastType, nextType)) &&
                     matcher.matches(query, title.substring(i, i + queryLength))) {
                 return true;
             }

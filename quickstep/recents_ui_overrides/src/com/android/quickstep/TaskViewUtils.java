@@ -152,10 +152,13 @@ public final class TaskViewUtils {
                 // TODO: Take into account the current fullscreen progress for animating the insets
                 params.setProgress(1 - percent);
                 RectF taskBounds = inOutHelper.applyTransform(targetSet, params);
+                if (recentsView == null){
+                    return;
+                }
                 int taskIndex = recentsView.indexOfChild(v);
                 int centerTaskIndex = recentsView.getCurrentPage();
                 boolean parallaxCenterAndAdjacentTask = taskIndex != centerTaskIndex;
-                if (!skipViewChanges && parallaxCenterAndAdjacentTask) {
+                if (!skipViewChanges && parallaxCenterAndAdjacentTask && 0 != mThumbnailRect.width()) {
                     float scale = taskBounds.width() / mThumbnailRect.width();
                     v.setScaleX(scale);
                     v.setScaleY(scale);

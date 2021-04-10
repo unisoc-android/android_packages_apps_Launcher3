@@ -31,6 +31,8 @@ import com.android.launcher3.model.ModelWriter;
 import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
 import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.views.Snackbar;
+import com.sprd.ext.grid.HotseatController;
+import com.sprd.ext.multimode.MultiModeController;
 
 public class DeleteDropTarget extends ButtonDropTarget {
 
@@ -65,6 +67,12 @@ public class DeleteDropTarget extends ButtonDropTarget {
      */
     @Override
     public boolean supportsAccessibilityDrop(ItemInfo info, View view) {
+        if (MultiModeController.isSingleLayerMode()) {
+            return (info instanceof WorkspaceItemInfo
+                    && info.itemType != LauncherSettings.Favorites.ITEM_TYPE_APPLICATION)
+                    || (info instanceof LauncherAppWidgetInfo)
+                    || (info instanceof PendingAddItemInfo);
+        }
         if (info instanceof WorkspaceItemInfo) {
             // Support the action unless the item is in a context menu.
             return info.screenId >= 0;
@@ -81,6 +89,9 @@ public class DeleteDropTarget extends ButtonDropTarget {
 
     @Override
     protected boolean supportsDrop(ItemInfo info) {
+        if (MultiModeController.isSingleLayerMode()) {
+            return supportsAccessibilityDrop(info, null);
+        }
         return true;
     }
 
@@ -125,6 +136,11 @@ public class DeleteDropTarget extends ButtonDropTarget {
             onAccessibilityDrop(null, item);
             ModelWriter modelWriter = mLauncher.getModelWriter();
             Runnable onUndoClicked = () -> {
+                HotseatController hc = mLauncher.getHotseat().getController();
+                if (hc != null && item.container == LauncherSettings.Favorites.CONTAINER_HOTSEAT) {
+                    // press "Undo", we need to reset the grid in hotseat when hotseat feature is on.
+                    hc.resetGridIfNeeded(mLauncher, item.screenId);
+                }
                 modelWriter.abortDelete(itemPage);
                 mLauncher.getUserEventDispatcher().logActionOnControl(TAP, UNDO);
             };

@@ -58,6 +58,9 @@ import com.android.launcher3.util.Themes;
 import com.android.launcher3.views.BottomUserEducationView;
 import com.android.launcher3.views.RecyclerViewFastScroller;
 import com.android.launcher3.views.SpringRelativeLayout;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.navigationbar.NavigationBarController;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -124,6 +127,9 @@ public class AllAppsContainerView extends SpringRelativeLayout implements DragSo
 
         mNavBarScrimPaint = new Paint();
         mNavBarScrimPaint.setColor(Themes.getAttrColor(context, R.attr.allAppsNavBarScrimColor));
+        if (FeatureOption.SPRD_ALLAPP_BG_TRANSPARENT_SUPPORT.get()) {
+            mNavBarScrimPaint.setColor(getResources().getColor(android.R.color.transparent));
+        }
 
         mAllAppsStore.addUpdateListener(this::onAppsUpdated);
 
@@ -142,6 +148,27 @@ public class AllAppsContainerView extends SpringRelativeLayout implements DragSo
         return mMultiValueAlpha.getProperty(index);
     }
 
+    public View getQsb() {
+        return mSearchContainer.findViewWithTag("qsb_view");
+    }
+
+    public boolean isNeedUpdateQsbWhenDyNavBarEnable() {
+        NavigationBarController nbc =
+                LauncherAppMonitor.getInstance(mLauncher).getNavigationBarController();
+        return nbc != null && nbc.isDynamicNavigationBarEnable()
+                && mLauncher.isInMultiWindowMode()
+                && !mLauncher.getDeviceProfile().isVerticalBarLayout()
+                && getQsb() != null;
+    }
+
+    public void updateQsbOnWindowInsetsChanged(Rect insets) {
+        if (isNeedUpdateQsbWhenDyNavBarEnable()) {
+            mLauncher.getAllAppsController()
+                    .setScrollRangeDelta(mSearchUiManager.getScrollRangeDelta(insets));
+            mLauncher.getAllAppsController().setState(mLauncher.getStateManager().getState());
+        }
+    }
+
     @Override
     protected void setDampedScrollShift(float shift) {
         // Bound the shift amount to avoid content from drawing on top (Y-val) of the QSB.
@@ -153,6 +180,9 @@ public class AllAppsContainerView extends SpringRelativeLayout implements DragSo
     public void onDeviceProfileChanged(DeviceProfile dp) {
         for (AdapterHolder holder : mAH) {
             if (holder.recyclerView != null) {
+                // Update the column of the all app once the dp.inv.numColumns has changed.
+                holder.adapter.updateAppsPerRowAndSpanCount(dp.inv.numColumns);
+
                 // Remove all views and clear the pool, while keeping the data same. After this
                 // call, all the viewHolders will be recreated.
                 holder.recyclerView.swapAdapter(holder.recyclerView.getAdapter(), true);
@@ -324,6 +354,10 @@ public class AllAppsContainerView extends SpringRelativeLayout implements DragSo
         setLayoutParams(mlp);
 
         InsettableFrameLayout.dispatchInsets(this, insets);
+        if (isNeedUpdateQsbWhenDyNavBarEnable()
+                && mLauncher.getRootView() != null) {
+            insets = mLauncher.getRootView().getOriginalInsets();
+        }
         mLauncher.getAllAppsController()
                 .setScrollRangeDelta(mSearchUiManager.getScrollRangeDelta(insets));
     }

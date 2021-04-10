@@ -64,6 +64,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 
+import androidx.annotation.VisibleForTesting;
+
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.compat.ShortcutConfigActivityInfo;
 import com.android.launcher3.config.FeatureFlags;
@@ -133,6 +135,13 @@ public final class Utilities {
      */
     public static final int FLAG_NO_GESTURES = 1 << 9;
 
+    private static boolean sDeveloperModeEnable = false;
+
+    @VisibleForTesting
+    public static void setDeveloperModeEnableForTesting(boolean enable) {
+        sDeveloperModeEnable = enable;
+    }
+
     public static boolean shouldDisableGestures(MotionEvent ev) {
         return (ev.getEdgeFlags() & FLAG_NO_GESTURES) == FLAG_NO_GESTURES;
     }
@@ -146,6 +155,9 @@ public final class Utilities {
             Build.TYPE.toLowerCase(Locale.ROOT).equals("eng");
 
     public static boolean isDevelopersOptionsEnabled(Context context) {
+        if(sDeveloperModeEnable) {
+            return true;
+        }
         return Settings.Global.getInt(context.getApplicationContext().getContentResolver(),
                         Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) != 0;
     }
@@ -455,6 +467,10 @@ public final class Utilities {
      */
     public static int calculateTextHeight(float textSizePx) {
         Paint p = new Paint();
+        return calculateTextHeight(p, textSizePx);
+    }
+
+    public static int calculateTextHeight(Paint p, float textSizePx) {
         p.setTextSize(textSizePx);
         Paint.FontMetrics fm = p.getFontMetrics();
         return (int) Math.ceil(fm.bottom - fm.top);

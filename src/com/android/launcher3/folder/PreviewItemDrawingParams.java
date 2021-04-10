@@ -20,7 +20,7 @@ import android.graphics.drawable.Drawable;
 /**
  * Manages the parameters used to draw a Folder preview item.
  */
-class PreviewItemDrawingParams {
+public class PreviewItemDrawingParams {
     float transX;
     float transY;
     float scale;
@@ -29,7 +29,7 @@ class PreviewItemDrawingParams {
     public boolean hidden;
     Drawable drawable;
 
-    PreviewItemDrawingParams(float transX, float transY, float scale, float overlayAlpha) {
+    public PreviewItemDrawingParams(float transX, float transY, float scale, float overlayAlpha) {
         this.transX = transX;
         this.transY = transY;
         this.scale = scale;
@@ -50,5 +50,13 @@ class PreviewItemDrawingParams {
         this.transX = transX;
         this.transY = transY;
         this.scale = scale;
+    }
+
+    public float getTransY() {
+        return transY;
+    }
+
+    public float getTransX() {
+        return transX;
     }
 }

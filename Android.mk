@@ -96,8 +96,12 @@ LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 # Proguard is disable for testing. Derivarive prjects to keep proguard enabled
 LOCAL_PROGUARD_ENABLED := disabled
 
-LOCAL_SDK_VERSION := current
-LOCAL_MIN_SDK_VERSION := 21
+ifneq (,$(wildcard frameworks/base))
+  LOCAL_PRIVATE_PLATFORM_APIS := true
+else
+  LOCAL_SDK_VERSION := system_current
+  LOCAL_MIN_SDK_VERSION := 26
+endif
 LOCAL_PACKAGE_NAME := Launcher3
 LOCAL_PRIVILEGED_MODULE := true
 LOCAL_PRODUCT_MODULE := true
@@ -127,8 +131,12 @@ LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/go/res
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
-LOCAL_SDK_VERSION := current
-LOCAL_MIN_SDK_VERSION := 21
+ifneq (,$(wildcard frameworks/base))
+  LOCAL_PRIVATE_PLATFORM_APIS := true
+else
+  LOCAL_SDK_VERSION := system_current
+  LOCAL_MIN_SDK_VERSION := 26
+endif
 LOCAL_PACKAGE_NAME := Launcher3Go
 LOCAL_PRIVILEGED_MODULE := true
 LOCAL_PRODUCT_MODULE := true
@@ -299,7 +307,7 @@ LOCAL_PACKAGE_NAME := Launcher3GoIconRecents
 LOCAL_PRIVILEGED_MODULE := true
 LOCAL_PRODUCT_MODULE := true
 LOCAL_OVERRIDES_PACKAGES := Home Launcher2 Launcher3 Launcher3Go Launcher3QuickStep
-LOCAL_REQUIRED_MODULES := privapp_whitelist_com.android.launcher3
+LOCAL_REQUIRED_MODULES := privapp_whitelist_com.android.launcher3 IconRecentsConfigOverlay
 
 LOCAL_FULL_LIBS_MANIFEST_FILES := \
     $(LOCAL_PATH)/go/AndroidManifest.xml \

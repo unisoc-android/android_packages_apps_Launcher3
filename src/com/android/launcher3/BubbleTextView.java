@@ -56,6 +56,10 @@ import com.android.launcher3.icons.IconCache.ItemInfoUpdateReceiver;
 import com.android.launcher3.model.PackageItemInfo;
 import com.android.launcher3.testing.TestProtocol;
 import com.android.launcher3.views.ActivityContext;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.grid.HotseatController;
+import com.sprd.ext.notificationdots.NotifyDotsNumUtils;
+import com.sprd.ext.unreadnotifier.DotDrawUtils;
 
 import java.text.NumberFormat;
 
@@ -110,6 +114,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
 
     private final boolean mLayoutHorizontal;
     private final int mIconSize;
+    private float mIconTextSize;
 
     @ViewDebug.ExportedProperty(category = "launcher")
     private boolean mIsIconVisible = true;
@@ -159,18 +164,22 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
             setTextSize(TypedValue.COMPLEX_UNIT_PX, grid.iconTextSizePx);
             setCompoundDrawablePadding(grid.iconDrawablePaddingPx);
             defaultIconSize = grid.iconSizePx;
+            mIconTextSize = grid.iconTextSizePx;
         } else if (display == DISPLAY_ALL_APPS) {
             DeviceProfile grid = mActivity.getDeviceProfile();
             setTextSize(TypedValue.COMPLEX_UNIT_PX, grid.allAppsIconTextSizePx);
             setCompoundDrawablePadding(grid.allAppsIconDrawablePaddingPx);
             defaultIconSize = grid.allAppsIconSizePx;
+            mIconTextSize = grid.allAppsIconTextSizePx;
         } else if (display == DISPLAY_FOLDER) {
             DeviceProfile grid = mActivity.getDeviceProfile();
             setTextSize(TypedValue.COMPLEX_UNIT_PX, grid.folderChildTextSizePx);
             setCompoundDrawablePadding(grid.folderChildDrawablePaddingPx);
             defaultIconSize = grid.folderChildIconSizePx;
+            mIconTextSize = grid.folderChildTextSizePx;
         } else {
             defaultIconSize = mActivity.getDeviceProfile().iconSizePx;
+            mIconTextSize = mActivity.getWallpaperDeviceProfile().iconTextSizePx;
         }
         mCenterVertically = a.getBoolean(R.styleable.BubbleTextView_centerVertically, false);
 
@@ -183,6 +192,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
 
         mDotParams = new DotRenderer.DrawParams();
 
+        setMaxLines(mActivity.getDeviceProfile().maxIconLabelLines);
         setEllipsize(TruncateAt.END);
         setAccessibilityDelegate(mActivity.getAccessibilityDelegate());
         setTextAlpha(1f);
@@ -319,6 +329,13 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        HotseatController hc = LauncherAppMonitor.getInstance(getContext()).getHotseatController();
+        if (hc != null && event.getAction() == MotionEvent.ACTION_DOWN
+                && hc.isNeedInterceptHotseatTouch(event, this)) {
+            // hotseat icon/blank area new touch event for hotseat adaptive feature.
+            return false;
+        }
+
         if (TestProtocol.sDebugTracing) {
             Log.d(TestProtocol.NO_START_TAG, "BubbleTextView.onTouchEvent " + event);
         }
@@ -401,11 +418,30 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
     }
 
     /**
+     * To read the db we support first, if the number is minus or 0, use notification count instead.
+     * @return unread number
+     */
+    private int getDotCount() {
+        int unreadNum = 0;
+        Object obj = getTag();
+        if (obj instanceof ItemInfo) {
+            ItemInfo info = (ItemInfo) obj;
+            unreadNum = info.unreadNum;
+            if (NotifyDotsNumUtils.showNotifyDotsNum(getContext()) && unreadNum <= 0 && mDotInfo != null) {
+                unreadNum = mDotInfo.getNotificationCount();
+            }
+        }
+        return unreadNum;
+    }
+
+    /**
      * Draws the notification dot in the top right corner of the icon bounds.
      * @param canvas The canvas to draw to.
      */
     protected void drawDotIfNecessary(Canvas canvas) {
-        if (!mForceHideDot && (hasDot() || mDotParams.scale > 0)) {
+        if (!mForceHideDot && DotDrawUtils.shouldDrawDotCount(this)) {
+            DotDrawUtils.drawDotAndCountIfNeed(canvas, this, getDotCount());
+        } else if (!mForceHideDot && (hasDot() || mDotParams.scale > 0)) {
             getIconBounds(mDotParams.iconBounds);
             Utilities.scaleRectAboutCenter(mDotParams.iconBounds, IconShape.getNormalizationScale());
             final int scrollX = getScrollX();
@@ -423,6 +459,8 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
         mForceHideDot = forceHideDot;
 
         if (forceHideDot) {
+            invalidate();
+        } else if (DotDrawUtils.shouldDrawDotCount(this)) {
             invalidate();
         } else if (hasDot()) {
             animateDotScale(0, 1);
@@ -448,9 +486,9 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver, 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (mCenterVertically) {
-            Paint.FontMetrics fm = getPaint().getFontMetrics();
+            int maxIconLabelLines =  mActivity.getDeviceProfile().maxIconLabelLines;
             int cellHeightPx = mIconSize + getCompoundDrawablePadding() +
-                    (int) Math.ceil(fm.bottom - fm.top);
+                    Utilities.calculateTextHeight(getPaint(), mIconTextSize) * maxIconLabelLines;
             int height = MeasureSpec.getSize(heightMeasureSpec);
             setPadding(getPaddingLeft(), (height - cellHeightPx) / 2, getPaddingRight(),
                     getPaddingBottom());

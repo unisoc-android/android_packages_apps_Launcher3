@@ -23,6 +23,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -178,7 +179,13 @@ public class TaskMenuView extends AbstractFloatingView {
     }
 
     private void addMenuOptions(TaskView taskView) {
-        Drawable icon = taskView.getTask().icon.getConstantState().newDrawable();
+        Drawable icon;
+        if (null != taskView.getIcon()) {
+            icon = taskView.getIcon().getConstantState().newDrawable();
+        } else {
+            icon = Resources.getSystem()
+                    .getDrawable(android.R.drawable.sym_def_app_icon, null);
+        }
         mTaskIcon.setDrawable(icon);
         mTaskIcon.setOnClickListener(v -> close(true));
         mTaskName.setText(TaskUtils.getTitle(getContext(), taskView.getTask()));

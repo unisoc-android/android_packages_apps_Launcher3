@@ -64,8 +64,10 @@ public class WidgetsDiffReporter {
         }
         ArrayList<WidgetListRowEntry> orgEntries =
                 (ArrayList<WidgetListRowEntry>) currentEntries.clone();
+        ArrayList<WidgetListRowEntry> newEntriesClone =
+                (ArrayList<WidgetListRowEntry>) newEntries.clone();
         Iterator<WidgetListRowEntry> orgIter = orgEntries.iterator();
-        Iterator<WidgetListRowEntry> newIter = newEntries.iterator();
+        Iterator<WidgetListRowEntry> newIter = newEntriesClone.iterator();
 
         WidgetListRowEntry orgRowEntry = orgIter.next();
         WidgetListRowEntry newRowEntry = newIter.next();

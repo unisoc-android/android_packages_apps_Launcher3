@@ -129,7 +129,7 @@ public class FloatingIconView extends View implements
 
     private final Launcher mLauncher;
     private final int mBlurSizeOutline;
-
+    private final boolean mIsRtl;
     private boolean mIsVerticalBarLayout = false;
     private boolean mIsAdaptiveIcon = false;
     private boolean mIsOpening;
@@ -174,6 +174,7 @@ public class FloatingIconView extends View implements
         mLauncher = Launcher.getLauncher(context);
         mBlurSizeOutline = getResources().getDimensionPixelSize(
                 R.dimen.blur_size_medium_outline);
+        mIsRtl = Utilities.isRtl(getResources());
         mListenerView = new ListenerView(context, attrs);
 
         mFgSpringX = new SpringAnimation(this, mFgTransXProperty)
@@ -213,7 +214,10 @@ public class FloatingIconView extends View implements
         setAlpha(alpha);
 
         LayoutParams lp = (LayoutParams) getLayoutParams();
-        float dX = rect.left - lp.leftMargin;
+        float dX = mIsRtl
+                ? rect.left
+                - (mLauncher.getDeviceProfile().widthPx - lp.getMarginStart() - lp.width)
+                : rect.left - lp.getMarginStart();
         float dY = rect.top - lp.topMargin;
         setTranslationX(dX);
         setTranslationY(dY);
@@ -325,12 +329,17 @@ public class FloatingIconView extends View implements
         // Position the floating view exactly on top of the original
         lp.leftMargin = Math.round(position.left);
         lp.topMargin = Math.round(position.top);
-
+        if (mIsRtl) {
+            lp.setMarginStart(Math.round(mLauncher.getDeviceProfile().widthPx - position.right));
+        } else {
+            lp.setMarginStart(Math.round(position.left));
+        }
         // Set the properties here already to make sure they are available when running the first
         // animation frame.
-        layout(lp.leftMargin, lp.topMargin, lp.leftMargin + lp.width, lp.topMargin
-                + lp.height);
-
+        int left = mIsRtl
+                ? mLauncher.getDeviceProfile().widthPx - lp.getMarginStart() - lp.width
+                : lp.leftMargin;
+        layout(left, lp.topMargin, left + lp.width, lp.topMargin + lp.height);
     }
 
     /**
@@ -408,6 +417,7 @@ public class FloatingIconView extends View implements
             int height = isFolderIcon ? originalView.getHeight() : (int) pos.height();
             if (supportsAdaptiveIcons) {
                 drawable = getFullDrawable(l, info, width, height, false, sTmpObjArray);
+
                 if (drawable instanceof AdaptiveIconDrawable) {
                     badge = getBadge(l, info, sTmpObjArray[0]);
                 } else {
@@ -514,9 +524,10 @@ public class FloatingIconView extends View implements
             } else {
                 lp.height = (int) Math.max(lp.height, lp.width * aspectRatio);
             }
-            layout(lp.leftMargin, lp.topMargin, lp.leftMargin + lp.width, lp.topMargin
-                    + lp.height);
-
+            int left = mIsRtl
+                    ? mLauncher.getDeviceProfile().widthPx - lp.getMarginStart() - lp.width
+                    : lp.leftMargin;
+            layout(left, lp.topMargin, left + lp.width, lp.topMargin + lp.height);
             float scale = Math.max((float) lp.height / originalHeight,
                     (float) lp.width / originalWidth);
             float bgDrawableStartScale;
@@ -704,7 +715,7 @@ public class FloatingIconView extends View implements
      */
     @UiThread
     public static IconLoadResult fetchIcon(Launcher l, View v, ItemInfo info, boolean isOpening) {
-        IconLoadResult result = new IconLoadResult();
+        IconLoadResult result = new IconLoadResult(info);
         new Handler(LauncherModel.getWorkerLooper()).postAtFrontOfQueue(() -> {
             RectF position = new RectF();
             getLocationBoundsForView(l, v, isOpening, position);
@@ -733,10 +744,13 @@ public class FloatingIconView extends View implements
 
         // Get the drawable on the background thread
         boolean shouldLoadIcon = originalView.getTag() instanceof ItemInfo && hideOriginal;
-        view.mIconLoadResult = sIconLoadResult;
-        if (shouldLoadIcon && view.mIconLoadResult == null) {
-            view.mIconLoadResult = fetchIcon(launcher, originalView,
-                    (ItemInfo) originalView.getTag(), isOpening);
+        if (shouldLoadIcon) {
+            if (sIconLoadResult != null && sIconLoadResult.itemInfo == originalView.getTag()) {
+                view.mIconLoadResult = sIconLoadResult;
+            } else {
+                view.mIconLoadResult = fetchIcon(launcher, originalView,
+                        (ItemInfo) originalView.getTag(), isOpening);
+            }
         }
         sIconLoadResult = null;
 
@@ -878,10 +892,15 @@ public class FloatingIconView extends View implements
     }
 
     private static class IconLoadResult {
+        final ItemInfo itemInfo;
         Drawable drawable;
         Drawable badge;
         int iconOffset;
         Runnable onIconLoaded;
         boolean isIconLoaded;
+
+        public IconLoadResult(ItemInfo itemInfo) {
+            this.itemInfo = itemInfo;
+        }
     }
 }

@@ -96,6 +96,41 @@
     </grid-option>
 
     <grid-option
+        launcher:name="4_by_5"
+        launcher:numRows="5"
+        launcher:numColumns="4"
+        launcher:numFolderRows="4"
+        launcher:numFolderColumns="4"
+        launcher:numHotseatIcons="4"
+        launcher:defaultLayoutId="@xml/default_workspace_4x5" >
+
+        <display-option
+            launcher:name="Short Stubby"
+            launcher:minWidthDps="275"
+            launcher:minHeightDps="420"
+            launcher:iconImageSize="48"
+            launcher:iconTextSize="13.0"
+            launcher:canBeDefault="true" />
+
+        <display-option
+            launcher:name="Nexus S"
+            launcher:minWidthDps="296"
+            launcher:minHeightDps="491.33"
+            launcher:iconImageSize="48"
+            launcher:iconTextSize="13.0"
+            launcher:canBeDefault="true" />
+
+        <display-option
+            launcher:name="Nexus 5"
+            launcher:minWidthDps="335"
+            launcher:minHeightDps="567"
+            launcher:iconImageSize="54"
+            launcher:iconTextSize="13.0"
+            launcher:canBeDefault="true" />
+
+    </grid-option>
+
+    <grid-option
         launcher:name="5_by_5"
         launcher:numRows="5"
         launcher:numColumns="5"

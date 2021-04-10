@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"<xliff:g id="count">%1$s</xliff:g> ଉପଲବ୍ଧ"</string>
+<string name="recents_clean_finished_toast">"<xliff:g id="count">%1$s</xliff:g> ମେମୋରୀ ମୂକ୍ତ କରନ୍ତୁ, <xliff:g id="count">%2$s</xliff:g>  ଏବେ ଉପଲବ୍ଧ ଅଛି"</string>
+<string name="recents_nothing_to_clear">"କ୍ୟାଚ୍‌ରେ ପରିସ୍କାର କରିବାକୁ କିଛି ନାହିଁ"</string>
+</resources>

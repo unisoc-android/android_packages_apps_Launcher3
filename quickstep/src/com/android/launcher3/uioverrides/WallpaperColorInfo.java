@@ -27,13 +27,18 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.android.launcher3.util.Themes;
 import com.android.systemui.shared.system.TonalCompat;
 import com.android.systemui.shared.system.TonalCompat.ExtractionInfo;
+import com.sprd.ext.LogUtils;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
+
 @TargetApi(Build.VERSION_CODES.P)
 public class WallpaperColorInfo implements OnColorsChangedListener {
+    private static final String TAG = "WallpaperColorInfo";
 
     private static final int MAIN_COLOR_LIGHT = 0xffdadce0;
     private static final int MAIN_COLOR_DARK = 0xff202124;
@@ -51,15 +56,18 @@ public class WallpaperColorInfo implements OnColorsChangedListener {
         }
     }
 
+    private final Context mAppContext;
     private final ArrayList<OnChangeListener> mListeners = new ArrayList<>();
     private final WallpaperManager mWallpaperManager;
     private final TonalCompat mTonalCompat;
 
     private ExtractionInfo mExtractionInfo;
+    private boolean mIsDarkTheme;
 
     private OnChangeListener[] mTempListeners = new OnChangeListener[0];
 
     private WallpaperColorInfo(Context context) {
+        mAppContext = context;
         mWallpaperManager = context.getSystemService(WallpaperManager.class);
         mTonalCompat = new TonalCompat(context);
 
@@ -89,14 +97,35 @@ public class WallpaperColorInfo implements OnColorsChangedListener {
 
     @Override
     public void onColorsChanged(WallpaperColors colors, int which) {
+        if (LogUtils.DEBUG_EXTERNAL_MSG) {
+            LogUtils.d(TAG, "onColorsChanged, which:" + which + " colors:" + colors);
+        }
+        if (null == colors) {
+            LogUtils.d(TAG, "onColorsChanged, wallpaperColors is null.");
+            if(Themes.isDarkTheme(mAppContext, this)) {
+                LogUtils.d(TAG, "The current theme is dark, don't notify.");
+                return;
+            }
+        }
+
         if ((which & FLAG_SYSTEM) != 0) {
             update(colors);
             notifyChange();
         }
     }
 
+    public void updateIfNeeded() {
+        if (mIsDarkTheme != Themes.isDarkTheme(mAppContext, this)) {
+            update(mWallpaperManager.getWallpaperColors(FLAG_SYSTEM));
+        }
+    }
+
     private void update(WallpaperColors wallpaperColors) {
         mExtractionInfo = mTonalCompat.extractDarkColors(wallpaperColors);
+        mIsDarkTheme = Themes.isDarkTheme(mAppContext, this);
+        if (LogUtils.DEBUG_EXTERNAL_MSG) {
+            LogUtils.d(TAG, "update done, " + this);
+        }
     }
 
     public void addOnChangeListener(OnChangeListener listener) {
@@ -119,5 +148,15 @@ public class WallpaperColorInfo implements OnColorsChangedListener {
 
     public interface OnChangeListener {
         void onExtractedColorsChanged(WallpaperColorInfo wallpaperColorInfo);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "MainColor:" + Integer.toHexString(getMainColor()) +
+                " SecondaryColor:" + Integer.toHexString(getSecondaryColor()) +
+                " isDark:" + isDark() +
+                " supportsDarkText:" + supportsDarkText() +
+                " isMainColorDark:" + isMainColorDark();
     }
 }

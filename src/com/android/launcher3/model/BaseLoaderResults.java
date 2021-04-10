@@ -73,6 +73,21 @@ public abstract class BaseLoaderResults {
         mCallbacks = callbacks == null ? new WeakReference<>(null) : callbacks;
     }
 
+    private void verifyScreenId(IntArray screenIds) {
+        Callbacks callbacks = mCallbacks.get();
+        if (callbacks == null) {
+            return;
+        }
+
+        IntSet screenSet = IntSet.wrap(screenIds);
+        screenIds.clear();
+        IntArray pendingScreens = callbacks.getDropPendingScreens();
+        for (int i = 0; i < pendingScreens.size(); i++) {
+            screenSet.add(pendingScreens.get(i));
+        }
+        screenIds.addAll(screenSet.getArray());
+    }
+
     /**
      * Binds all loaded data to actual views on the main thread.
      */
@@ -95,6 +110,7 @@ public abstract class BaseLoaderResults {
             workspaceItems.addAll(mBgDataModel.workspaceItems);
             appWidgets.addAll(mBgDataModel.appWidgets);
             orderedScreenIds.addAll(mBgDataModel.collectWorkspaceScreens());
+            verifyScreenId(orderedScreenIds);
             mBgDataModel.lastBindId++;
             mMyBindingId = mBgDataModel.lastBindId;
         }
@@ -104,8 +120,10 @@ public abstract class BaseLoaderResults {
             int currScreen = mPageToBindFirst != PagedView.INVALID_RESTORE_PAGE
                     ? mPageToBindFirst : callbacks.getCurrentWorkspaceScreen();
             if (currScreen >= orderedScreenIds.size()) {
-                // There may be no workspace screens (just hotseat items and an empty page).
-                currScreen = PagedView.INVALID_RESTORE_PAGE;
+                // There may be no workspace screens (just hotseat items and an empty page),
+                // Else page to bind is empty and not saved in db.
+                currScreen = orderedScreenIds.size() == 0 ? PagedView.INVALID_RESTORE_PAGE
+                        : (orderedScreenIds.size() - 1);
             }
             currentScreen = currScreen;
         }

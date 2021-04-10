@@ -105,8 +105,12 @@ public class StaggeredWorkspaceAnim {
             View hotseat = launcher.getHotseat().getChildAt(0);
             addStaggeredAnimationForView(hotseat, grid.inv.numRows + 1, totalRows);
 
-            View qsb = launcher.findViewById(R.id.search_container_all_apps);
-            addStaggeredAnimationForView(qsb, grid.inv.numRows + 2, totalRows);
+            // Don't use the all apps search, because only add the animation for the idle screen.
+            // View qsb = launcher.findViewById(R.id.search_container_all_apps);
+            View qsb = launcher.getAppsView().getQsb();
+            if (qsb != null) {
+                addStaggeredAnimationForView(qsb, grid.inv.numRows + 2, totalRows);
+            }
         }
 
         addWorkspaceScrimAnimationForState(launcher, BACKGROUND_APP, 0);

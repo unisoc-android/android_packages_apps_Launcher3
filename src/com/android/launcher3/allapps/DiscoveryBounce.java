@@ -37,6 +37,7 @@ import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.states.InternalStateHandler;
+import com.sprd.ext.multimode.MultiModeController;
 
 /**
  * Abstract base class of floating view responsible for showing discovery bounce animation
@@ -149,7 +150,8 @@ public class DiscoveryBounce extends AbstractFloatingView {
                 && !shouldShowForWorkProfile(launcher))
                 || AbstractFloatingView.getTopOpenView(launcher) != null
                 || UserManagerCompat.getInstance(launcher).isDemoUser()
-                || Utilities.IS_RUNNING_IN_TEST_HARNESS) {
+                || Utilities.IS_RUNNING_IN_TEST_HARNESS
+                || MultiModeController.isSingleLayerMode()) {
             return;
         }
 

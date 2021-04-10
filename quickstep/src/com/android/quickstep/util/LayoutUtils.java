@@ -26,7 +26,9 @@ import androidx.annotation.IntDef;
 
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.R;
-import com.android.launcher3.config.FeatureFlags;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.clearall.ClearAllController;
+import com.sprd.ext.meminfo.MeminfoController;
 
 import java.lang.annotation.Retention;
 
@@ -91,7 +93,9 @@ public class LayoutUtils {
 
         float topIconMargin = res.getDimension(R.dimen.task_thumbnail_top_margin);
         float paddingVert = res.getDimension(R.dimen.task_card_vert_space);
+        float paddingBottom = getOverviewBottomItemsHeight(res);
 
+        paddingVert = Math.max(paddingVert, paddingBottom);
         // Note this should be same as dp.availableWidthPx and dp.availableHeightPx unless
         // we override the insets ourselves.
         int launcherVisibleWidth = dp.widthPx - insets.left - insets.right;
@@ -106,9 +110,9 @@ public class LayoutUtils {
         float outHeight = scale * taskHeight;
 
         // Center in the visible space
+        float space = launcherVisibleHeight - extraVerticalSpace - outHeight;
         float x = insets.left + (launcherVisibleWidth - outWidth) / 2;
-        float y = insets.top + Math.max(topIconMargin,
-                (launcherVisibleHeight - extraVerticalSpace - outHeight) / 2);
+        float y = insets.top + Math.max(topIconMargin, Math.min(space - paddingBottom, space / 2));
         outRect.set(Math.round(x), Math.round(y),
                 Math.round(x) + Math.round(outWidth), Math.round(y) + Math.round(outHeight));
     }
@@ -119,5 +123,19 @@ public class LayoutUtils {
         int spaceBetweenShelfAndRecents = (int) context.getResources().getDimension(
                 R.dimen.task_card_vert_space);
         return shelfHeight + spaceBetweenShelfAndRecents;
+    }
+
+    public static float getOverviewBottomItemsHeight(Resources res) {
+        float height = 0f;
+        if (ClearAllController.IS_SUPPORT_CLEAR_ALL_ON_BOTTOM) {
+            height += res.getDimension(R.dimen.recents_clearall_height);
+        }
+        if (MeminfoController.IS_SUPPORT_SHOW_MEMINFO) {
+            height += res.getDimension(R.dimen.recents_tasklock_enddisplacement);
+        }
+        if (Float.compare(height, 0f) != 0) {
+            height += res.getDimension(R.dimen.recents_bottom_padding);
+        }
+        return height;
     }
 }

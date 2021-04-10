@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"Badge non lu"</string>
+<string name="unread_call">"Tél."</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">e-mail</string>
+<string name="unread_calendar">"calendrier"</string>
+<string name="unread_hint">"l\'autorisation <xliff:g id="unread_type">%1$s</xliff:g> requise est absente, veuillez d\'abord appliquer l\'autorisation."</string>
+<string name="pref_missed_call_count_title">"Appel manqué"</string>
+<string name="pref_missed_call_count_summary">"Sélectionnez une application du téléphone pour afficher les numéro des appels en absence dessus"</string>
+<string name="pref_unread_sms_count_title">"Message non lu"</string>
+<string name="pref_unread_sms_count_summary">"Sélectionnez une application SMS pour afficher les numéro des messages non lus dessus"</string>
+<string name="pref_unread_email_count_title">"E-mails non lus"</string>
+<string name="pref_unread_email_count_summary">"Sélectionnez une application de messagerie pour afficher les e-mails non lus dessus"</string>
+<string name="pref_unread_calendar_count_title">"Événements du calendrier non lus"</string>
+<string name="pref_unread_calendar_count_summary">"Sélectionnez l\'application Calendrier pour afficher les événements de calendrier non lus dessus"</string>
+<string name="selected_text">"Séléctionné"</string>
+<string name="dynamic_icon_title">"Icône dynamique"</string>
+<string name="allow_circular_sliding_title">"Boucle de l\'écran d\'accueil"</string>
+<string name="allow_circular_sliding_summary">"Le paramètre de contenu personnalisé de la page de gauche ne permet pas d\'établir une boucle sur l\'écran d\'accueil"</string>
+<string name="pull_down_action_pref_title">"Action descendante"</string>
+<string name="pull_down_do_nothing">"Ne rien faire"</string>
+<string name="pull_down_notification">"Afficher les notifications"</string>
+<string name="pull_down_search">"Ouvrir la recherche"</string>
+<string name="home_screen_style_title">" Style de l’écran d’accueil "</string>
+<string name="home_screen_style_single">" Couche unique "</string>
+<string name="home_screen_style_dual">" Double couche "</string>
+<string name="home_screen_style_notification">" Application des modifications du style d’écran d’accueil "</string>
+<string name="folder_icon_model_pref_title">" Style d’icône du dossier "</string>
+<string name="auto_model">"Automatique"</string>
+<string name="annular_model">" Annulaire "</string>
+<string name="grid_model">"grille"</string>
+<string name="desktop_grid">" Grille du bureau "</string>
+<string name="notification_dots_ext_title">"Afficher le nombre de points de notification"</string>
+<string name="notification_dots_ext_summary">"Lorsque les points de notification sont activés"</string>
+</resources>

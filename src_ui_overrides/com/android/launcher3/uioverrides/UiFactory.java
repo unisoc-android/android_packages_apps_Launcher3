@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.text.TextUtils;
 
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Launcher;
@@ -65,8 +66,8 @@ public class UiFactory {
     public static void useFadeOutAnimationForLauncherStart(Launcher launcher,
             CancellationSignal cancellationSignal) { }
 
-    public static boolean dumpActivity(Activity activity, PrintWriter writer) {
-        return false;
+    public static boolean dumpActivity(Activity activity, PrintWriter writer, String[] args) {
+        return !(args.length > 0 && TextUtils.equals(args[0], "--all"));
     }
 
     public static void setBackButtonAlpha(Launcher launcher, float alpha, boolean animate) { }

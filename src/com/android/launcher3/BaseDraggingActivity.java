@@ -38,6 +38,7 @@ import com.android.launcher3.testing.TestProtocol;
 import com.android.launcher3.uioverrides.DisplayRotationListener;
 import com.android.launcher3.uioverrides.WallpaperColorInfo;
 import com.android.launcher3.util.Themes;
+import com.sprd.ext.LauncherAppMonitor;
 
 import androidx.annotation.Nullable;
 
@@ -70,6 +71,7 @@ public abstract class BaseDraggingActivity extends BaseActivity
 
         // Update theme
         WallpaperColorInfo wallpaperColorInfo = WallpaperColorInfo.getInstance(this);
+        wallpaperColorInfo.updateIfNeeded();
         wallpaperColorInfo.addOnChangeListener(this);
         int themeRes = Themes.getActivityThemeRes(this);
         if (themeRes != mThemeRes) {
@@ -92,6 +94,7 @@ public abstract class BaseDraggingActivity extends BaseActivity
     private void updateTheme() {
         if (mThemeRes != Themes.getActivityThemeRes(this)) {
             recreate();
+            LauncherAppMonitor.getInstance(this).onLauncherThemeChanged();
         }
     }
 
@@ -147,6 +150,10 @@ public abstract class BaseDraggingActivity extends BaseActivity
         Bundle optsBundle = (v != null) ? getActivityLaunchOptionsAsBundle(v) : null;
         UserHandle user = item == null ? null : item.user;
 
+        if (!com.sprd.ext.FeatureOption.SPRD_APP_REMOTE_ANIM_SUPPORT.get() && v != null) {
+            optsBundle = ActivityOptions.makeScaleUpAnimation(v, 0, 0,
+                             v.getMeasuredWidth(), v.getMeasuredHeight()).toBundle();
+        }
         // Prepare intent
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (v != null) {

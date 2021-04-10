@@ -20,6 +20,8 @@ import android.util.Log;
 
 import com.android.launcher3.FolderInfo;
 import com.android.launcher3.InvariantDeviceProfile;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.folder.FolderIconController;
 
 import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
 
@@ -75,6 +77,14 @@ public class FolderIconPreviewVerifier {
     public boolean isItemInPreview(int page, int rank) {
         if (mGridSize[0] == 1) {
             Log.w(TAG, "setFolderInfo not called before checking if item is in preview.");
+        }
+
+        LauncherAppMonitor monitor = LauncherAppMonitor.getInstanceNoCreate();
+        if (monitor != null) {
+            FolderIconController fic = monitor.getFolderIconController();
+            if (fic != null && fic.isGridFolderIcon()) {
+                return rank < fic.getGridLayoutRule().getMaxNumItemsInPreview();
+            }
         }
 
         // First page items are laid out such that the first 4 items are always in the upper

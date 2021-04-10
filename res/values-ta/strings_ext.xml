@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"படிக்கப்படாத பேட்ஜ்"</string>
+<string name="unread_call">"தொலைபேசி"</string>
+<string name="unread_sms">"எஸ் எம் எஸ்"</string>
+<string name="unread_email">மின்னஞ்சல்</string>
+<string name="unread_calendar">"நாள்காட்டி"</string>
+<string name="unread_hint">"<xliff:g id="unread_type">%1$s</xliff:g> க்குத் தேவைப்படும் அனுமதி இல்லை, முதலில் அனுமதிக்கு விண்ணப்பிக்கவும்."</string>
+<string name="pref_missed_call_count_title">"தவறிய அழைப்பு"</string>
+<string name="pref_missed_call_count_summary">"ஒரு ஃபோன் பயன்பாட்டைத் தேர்ந்தெடுத்து, தவறவிட்ட அழைப்புகள் எண்ணை அதில் காட்டவும்"</string>
+<string name="pref_unread_sms_count_title">"படிக்கப்படாத உரை செய்தி"</string>
+<string name="pref_unread_sms_count_summary">"ஒரு SMS பயன்பாட்டைத் தேர்ந்தெடுத்து, படிக்கப்படாத செய்திகளின் எண்ணிக்கையை அதில் காட்டவும்"</string>
+<string name="pref_unread_email_count_title">"படிக்கப்படாத மின்னஞ்சல்"</string>
+<string name="pref_unread_email_count_summary">"ஒரு மின்னஞ்சல் பயன்பாட்டைத் தேர்ந்தெடுத்து, அதில் படிக்கப்படாத அஞ்சல்களின் எண்ணைக் காட்டவும்"</string>
+<string name="pref_unread_calendar_count_title">"படிக்கப்படாத காலெண்டர்"</string>
+<string name="pref_unread_calendar_count_summary">"காலெண்டர் பயன்பாட்டைத் தேர்ந்தெடுத்து, படிக்கப்படாத காலெண்டர் நிகழ்வுகளை அதில் காண்பிக்கவும்"</string>
+<string name="selected_text">"தேர்வுசெய்யப்பட்டது"</string>
+<string name="dynamic_icon_title">"டைனமிக் ஐகான்"</string>
+<string name="allow_circular_sliding_title">"முகப்பு திரை லூப்"</string>
+<string name="allow_circular_sliding_summary">"தனிப்பயனான இடது பக்கம் இருந்தால்,முகப்பு திரை லூப்பை அனுமதிக்காது"</string>
+<string name="pull_down_action_pref_title">"கீழே இழுக்கும் செயற்பாடு"</string>
+<string name="pull_down_do_nothing">"ஒன்று செய்ய வேண்டாம்"</string>
+<string name="pull_down_notification">அறிவிப்புக்கள் காட்டவும்</string>
+<string name="pull_down_search">"தேடுதலை திறக்கவும்"</string>
+<string name="home_screen_style_title">"முகப்பு திரை பாணி"</string>
+<string name="home_screen_style_single">"ஒற்றை அடுக்கு"</string>
+<string name="home_screen_style_dual">"இரட்டை அடுக்கு"</string>
+<string name="home_screen_style_notification">"முகப்பு திரை பாணி மாற்றங்கள் செயல்படுத்தப்படுகிறது"</string>
+<string name="folder_icon_model_pref_title">"கோப்புறை சின்னப் பாணி"</string>
+<string name="auto_model">"தானியங்கு"</string>
+<string name="annular_model">"ஆனுலர்"</string>
+<string name="grid_model">"கட்டம்"</string>
+<string name="desktop_grid">"டெஸ்க்டாப் கிரிட்"</string>
+<string name="notification_dots_ext_title">"அறிவிப்புப் புள்ளிகளின் எண்ணைக் காட்டு"</string>
+<string name="notification_dots_ext_summary">"அறிவிப்புப் புள்ளிகள் இருக்கும்போது"</string>
+</resources>

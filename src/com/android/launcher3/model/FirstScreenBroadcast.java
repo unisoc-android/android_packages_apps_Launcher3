@@ -25,6 +25,7 @@ import com.android.launcher3.FolderInfo;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherAppWidgetInfo;
 import com.android.launcher3.LauncherSettings;
+import com.android.launcher3.WorkspaceItemInfo;
 import com.android.launcher3.util.MultiHashMap;
 
 import java.util.ArrayList;
@@ -103,8 +104,9 @@ public class FirstScreenBroadcast {
         for (ItemInfo info : firstScreenItems) {
             if (info instanceof FolderInfo) {
                 FolderInfo folderInfo = (FolderInfo) info;
+                ArrayList<WorkspaceItemInfo> folderContents = new ArrayList<>(folderInfo.contents);
                 String folderItemInfoPackage;
-                for (ItemInfo folderItemInfo : folderInfo.contents) {
+                for (ItemInfo folderItemInfo : folderContents) {
                     folderItemInfoPackage = getPackageName(folderItemInfo);
                     if (folderItemInfoPackage != null
                             && packages.contains(folderItemInfoPackage)) {

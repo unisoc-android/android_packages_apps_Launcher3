@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"নপঢ়া বেজ"</string>
+<string name="unread_call">"ফোন"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">"ই-মেইল"</string>
+<string name="unread_calendar">"কেলেণ্ডাৰ"</string>
+<string name="unread_hint">"মিছ অনুমতিৰ <xliff:g id="unread_type">%1$s</xliff:g> প্ৰয়োজন, অনুগ্ৰহ কৰি প্ৰথম অনুমতিৰ কাৰণে আবেদন কৰক|"</string>
+<string name="pref_missed_call_count_title">"মিচড কল।"</string>
+<string name="pref_missed_call_count_summary">"এটা ফোন এপ্প বাচনি কৰক, ইয়াত মিছদ হোৱা ক’ল নম্বৰ সমূহ প্ৰদৰ্শিত হ’ব |"</string>
+<string name="pref_unread_sms_count_title">"পঢ়িব নোৱাৰা মেছেজ"</string>
+<string name="pref_unread_sms_count_summary">"এটা ফোন এপ্প বাচনি কৰক, ইয়াত মিছদ হোৱা ক’ল নম্বৰ সমূহ প্ৰদৰ্শিত হ’ব |"</string>
+<string name="pref_unread_email_count_title">"নপঢ়া মেইল"</string>
+<string name="pref_unread_email_count_summary">"এটা ফোন এপ্প বাচনি কৰক, ইয়াত মিছদ হোৱা ক’ল নম্বৰ সমূহ প্ৰদৰ্শিত হ’ব |"</string>
+<string name="pref_unread_calendar_count_title">"নপঢ়া কেলেণ্ডাৰ"</string>
+<string name="pref_unread_calendar_count_summary">"এটা ফোন এপ্প বাচনি কৰক, ইয়াত মিছদ হোৱা ক’ল নম্বৰ সমূহ প্ৰদৰ্শিত হ’ব |"</string>
+<string name="selected_text">"চয়নিত"</string>
+<string name="dynamic_icon_title">"ডায়নামিক আইকণ"</string>
+<string name="allow_circular_sliding_title">"হোম স্ক্ৰীণ লুপ"</string>
+<string name="allow_circular_sliding_summary">"যদিহে কাষ্টমে পেজ এৰি দিয়ে, তেন্তে হোম স্ক্ৰীণ লুপৰ বাবে অনুমতি নিদিয়ে"</string>
+<string name="pull_down_action_pref_title">"পুল ডাউন ক্ৰিয়া"</string>
+<string name="pull_down_do_nothing">"একো নকৰিব"</string>
+<string name="pull_down_notification">"অধিসূচনা প্ৰদৰ্শন কৰক"</string>
+<string name="pull_down_search">"অনুসন্ধান খোলক"</string>
+<string name="home_screen_style_title">"গৃহ স্ক্ৰীণৰ শৈলী"</string>
+<string name="home_screen_style_single">"একক স্তৰ"</string>
+<string name="home_screen_style_dual">"দ্বৈত স্তৰ"</string>
+<string name="home_screen_style_notification">"গৃহ স্ক্ৰীণৰ শৈলীৰ পৰিবৰ্তন প্ৰয়োগ কৰি আছে"</string>
+<string name="folder_icon_model_pref_title">"ফল্ডাৰ আইকন শৈলী"</string>
+<string name="auto_model">"অটো"</string>
+<string name="annular_model">"বলয়াকাৰ"</string>
+<string name="grid_model">"গ্ৰিড"</string>
+<string name="desktop_grid">"ডেস্কটপ গ্ৰিড"</string>
+<string name="notification_dots_ext_title">"অধিসূচনা ডট নম্বৰ দেখুওৱাওক"</string>
+<string name="notification_dots_ext_summary">"যেতিয়া অধিসূচনা ডটসমূহ অন থাকে"</string>
+</resources>

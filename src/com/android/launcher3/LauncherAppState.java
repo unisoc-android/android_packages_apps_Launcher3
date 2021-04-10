@@ -19,14 +19,12 @@ package com.android.launcher3;
 import static com.android.launcher3.InvariantDeviceProfile.CHANGE_FLAG_ICON_PARAMS;
 import static com.android.launcher3.util.SecureSettingsObserver.newNotificationSettingsObserver;
 
-import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
-import android.os.Process;
 import android.util.Log;
 
 import com.android.launcher3.compat.LauncherAppsCompat;
@@ -39,13 +37,14 @@ import com.android.launcher3.notification.NotificationListener;
 import com.android.launcher3.util.MainThreadInitializedObject;
 import com.android.launcher3.util.Preconditions;
 import com.android.launcher3.util.SecureSettingsObserver;
+import com.sprd.ext.LauncherAppMonitor;
 
 public class LauncherAppState {
 
     public static final String ACTION_FORCE_ROLOAD = "force-reload-launcher";
 
     // We do not need any synchronization for this variable as its only written on UI thread.
-    private static final MainThreadInitializedObject<LauncherAppState> INSTANCE =
+    public static final MainThreadInitializedObject<LauncherAppState> INSTANCE =
             new MainThreadInitializedObject<>((c) -> new LauncherAppState(c));
 
     private final Context mContext;
@@ -76,6 +75,7 @@ public class LauncherAppState {
         Preconditions.assertUIThread();
         mContext = context;
 
+        LauncherAppMonitor lam = LauncherAppMonitor.getInstance(mContext);
         mInvariantDeviceProfile = InvariantDeviceProfile.INSTANCE.get(mContext);
         mIconCache = new IconCache(mContext, mInvariantDeviceProfile);
         mWidgetCache = new WidgetPreviewLoader(mContext, mIconCache);
@@ -92,6 +92,8 @@ public class LauncherAppState {
         filter.addAction(Intent.ACTION_MANAGED_PROFILE_AVAILABLE);
         filter.addAction(Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE);
         filter.addAction(Intent.ACTION_MANAGED_PROFILE_UNLOCKED);
+        // For launcher may start when user is unlocking state.
+        filter.addAction(Intent.ACTION_USER_UNLOCKED);
 
         if (FeatureFlags.IS_DOGFOOD_BUILD) {
             filter.addAction(ACTION_FORCE_ROLOAD);
@@ -111,6 +113,7 @@ public class LauncherAppState {
             mNotificationDotsObserver.register();
             mNotificationDotsObserver.dispatchOnChange();
         }
+        lam.onAppCreated(mContext);
     }
 
     protected void onNotificationSettingsChanged(boolean areNotificationDotsEnabled) {

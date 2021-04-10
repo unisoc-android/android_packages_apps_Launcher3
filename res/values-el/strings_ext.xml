@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"Μη αναγνωσμένο σήμα"</string>
+<string name="unread_call">"Τηλέφωνο"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">"διεύθυνση ηλεκτρονικού ταχυδρομείου"</string>
+<string name="unread_calendar">"ημερολογιο"</string>
+<string name="unread_hint">"Λείπει η απαιτούμενη <xliff:g id="unread_type">%1$s</xliff:g> άδεια. Υποβάλετε πρώτα αίτηση για άδεια."</string>
+<string name="pref_missed_call_count_title">"Αναπάντητη κλήση"</string>
+<string name="pref_missed_call_count_summary">"Επιλέξτε μια εφαρμογή τηλεφώνου. Εμφανίστε σε αυτήν τον αριθμό αναπάντητων κλήσεων"</string>
+<string name="pref_unread_sms_count_title">"Μη αναγνωσμένο μήνυμα"</string>
+<string name="pref_unread_sms_count_summary">"Επιλέξτε μια εφαρμογή τηλεφώνου. Εμφανίστε σε αυτήν τον αριθμό μη αναγνωσμένων μηνυμάτων"</string>
+<string name="pref_unread_email_count_title">"Μη αναγνωσμένο email"</string>
+<string name="pref_unread_email_count_summary">"Επιλέξτε μια εφαρμογή email. Εμφανίστε σε αυτήν τον αριθμό μη αναγνωσμένων email"</string>
+<string name="pref_unread_calendar_count_title">"Μη αναγνωσμένο ημερολόγιο"</string>
+<string name="pref_unread_calendar_count_summary">"Επιλέξτε μια εφαρμογή ημερολογίου. Εμφανίστε σε αυτήν τον αριθμό μη αναγνωσμένων συμβάντων ημερολογίου"</string>
+<string name="selected_text">"Επιλέχθηκε"</string>
+<string name="dynamic_icon_title">"Δυναμικό εικονίδιο"</string>
+<string name="allow_circular_sliding_title">"Βρόχος αρχικής οθόνης"</string>
+<string name="allow_circular_sliding_summary">"Η ρύθμιση αριστερή σελίδα προσαρμοσμένου περιεχομένου δεν επιτρέπει βρόχο αρχικής οθόνης"</string>
+<string name="pull_down_action_pref_title">Ενέργεια τραβήγματος προς τα κάτω</string>
+<string name="pull_down_do_nothing">"Να μην γίνει καμία ενέργεια"</string>
+<string name="pull_down_notification">"Εμφάν. ειδοποιήσεων"</string>
+<string name="pull_down_search">Άνοιγμα αναζήτησης</string>
+<string name="home_screen_style_title">Στυλ αρχικής οθόνης</string>
+<string name="home_screen_style_single">Απλής στρώσης</string>
+<string name="home_screen_style_dual">Διπλής στρώσης</string>
+<string name="home_screen_style_notification">Εφαρμόζονται οι αλλαγές του στυλ αρχικής οθόνης</string>
+<string name="folder_icon_model_pref_title">Στυλ εικονιδίου φακέλου</string>
+<string name="auto_model">Αυτόματη</string>
+<string name="annular_model">Δακτυλιοειδές</string>
+<string name="grid_model">"πλέγμα"</string>
+<string name="desktop_grid">Πλέγμα επιφάνειας εργασίας</string>
+<string name="notification_dots_ext_title">"Εμφάνιση αριθμού κουκκίδων ειδοποίησης"</string>
+<string name="notification_dots_ext_summary">"Όταν είναι ενεργοποιημένες οι κουκκίδες ειδοποίησης"</string>
+</resources>

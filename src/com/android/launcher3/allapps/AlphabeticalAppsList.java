@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 import com.android.launcher3.AppInfo;
+import com.android.launcher3.BubbleTextView;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.compat.AlphabeticIndexCompat;
@@ -27,6 +28,7 @@ import com.android.launcher3.testing.TestProtocol;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.ItemInfoMatcher;
 import com.android.launcher3.util.LabelComparator;
+import com.sprd.ext.LauncherAppMonitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +48,7 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
     private static final int FAST_SCROLL_FRACTION_DISTRIBUTE_BY_ROWS_FRACTION = 0;
     private static final int FAST_SCROLL_FRACTION_DISTRIBUTE_BY_NUM_SECTIONS = 1;
 
-    private final int mFastScrollDistributionMode = FAST_SCROLL_FRACTION_DISTRIBUTE_BY_NUM_SECTIONS;
+    private static final int sFastScrollDistributionMode = FAST_SCROLL_FRACTION_DISTRIBUTE_BY_NUM_SECTIONS;
 
     /**
      * Info about a fast scroller section, depending if sections are merged, the fast scroller
@@ -87,6 +89,8 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
         public AppInfo appInfo = null;
         // The index of this app not including sections
         public int appIndex = -1;
+        // The icon view of this app
+        BubbleTextView iconView = null;
 
         public static AdapterItem asApp(int pos, String sectionName, AppInfo appInfo,
                 int appIndex) {
@@ -287,6 +291,7 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
             }
         }
 
+        LauncherAppMonitor.getInstance(mLauncher).onAllAppsListUpdated(mApps);
         // Recompose the set of adapter items from the current set of apps
         updateAdapterItems();
     }
@@ -377,7 +382,7 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
             mNumAppRowsInAdapter = rowIndex + 1;
 
             // Pre-calculate all the fast scroller fractions
-            switch (mFastScrollDistributionMode) {
+            switch (sFastScrollDistributionMode) {
                 case FAST_SCROLL_FRACTION_DISTRIBUTE_BY_ROWS_FRACTION:
                     float rowFraction = 1f / mNumAppRowsInAdapter;
                     for (FastScrollSectionInfo info : mFastScrollerSections) {

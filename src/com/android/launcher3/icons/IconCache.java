@@ -33,6 +33,7 @@ import com.android.launcher3.AppInfo;
 import com.android.launcher3.IconProvider;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.ItemInfoWithIcon;
+import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.LauncherModel;
 import com.android.launcher3.MainThreadExecutor;
@@ -47,6 +48,7 @@ import com.android.launcher3.icons.cache.HandlerRunnable;
 import com.android.launcher3.model.PackageItemInfo;
 import com.android.launcher3.util.InstantAppResolver;
 import com.android.launcher3.util.Preconditions;
+import com.sprd.ext.FeatureOption;
 
 import java.util.function.Supplier;
 
@@ -72,7 +74,7 @@ public class IconCache extends BaseIconCache {
     private int mPendingIconRequestCount = 0;
 
     public IconCache(Context context, InvariantDeviceProfile inv) {
-        super(context, LauncherFiles.APP_ICONS_DB, LauncherModel.getWorkerLooper(),
+        super(context, LauncherFiles.getAppIconsDb(context), LauncherModel.getWorkerLooper(),
                 inv.fillResIconDpi, inv.iconBitmapSize, true /* inMemoryCache */);
         mComponentWithLabelCachingLogic = new ComponentCachingLogic(context);
         mLauncherActivityInfoCachingLogic = new LauncherActivtiyCachingLogic(this);
@@ -207,6 +209,13 @@ public class IconCache extends BaseIconCache {
             boolean usePkgIcon, boolean useLowResIcon) {
         CacheEntry entry = cacheLocked(infoInOut.getTargetComponent(), infoInOut.user,
                 activityInfoProvider, mLauncherActivityInfoCachingLogic, usePkgIcon, useLowResIcon);
+
+        if (FeatureOption.SPRD_FAST_UPDATE_LABEL.get()
+                && LauncherAppState.getInstance(mContext).getModel().isLanguageChanging()
+                && activityInfoProvider.get() != null) {
+            entry.title = activityInfoProvider.get().getLabel();
+        }
+
         applyCacheEntry(entry, infoInOut);
     }
 

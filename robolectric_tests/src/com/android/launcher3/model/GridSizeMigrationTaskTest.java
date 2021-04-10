@@ -2,6 +2,7 @@ package com.android.launcher3.model;
 
 import static com.android.launcher3.model.GridSizeMigrationTask.getWorkspaceScreenIds;
 
+import static com.sprd.ext.FeatureOption.SPRD_DESKTOP_GRID_SUPPORT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -54,8 +55,19 @@ public class GridSizeMigrationTaskTest extends BaseGridChangesTestCase {
         };
 
         mIdp.numHotseatIcons = 3;
-        new GridSizeMigrationTask(mContext, mDb, mValidPackages, 5, 3)
-                .migrateHotseat();
+//        new GridSizeMigrationTask(mContext, mDb, mValidPackages, 5, 3)
+//                .migrateHotseat();
+        int destHotseatSize = 3;
+        GridSizeMigrationTask migrationTask =
+                new GridSizeMigrationTask(mContext, mDb, mValidPackages, 5, destHotseatSize);
+        migrationTask.migrateHotseat();
+        if (SPRD_DESKTOP_GRID_SUPPORT.get()) {
+            // The dropped item from the hotseat will be added to the workspace and not removed
+            // from the database.
+            migrationTask.setTargetSize(new Point(1, destHotseatSize));
+            migrationTask.migrateItemsFormHotseatToWorkspace();
+        }
+
         // First item is dropped as it has the least weight.
         verifyHotseat(hotseatItems[1], hotseatItems[3], hotseatItems[4]);
     }
@@ -71,8 +83,19 @@ public class GridSizeMigrationTaskTest extends BaseGridChangesTestCase {
         };
 
         mIdp.numHotseatIcons = 3;
-        new GridSizeMigrationTask(mContext, mDb, mValidPackages, 5, 3)
-                .migrateHotseat();
+//        new GridSizeMigrationTask(mContext, mDb, mValidPackages, 5, 3)
+//                .migrateHotseat();
+        int destHotseatSize = 3;
+        GridSizeMigrationTask migrationTask =
+                new GridSizeMigrationTask(mContext, mDb, mValidPackages, 5, destHotseatSize);
+        migrationTask.migrateHotseat();
+        if (SPRD_DESKTOP_GRID_SUPPORT.get()) {
+            // The dropped item from the hotseat will be added to the workspace and not removed
+            // from the database.
+            migrationTask.setTargetSize(new Point(1, destHotseatSize));
+            migrationTask.migrateItemsFormHotseatToWorkspace();
+        }
+
         // First item is dropped as it has the least weight.
         verifyHotseat(hotseatItems[1], hotseatItems[3], hotseatItems[4]);
     }
@@ -272,11 +295,13 @@ public class GridSizeMigrationTaskTest extends BaseGridChangesTestCase {
      */
     private void verifyWorkspace(int[][][] ids) {
         IntArray allScreens = getWorkspaceScreenIds(mDb);
-        assertEquals(ids.length, allScreens.size());
+//        assertEquals(ids.length, allScreens.size());
+        assertEquals(ids.length + mScreenIndexOffset, allScreens.size());
         int total = 0;
 
         for (int i = 0; i < ids.length; i++) {
-            int screenId = allScreens.get(i);
+//            int screenId = allScreens.get(i);
+            int screenId = allScreens.get(i + mScreenIndexOffset);
             for (int y = 0; y < ids[i].length; y++) {
                 for (int x = 0; x < ids[i][y].length; x++) {
                     int id = ids[i][y][x];
@@ -300,6 +325,8 @@ public class GridSizeMigrationTaskTest extends BaseGridChangesTestCase {
             }
         }
 
+        mScreenIndexOffset = 0;
+
         // Verify that not other entry exist in the DB.
         Cursor c = mContext.getContentResolver().query(LauncherSettings.Favorites.CONTENT_URI,
                 new String[]{LauncherSettings.Favorites._ID},
@@ -310,7 +337,10 @@ public class GridSizeMigrationTaskTest extends BaseGridChangesTestCase {
 
     @Test
     public void testMultiStepMigration_small_to_large() throws Exception {
-        MultiStepMigrationTaskVerifier verifier = new MultiStepMigrationTaskVerifier();
+//        MultiStepMigrationTaskVerifier verifier = new MultiStepMigrationTaskVerifier();
+        MultiStepMigrationTaskVerifier verifier = new MultiStepMigrationTaskVerifier(
+                3, 3, 5, 5
+        );
         verifier.migrate(new Point(3, 3), new Point(5, 5));
         verifier.assertCompleted();
     }
@@ -328,7 +358,8 @@ public class GridSizeMigrationTaskTest extends BaseGridChangesTestCase {
     @Test
     public void testMultiStepMigration_zig_zag() throws Exception {
         MultiStepMigrationTaskVerifier verifier = new MultiStepMigrationTaskVerifier(
-                5, 7, 4, 7,
+//                5, 7, 4, 7,
+                5, 5, 4, 7,
                 4, 7, 3, 7
         );
         verifier.migrate(new Point(5, 5), new Point(3, 7));

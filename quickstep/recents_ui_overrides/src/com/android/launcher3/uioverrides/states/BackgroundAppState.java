@@ -68,8 +68,11 @@ public class BackgroundAppState extends OverviewState {
         if (taskCount == 0) {
             return super.getOverviewScaleAndTranslation(launcher);
         }
-        TaskView dummyTask = recentsView.getTaskViewAt(Math.max(taskCount - 1,
+        TaskView dummyTask = recentsView.getTaskViewAt(Math.min(taskCount - 1,
                 recentsView.getCurrentPage()));
+        if (null == dummyTask) {
+            return super.getOverviewScaleAndTranslation(launcher);
+        }
         return recentsView.getTempClipAnimationHelper().updateForFullscreenOverview(dummyTask)
                 .getScaleAndTranslation();
     }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"សញ្ញាមិនទាន់អាន"</string>
+<string name="unread_call">"ទូរស័ព្ទ"</string>
+<string name="unread_sms">"សារអេសអេមអេស"</string>
+<string name="unread_email">"អ៊ីមែល"</string>
+<string name="unread_calendar">ប្រតិទិន</string>
+<string name="unread_hint">"ការខកខានទាមទារការអនុញ្ញាត <xliff:g id="unread_type">%1$s</xliff:g> សូមដាក់ពាក្យសុំការអនុញ្ញាតជាមុន។"</string>
+<string name="pref_missed_call_count_title">"ការហៅបានខក"</string>
+<string name="pref_missed_call_count_summary">"ជ្រើសរើសកម្មវិធីទូរស័ព្ទ បង្ហាញលេខហៅដែលខកខាននៅលើវា"</string>
+<string name="pref_unread_sms_count_title">"សារមិនទាន់អាន"</string>
+<string name="pref_unread_sms_count_summary">"ជ្រើសរើសកម្មវិធីសារ SMS បង្ហាញលេខសារមិនទាន់អាននៅលើវា"</string>
+<string name="pref_unread_email_count_title">"អ៊ីម៉ែលមិនទាន់អាន"</string>
+<string name="pref_unread_email_count_summary">"ជ្រើសរើសកម្មវិធីអ៊ីម៉ែល បង្ហាញលេខអ៊ីម៉ែលមិនទាន់អាននៅលើវា"</string>
+<string name="pref_unread_calendar_count_title">"ប្រតិទិនមិនទាន់អាន"</string>
+<string name="pref_unread_calendar_count_summary">"ជ្រើសកម្មវិធីប្រតិទិន បង្ហាញព្រឹត្តិការណ៍ប្រតិទិនមិនទាន់អាននៅលើវា"</string>
+<string name="selected_text">បានជ្រើសរើស</string>
+<string name="dynamic_icon_title">"រូបតំណាងថាមវន្ត"</string>
+<string name="allow_circular_sliding_title">"រង្វិលជុំទំព័រដើម"</string>
+<string name="allow_circular_sliding_summary">"ប្រសិនបើមានទំព័រខាងឆ្វេងតាមតម្រូវការ នោះមិនអនុញ្ញាតរង្វិលជុំអេក្រង់ដើមឡើយ"</string>
+<string name="pull_down_action_pref_title">"ទាញ​សកម្មភាព​ចុះ​ក្រោម"</string>
+<string name="pull_down_do_nothing">"មិន​ធ្វើ​អ្វី​សោះ"</string>
+<string name="pull_down_notification">"បង្ហាញ​ការ​ជូន​ដំណឹង"</string>
+<string name="pull_down_search">"បើក​ការ​ស្វែងរក"</string>
+<string name="home_screen_style_title">"រចនាបថអេក្រង់ដើម"</string>
+<string name="home_screen_style_single">"ស្រទាប់ទោល"</string>
+<string name="home_screen_style_dual">"ស្រទាប់ពីរ"</string>
+<string name="home_screen_style_notification">"កំពុងអនុវត្តការផ្លាស់ប្តូររចនាបថអេក្រង់ដើម"</string>
+<string name="folder_icon_model_pref_title">"រចនាបថរូបតំណាងថត"</string>
+<string name="auto_model">ស្វ័យប្រវត្តិ</string>
+<string name="annular_model">"ដែលមានរាងដូចកង"</string>
+<string name="grid_model">"ក្រឡា"</string>
+<string name="desktop_grid">"ក្រឡាចត្រង្គលើកុំព្យូទ័រលើតុ"</string>
+<string name="notification_dots_ext_title">"បង្ហាញចំនួនចំណុចជូនដំណឹង"</string>
+<string name="notification_dots_ext_summary">"នៅពេលចំណុចជូនដំណឹងបានបើក"</string>
+</resources>

@@ -19,6 +19,8 @@ import static com.android.quickstep.TaskAdapter.TASKS_START_POSITION;
 import static com.android.quickstep.TaskUtils.getLaunchComponentKeyForTask;
 
 import android.app.ActivityOptions;
+import android.content.Context;
+import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -28,13 +30,19 @@ import com.android.quickstep.views.TaskItemView;
 import com.android.systemui.shared.recents.model.Task;
 import com.android.systemui.shared.recents.model.Task.TaskKey;
 import com.android.systemui.shared.system.ActivityManagerWrapper;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.lockicon.TaskLockStatus;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Controller that provides logic for task-related commands on recents and updating the model/view
  * as appropriate.
  */
 public final class TaskActionController {
-
+    private static final String TAG = "TaskActionController";
     private final TaskListLoader mLoader;
     private final TaskAdapter mAdapter;
     private final StatsLogManager mStatsLogManager;
@@ -75,9 +83,14 @@ public final class TaskActionController {
      * @param task the task to launch
      */
     public void launchTask(@NonNull Task task) {
+        launchTask(task, null, null);
+    }
+
+    public void launchTask(@NonNull Task task, Consumer<Boolean> resultCallback,
+                           Handler resultCallbackHandle) {
         ActivityOptions opts = ActivityOptions.makeBasic();
         ActivityManagerWrapper.getInstance().startActivityFromRecentsAsync(task.key, opts,
-                null /* resultCallback */, null /* resultCallbackHandler */);
+                resultCallback, resultCallbackHandle);
         mStatsLogManager.logTaskLaunch(null /* view */, getLaunchComponentKeyForTask(task.key));
     }
 
@@ -106,5 +119,24 @@ public final class TaskActionController {
         ActivityManagerWrapper.getInstance().removeAllRecentTasks();
         mLoader.clearAllTasks();
         mAdapter.notifyItemRangeRemoved(TASKS_START_POSITION /* positionStart */, count);
+    }
+
+    /**
+     * Clears all unlocked tasks.
+     */
+    public boolean clearAllUnlockedTasks(Context context) {
+        boolean isRemoved = false;
+        List<Task> tasks = new ArrayList<>(mLoader.getCurrentTaskList());
+        for (Task task : tasks) {
+            if (!TaskLockStatus.isSavedLockedTask(context, TaskLockStatus.makeTaskStringKey(context, task))) {
+                if (LogUtils.DEBUG_ALL) {
+                    LogUtils.d(TAG, "clearAllUnlockedTasks: " + task.key.baseIntent.getComponent());
+                }
+                ActivityManagerWrapper.getInstance().removeTask(task.key.id);
+                mLoader.removeTask(task);
+                isRemoved = true;
+            }
+        }
+        return isRemoved;
     }
 }

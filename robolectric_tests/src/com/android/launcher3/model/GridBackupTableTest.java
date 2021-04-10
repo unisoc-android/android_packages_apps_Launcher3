@@ -7,6 +7,8 @@ import static com.android.launcher3.LauncherSettings.Favorites.BACKUP_TABLE_NAME
 import static com.android.launcher3.LauncherSettings.Favorites.TABLE_NAME;
 import static com.android.launcher3.provider.LauncherDbUtils.tableExists;
 
+import static com.sprd.ext.FeatureOption.SPRD_DESKTOP_GRID_SUPPORT;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -109,7 +111,12 @@ public class GridBackupTableTest extends BaseGridChangesTestCase {
         assertTrue(mContext.getContentResolver()
                 .update(Favorites.CONTENT_URI, values, null, null) > 0);
 
-        // Backup table remains
-        assertTrue(tableExists(mDb, BACKUP_TABLE_NAME));
+        if (SPRD_DESKTOP_GRID_SUPPORT.get()) {
+            // Backup table removed
+            assertFalse(tableExists(mDb, BACKUP_TABLE_NAME));
+        } else {
+            // Backup table remains
+            assertTrue(tableExists(mDb, BACKUP_TABLE_NAME));
+        }
     }
 }

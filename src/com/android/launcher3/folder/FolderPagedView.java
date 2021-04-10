@@ -46,6 +46,9 @@ import com.android.launcher3.keyboard.ViewGroupFocusHelper;
 import com.android.launcher3.pageindicators.PageIndicatorDots;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.util.Thunk;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.folder.FolderIconController;
+import com.sprd.ext.folder.GridFolder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -117,6 +120,16 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
      */
     public static void calculateGridSize(int count, int countX, int countY, int maxCountX,
             int maxCountY, int maxItemsPerPage, int[] out) {
+        LauncherAppMonitor monitor = LauncherAppMonitor.getInstanceNoCreate();
+        if (monitor != null) {
+            FolderIconController fic = monitor.getFolderIconController();
+            if (fic != null && fic.isGridFolderIcon()) {
+                out[0] = maxCountX;
+                out[1] = maxCountY;
+                return;
+            }
+        }
+
         boolean done;
         int gridCountX = countX;
         int gridCountY = countY;
@@ -230,8 +243,10 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
 
     @SuppressLint("InflateParams")
     public View createNewView(WorkspaceItemInfo item) {
+        int layoutId = mFolder instanceof GridFolder ?
+                R.layout.grid_folder_application : R.layout.folder_application;
         final BubbleTextView textView = (BubbleTextView) mInflater.inflate(
-                R.layout.folder_application, null, false);
+                layoutId, null, false);
         textView.applyFromWorkspaceItem(item);
         textView.setHapticFeedbackEnabled(false);
         textView.setOnClickListener(ItemClickHandler.INSTANCE);
@@ -376,9 +391,12 @@ public class FolderPagedView extends PagedView<PageIndicatorDots> {
 
         // Update footer
         mPageIndicator.setVisibility(getPageCount() > 1 ? View.VISIBLE : View.GONE);
-        // Set the gravity as LEFT or RIGHT instead of START, as START depends on the actual text.
-        mFolder.mFolderName.setGravity(getPageCount() > 1 ?
-                (mIsRtl ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
+        FolderIconController fic = LauncherAppMonitor.getInstance(getContext()).getFolderIconController();
+        if (fic == null || fic.isNativeFolderIcon()) {
+            // Set the gravity as LEFT or RIGHT instead of START, as START depends on the actual text.
+            mFolder.mFolderName.setGravity(getPageCount() > 1 ?
+                    (mIsRtl ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
+        }
     }
 
     public int getDesiredWidth() {

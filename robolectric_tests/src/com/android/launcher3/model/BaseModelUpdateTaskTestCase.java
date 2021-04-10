@@ -25,11 +25,13 @@ import com.android.launcher3.LauncherModel;
 import com.android.launcher3.LauncherModel.Callbacks;
 import com.android.launcher3.LauncherModel.ModelUpdateTask;
 import com.android.launcher3.LauncherProvider;
+import com.android.launcher3.icons.BitmapInfo;
 import com.android.launcher3.icons.IconCache;
 import com.android.launcher3.icons.cache.CachingLogic;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.TestLauncherProvider;
 
+import org.junit.After;
 import org.junit.Before;
 import org.mockito.ArgumentCaptor;
 import org.robolectric.Robolectric;
@@ -40,6 +42,7 @@ import org.robolectric.shadows.ShadowLog;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -68,6 +71,8 @@ public class BaseModelUpdateTaskTestCase {
     public AllAppsList allAppsList;
     public Callbacks callbacks;
 
+    public ArrayList<String> mAppSortConfigs;
+
     @Before
     public void setUp() throws Exception {
         ShadowLog.stream = System.out;
@@ -80,6 +85,7 @@ public class BaseModelUpdateTaskTestCase {
         model = mock(LauncherModel.class);
         modelWriter = mock(ModelWriter.class);
 
+        LauncherAppState.INSTANCE.initializeForTesting(appState);
         when(appState.getModel()).thenReturn(model);
         when(model.getWriter(anyBoolean(), anyBoolean())).thenReturn(modelWriter);
         when(model.getCallback()).thenReturn(callbacks);
@@ -97,6 +103,11 @@ public class BaseModelUpdateTaskTestCase {
         when(appState.getIconCache()).thenReturn(iconCache);
         when(appState.getInvariantDeviceProfile()).thenReturn(idp);
         when(appState.getContext()).thenReturn(targetContext);
+    }
+
+    @After
+    public void tearDownBaseCase() {
+        mProvider.getDataBaseHelper().close();
     }
 
     /**
@@ -123,6 +134,7 @@ public class BaseModelUpdateTaskTestCase {
                 this.getClass().getResourceAsStream(resourceName)))) {
             String line;
             HashMap<String, Class> classMap = new HashMap<>();
+            mAppSortConfigs = new ArrayList<>();
             while((line = reader.readLine()) != null) {
                 line = line.trim();
                 if (line.startsWith("#") || line.isEmpty()) {
@@ -139,6 +151,9 @@ public class BaseModelUpdateTaskTestCase {
                         break;
                     case "allApps":
                         allAppsList.add((AppInfo) initItem(AppInfo.class, commands, 1), null);
+                        break;
+                    case "appSort":
+                        mAppSortConfigs.add(commands[1]);
                         break;
                 }
             }
@@ -204,6 +219,11 @@ public class BaseModelUpdateTaskTestCase {
                 getDefaultIcon(user).applyTo(entry);
             }
             return entry;
+        }
+
+        @Override
+        public synchronized BitmapInfo getDefaultIcon(UserHandle user) {
+            return BitmapInfo.fromBitmap(newIcon());
         }
 
         public void addCache(ComponentName key, String title) {

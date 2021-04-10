@@ -142,11 +142,14 @@ public class TaskSystemShortcut<T extends SystemShortcut> extends SystemShortcut
                             @Override
                             public void onLayoutChange(View v, int l, int t, int r, int b,
                                     int oldL, int oldT, int oldR, int oldB) {
-                                taskView.getRootView().removeOnLayoutChangeListener(this);
+                                recentsView.getRootView().removeOnLayoutChangeListener(this);
                                 recentsView.clearIgnoreResetTask(taskId);
 
-                                // Start animating in the side pages once launcher has been resized
-                                recentsView.dismissTask(taskView, false, false);
+                                TaskView tv = recentsView.getTaskView(taskId);
+                                if (null != tv) {
+                                    // Start animating in the side pages once launcher has been resized
+                                    recentsView.dismissTask(tv, false, false);
+                                }
                             }
                         };
 
@@ -156,7 +159,7 @@ public class TaskSystemShortcut<T extends SystemShortcut> extends SystemShortcut
                             public void onDeviceProfileChanged(DeviceProfile dp) {
                                 activity.removeOnDeviceProfileChangeListener(this);
                                 if (dp.isMultiWindowMode) {
-                                    taskView.getRootView().addOnLayoutChangeListener(
+                                    recentsView.getRootView().addOnLayoutChangeListener(
                                             onLayoutChangeListener);
                                 }
                             }
@@ -206,9 +209,13 @@ public class TaskSystemShortcut<T extends SystemShortcut> extends SystemShortcut
                                     taskId, thumbnail, taskBounds));
                         }
                     };
+                    int viewDisplayID = DEFAULT_DISPLAY;
+                    if (v.getDisplay() != null) {
+                        viewDisplayID = v.getDisplay().getDisplayId();
+                    }
                     WindowManagerWrapper.getInstance().overridePendingAppTransitionMultiThumbFuture(
                             future, animStartedListener, mHandler, true /* scaleUp */,
-                            v.getDisplay().getDisplayId());
+                            viewDisplayID);
                 }
             });
         }

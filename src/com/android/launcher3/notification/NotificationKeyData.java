@@ -62,4 +62,14 @@ public class NotificationKeyData {
         // Only compare the keys.
         return ((NotificationKeyData) obj).notificationKey.equals(notificationKey);
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "NotificationKeyData{ " +
+                "notificationKey = " + notificationKey +
+                ", shortcutId = " + shortcutId +
+                ", count = " + count +
+                " }";
+    }
 }

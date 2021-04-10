@@ -19,6 +19,7 @@ import static com.android.launcher3.ui.TaplTestsLauncher3.getAppPackageName;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assume.assumeFalse;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -78,14 +79,20 @@ public class RequestPinItemTest extends AbstractLauncherUiTest {
 
     @Test
     public void testPinWidgetNoConfig() throws Throwable {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         runTest("pinWidgetNoConfig", true, (info, view) -> info instanceof LauncherAppWidgetInfo &&
                 ((LauncherAppWidgetInfo) info).appWidgetId == mAppWidgetId &&
                 ((LauncherAppWidgetInfo) info).providerName.getClassName()
                         .equals(AppWidgetNoConfig.class.getName()));
     }
 
-        @Test
+    @Test
     public void testPinWidgetNoConfig_customPreview() throws Throwable {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         // Command to set custom preview
         Intent command =  RequestPinItemActivity.getCommandIntent(
                 RequestPinItemActivity.class, "setRemoteViewColor").putExtra(
@@ -99,6 +106,9 @@ public class RequestPinItemTest extends AbstractLauncherUiTest {
 
     @Test
     public void testPinWidgetWithConfig() throws Throwable {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         runTest("pinWidgetWithConfig", true,
                 (info, view) -> info instanceof LauncherAppWidgetInfo &&
                         ((LauncherAppWidgetInfo) info).appWidgetId == mAppWidgetId &&
@@ -108,6 +118,9 @@ public class RequestPinItemTest extends AbstractLauncherUiTest {
 
     @Test
     public void testPinShortcut() throws Throwable {
+        // There's no allapps in single mode, so ignore.
+        assumeFalse(isInSingleMode);
+
         // Command to set the shortcut id
         Intent command = RequestPinItemActivity.getCommandIntent(
                 RequestPinItemActivity.class, "setShortcutId").putExtra(

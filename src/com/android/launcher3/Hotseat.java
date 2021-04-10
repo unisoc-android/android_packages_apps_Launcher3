@@ -31,11 +31,14 @@ import com.android.launcher3.logging.StatsLogUtils.LogContainerProvider;
 import com.android.launcher3.userevent.nano.LauncherLogProto;
 import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.views.Transposable;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.grid.HotseatController;
 
 public class Hotseat extends CellLayout implements LogContainerProvider, Insettable, Transposable {
 
     @ViewDebug.ExportedProperty(category = "launcher")
-    private boolean mHasVerticalHotseat;
+    public boolean mHasVerticalHotseat;
+    private final HotseatController mController;
 
     public Hotseat(Context context) {
         this(context, null);
@@ -47,14 +50,19 @@ public class Hotseat extends CellLayout implements LogContainerProvider, Insetta
 
     public Hotseat(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mController = LauncherAppMonitor.getInstance(context).getHotseatController();
+    }
+
+    public HotseatController getController() {
+        return mController;
     }
 
     /* Get the orientation specific coordinates given an invariant order in the hotseat. */
-    int getCellXFromOrder(int rank) {
+    public int getCellXFromOrder(int rank) {
         return mHasVerticalHotseat ? 0 : rank;
     }
 
-    int getCellYFromOrder(int rank) {
+    public int getCellYFromOrder(int rank) {
         return mHasVerticalHotseat ? (getCountY() - (rank + 1)) : 0;
     }
 

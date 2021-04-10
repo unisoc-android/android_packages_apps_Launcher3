@@ -27,7 +27,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.android.launcher3.R;
 import com.android.quickstep.views.TaskItemView;
+import com.android.quickstep.views.TaskMenuView;
 import com.android.systemui.shared.recents.model.Task;
+import com.sprd.ext.clearall.ClearAllController;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +43,7 @@ public final class TaskAdapter extends Adapter<ViewHolder> {
 
     public static final int CHANGE_EVENT_TYPE_EMPTY_TO_CONTENT = 0;
     public static final int MAX_TASKS_TO_DISPLAY = 6;
-    public static final int TASKS_START_POSITION = 1;
+    public static final int TASKS_START_POSITION = ClearAllController.IS_SUPPORT_CLEAR_ALL_ON_BOTTOM ? 0: 1;
 
     public static final int ITEM_TYPE_TASK = 0;
     public static final int ITEM_TYPE_CLEAR_ALL = 1;
@@ -85,6 +87,8 @@ public final class TaskAdapter extends Adapter<ViewHolder> {
                 TaskHolder taskHolder = new TaskHolder(itemView);
                 itemView.setOnClickListener(
                         view -> mTaskActionController.launchTaskFromView(taskHolder));
+                itemView.setOnLongClickListener((View v) ->
+                        TaskMenuView.showForTask(taskHolder, mTaskActionController) != null);
                 return taskHolder;
             case ITEM_TYPE_CLEAR_ALL:
                 View clearView = LayoutInflater.from(parent.getContext())
@@ -140,13 +144,15 @@ public final class TaskAdapter extends Adapter<ViewHolder> {
                 taskHolder.bindTask(task, willAnimate /* willAnimate */);
                 mLoader.loadTaskIconAndLabel(task, () -> {
                     // Ensure holder still has the same task.
-                    if (Objects.equals(Optional.of(task), taskHolder.getTask())) {
+                    if (taskHolder.getTask().isPresent()
+                            && Objects.equals(Optional.of(task), taskHolder.getTask())) {
                         taskHolder.getTaskItemView().setIcon(task.icon);
                         taskHolder.getTaskItemView().setLabel(task.titleDescription);
                     }
                 });
                 mLoader.loadTaskThumbnail(task, () -> {
-                    if (Objects.equals(Optional.of(task), taskHolder.getTask())) {
+                    if (taskHolder.getTask().isPresent()
+                            && Objects.equals(Optional.of(task), taskHolder.getTask())) {
                         taskHolder.getTaskItemView().setThumbnail(task.thumbnail);
                     }
                 });
@@ -161,6 +167,10 @@ public final class TaskAdapter extends Adapter<ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
+
+        if (ClearAllController.IS_SUPPORT_CLEAR_ALL_ON_BOTTOM) {
+            return ITEM_TYPE_TASK;
+        }
         // Bottom is always clear all button.
         return (position == 0) ? ITEM_TYPE_CLEAR_ALL : ITEM_TYPE_TASK;
     }

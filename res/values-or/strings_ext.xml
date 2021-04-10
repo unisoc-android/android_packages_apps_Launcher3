@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"ପଢ଼ାହୋଇ ନ ଥିବା ବ୍ୟାଜ୍"</string>
+<string name="unread_call">"ଫୋନ"</string>
+<string name="unread_sms">"ଏସେମେସ"</string>
+<string name="unread_email">"ଇମେଲ"</string>
+<string name="unread_calendar">"କେଲେଣ୍ଡର"</string>
+<string name="unread_hint">"ମିସ୍‍ ଆବଶ୍ୟକ  <xliff:g id="unread_type">%1$s</xliff:g> ଅନୁମତି, ଦୟାକରି ଅନୁମତି ପାଇଁ ଆବେଦନ କରନ୍ତୁ"</string>
+<string name="pref_missed_call_count_title">"ମିସ୍‌ଡ୍‌ କଲ୍‌"</string>
+<string name="pref_missed_call_count_summary">"ଗୋଟିଏ ଫୋନ୍ ଆପ୍ ଚୟନ କରନ୍ତୁ, ମିସ୍ଡ କଲ୍ ର ନମ୍ବର ଏହା ଉପରେ ଡିସପ୍ଲେ କରନ୍ତୁ"</string>
+<string name="pref_unread_sms_count_title">"ପଢ଼ାହୋଇ ନ ଥିବା ମେସେଜ୍"</string>
+<string name="pref_unread_sms_count_summary">"ଏକ SMS ଆପ୍ ଚୟନ କରନ୍ତୁ, ପଢ଼ାହୋଇ ନ ଥିବା ମେସେଜ୍ ନମ୍ବର ଏହା ଉପରେ ଡିସପ୍ଲେ କରନ୍ତୁ"</string>
+<string name="pref_unread_email_count_title">"ପଢ଼ାହୋଇ ନ ଥିବା ଇମେଲ୍"</string>
+<string name="pref_unread_email_count_summary">"ଏକ ଇମେଲ୍ ଆପ୍ ଚୟନ କରନ୍ତୁ, ପଢ଼ାହୋଇ ନ ଥିବା ମେଲ୍ ଏହା ଉପରେ ପ୍ରଦର୍ଶନ କରନ୍ତୁ"</string>
+<string name="pref_unread_calendar_count_title">"ପଢ଼ାହୋଇ ନ ଥିବା କ୍ୟାଲେଣ୍ଡର"</string>
+<string name="pref_unread_calendar_count_summary">"ଏକ କ୍ୟାଲେଣ୍ଡର ଆପ୍ ଚୟନ କରନ୍ତୁ, ଏଥିରେ ପଢ଼ାହୋଇ ନ ଥିବା କ୍ୟାଲେଣ୍ଡର କାର୍ଯ୍ୟକ୍ରମଗୁଡ଼ିକ ପ୍ରଦର୍ଶିତ କରନ୍ତୁ"</string>
+<string name="selected_text">"ସିଲେକ୍ଟ ହେଲା"</string>
+<string name="dynamic_icon_title">"ଡାଇନାମିକ୍ ଆଇକନ୍"</string>
+<string name="allow_circular_sliding_title">"ହୋମ ସ୍କ୍ରିନ ଲୁପ"</string>
+<string name="allow_circular_sliding_summary">"ଯଦି କଷ୍ଟମ ବାମ ପେଜ ରେ ଅଛି, ତେବେ ହୋମ ସ୍କ୍ରିନ ଲୁପ ର ଅନୁମତି ନାହିଁ|"</string>
+<string name="pull_down_action_pref_title">"ତଳକୁ ଟାଣିବା କାର୍ଯ୍ୟ"</string>
+<string name="pull_down_do_nothing">"କିଛି କରନ୍ତୁନାହିଁ"</string>
+<string name="pull_down_notification">"ନୋଟିଫିକେସନ୍ ଗୁଡ଼ିକ ଦର୍ଶାନ୍ତୁ"</string>
+<string name="pull_down_search">"ସର୍ଚ ଖୋଲନୁ"</string>
+<string name="home_screen_style_title">"ହୋମ୍‍ ସ୍କ୍ରୀନ ଷ୍ଟାଇଲ"</string>
+<string name="home_screen_style_single">"ଏକକ ସ୍ତର"</string>
+<string name="home_screen_style_dual">"ଦୁଇ ସ୍ତର"</string>
+<string name="home_screen_style_notification">"ହୋମ୍‍ ସ୍କ୍ରୀନ ଷ୍ଟାଇଲ ବଦଳ କରାଯାଉଛି"</string>
+<string name="folder_icon_model_pref_title">"ଫୋଲ୍ଡର ଆଇକନ ଷ୍ଟାଇଲ"</string>
+<string name="auto_model">"ଆପେ"</string>
+<string name="annular_model">"ବଳୟାକାର"</string>
+<string name="grid_model">"ଗ୍ରୀଡ୍"</string>
+<string name="desktop_grid">"ଡେସ୍କଟପ୍‍ ଗ୍ରୀଡ"</string>
+<string name="notification_dots_ext_title">"ବିଜ୍ଞପ୍ତି ବିନ୍ଦୁଗୁଡ଼ିକର ନମ୍ବର ଦେଖାନ୍ତୁ"</string>
+<string name="notification_dots_ext_summary">"ଯେତେବେଳେ ବିଜ୍ଞପ୍ତି ବିନ୍ଦୁଗୁଡ଼ିକ ଚାଲୁ ଥାଏ"</string>
+</resources>

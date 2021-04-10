@@ -73,6 +73,9 @@ import com.android.launcher3.util.LooperIdleLock;
 import com.android.launcher3.util.MultiHashMap;
 import com.android.launcher3.util.PackageManagerHelper;
 import com.android.launcher3.util.TraceHelper;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.multimode.MultiModeController;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -187,6 +190,12 @@ public class LoaderTask implements Runnable {
             TraceHelper.partitionSection(TAG, "step 2.1: loading all apps");
             List<LauncherActivityInfo> allActivityList = loadAllApps();
 
+            // Notify all apps is loaded.
+            TraceHelper.partitionSection(TAG, "step 2.1.1: call onLoadAllAppsEnd callback");
+            LauncherAppMonitor.getInstance(mApp.getContext())
+                    .onLoadAllAppsEnd(new ArrayList<>(mBgAllAppsList.data));
+            verifyNotStopped();
+
             TraceHelper.partitionSection(TAG, "step 2.2: Binding all apps");
             verifyNotStopped();
             mResults.bindAllApps();
@@ -269,12 +278,12 @@ public class LoaderTask implements Runnable {
         }
 
         if (clearDb) {
-            Log.d(TAG, "loadWorkspace: resetting launcher database");
+            LogUtils.d(TAG, "loadWorkspace: resetting launcher database");
             LauncherSettings.Settings.call(contentResolver,
                     LauncherSettings.Settings.METHOD_CREATE_EMPTY_DB);
         }
 
-        Log.d(TAG, "loadWorkspace: loading default favorites");
+        LogUtils.d(TAG, "loadWorkspace: loading default favorites");
         LauncherSettings.Settings.call(contentResolver,
                 LauncherSettings.Settings.METHOD_LOAD_DEFAULT_FAVORITES);
 
@@ -500,6 +509,7 @@ public class LoaderTask implements Runnable {
                                     // Create a shortcut info in disabled mode for now.
                                     info = c.loadSimpleWorkspaceItem();
                                     info.runtimeStatusFlags |= FLAG_DISABLED_LOCKED_USER;
+                                    LogUtils.d(TAG, "User is locked, disable deep shortcut:" + info.title);
                                 }
                             } else { // item type == ITEM_TYPE_SHORTCUT
                                 info = c.loadSimpleWorkspaceItem();
@@ -736,7 +746,8 @@ public class LoaderTask implements Runnable {
             for (ShortcutKey key : shortcutKeyToPinnedShortcuts.keySet()) {
                 MutableInt numTimesPinned = mBgDataModel.pinnedShortcutCounts.get(key);
                 if ((numTimesPinned == null || numTimesPinned.value == 0)
-                        && !pendingShortcuts.contains(key)) {
+                        && !pendingShortcuts.contains(key)
+                        && !MultiModeController.getPreModeSavedShortcuts().contains(key)) {
                     // Shortcut is pinned but doesn't exist on the workspace; unpin it.
                     mShortcutManager.unpinShortcut(key);
                 }

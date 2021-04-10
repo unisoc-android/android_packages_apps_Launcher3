@@ -45,6 +45,7 @@ public abstract class BaseModelUpdateTask implements ModelUpdateTask {
     private BgDataModel mDataModel;
     private AllAppsList mAllAppsList;
     private Executor mUiExecutor;
+    boolean mIgnoreLoaded;
 
     public void init(LauncherAppState app, LauncherModel model,
             BgDataModel dataModel, AllAppsList allAppsList, Executor uiExecutor) {
@@ -57,7 +58,7 @@ public abstract class BaseModelUpdateTask implements ModelUpdateTask {
 
     @Override
     public final void run() {
-        if (!mModel.isModelLoaded()) {
+        if (!mModel.isModelLoaded() && !mIgnoreLoaded) {
             if (DEBUG_TASKS) {
                 Log.d(TAG, "Ignoring model task since loader is pending=" + this);
             }

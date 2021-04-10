@@ -70,4 +70,37 @@ LOCAL_INSTRUMENTATION_FOR := Launcher3
 
 include $(BUILD_PACKAGE)
 
+#
+# Build rule for Launcher3QuickStepTests
+#
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := tests
+LOCAL_STATIC_JAVA_LIBRARIES := \
+    androidx.test.runner \
+    androidx.test.rules \
+    androidx.test.uiautomator_uiautomator \
+    mockito-target-minus-junit4
+
+ifneq (,$(wildcard frameworks/base))
+    LOCAL_PRIVATE_PLATFORM_APIS := true
+    LOCAL_STATIC_JAVA_LIBRARIES += launcher-aosp-tapl
+else
+    LOCAL_SDK_VERSION := 28
+    LOCAL_MIN_SDK_VERSION := 21
+    LOCAL_STATIC_JAVA_LIBRARIES += ub-launcher-aosp-tapl
+endif
+
+LOCAL_SRC_FILES := $(call all-java-files-under, src) \
+    $(call all-java-files-under, ../quickstep/tests/src)
+
+
+LOCAL_FULL_LIBS_MANIFEST_FILES := $(LOCAL_PATH)/AndroidManifest-common.xml
+
+LOCAL_PACKAGE_NAME := Launcher3QuickStepTests
+
+LOCAL_INSTRUMENTATION_FOR := Launcher3QuickStep
+
+include $(BUILD_PACKAGE)
+
 include $(call all-makefiles-under,$(LOCAL_PATH))

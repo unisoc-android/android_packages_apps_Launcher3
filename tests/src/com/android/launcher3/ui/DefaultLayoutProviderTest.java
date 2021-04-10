@@ -28,11 +28,14 @@ import android.os.ParcelFileDescriptor.AutoCloseOutputStream;
 import androidx.test.InstrumentationRegistry;
 import androidx.test.filters.MediumTest;
 import androidx.test.runner.AndroidJUnit4;
+import androidx.test.uiautomator.By;
+import androidx.test.uiautomator.UiObject2;
 
 import com.android.launcher3.LauncherAppWidgetProviderInfo;
 import com.android.launcher3.testcomponent.TestCommandReceiver;
 import com.android.launcher3.util.LauncherLayoutBuilder;
 import com.android.launcher3.util.rule.ShellCommandRule;
+import com.android.launcher3.widget.WidgetCell;
 
 import org.junit.After;
 import org.junit.Before;
@@ -68,18 +71,18 @@ public class DefaultLayoutProviderTest extends AbstractLauncherUiTest {
     }
 
     @Test
-    public void testCustomProfileLoaded_with_icon_on_hotseat() throws Exception {
+    public void testCustomProfileLoaded_with_icon_on_hotseat() throws Throwable {
         writeLayout(new LauncherLayoutBuilder().atHotseat(0).putApp(SETTINGS_APP, SETTINGS_APP));
 
         // Launch the home activity
-        mActivityMonitor.startLauncher();
+        mDevice.pressHome();
         waitForModelLoaded();
 
         mLauncher.getWorkspace().getHotseatAppIcon(getSettingsApp().getLabel().toString());
     }
 
     @Test
-    public void testCustomProfileLoaded_with_widget() throws Exception {
+    public void testCustomProfileLoaded_with_widget() throws Throwable {
         // A non-restored widget with no config screen gets restored automatically.
         LauncherAppWidgetProviderInfo info = TestViewHelpers.findWidgetProvider(this, false);
 
@@ -88,7 +91,7 @@ public class DefaultLayoutProviderTest extends AbstractLauncherUiTest {
                         info.getComponent().getClassName(), 2, 2));
 
         // Launch the home activity
-        mActivityMonitor.startLauncher();
+        mDevice.pressHome();
         waitForModelLoaded();
 
         // Verify widget present
@@ -97,7 +100,7 @@ public class DefaultLayoutProviderTest extends AbstractLauncherUiTest {
     }
 
     @Test
-    public void testCustomProfileLoaded_with_folder() throws Exception {
+    public void testCustomProfileLoaded_with_folder() throws Throwable {
         writeLayout(new LauncherLayoutBuilder().atHotseat(0).putFolder(android.R.string.copy)
                 .addApp(SETTINGS_APP, SETTINGS_APP)
                 .addApp(SETTINGS_APP, SETTINGS_APP)
@@ -105,7 +108,7 @@ public class DefaultLayoutProviderTest extends AbstractLauncherUiTest {
                 .build());
 
         // Launch the home activity
-        mActivityMonitor.startLauncher();
+        mDevice.pressHome();
         waitForModelLoaded();
 
         mLauncher.getWorkspace().getHotseatFolder("Folder: Copy");
@@ -116,7 +119,9 @@ public class DefaultLayoutProviderTest extends AbstractLauncherUiTest {
         mDevice.executeShellCommand("settings delete secure launcher3.layout.provider");
     }
 
-    private void writeLayout(LauncherLayoutBuilder builder) throws Exception {
+    private void writeLayout(LauncherLayoutBuilder builder) throws Throwable {
+        initProviderByAddWidget();
+
         mDevice.executeShellCommand("settings put secure launcher3.layout.provider " + mAuthority);
         ParcelFileDescriptor pfd = mTargetContext.getContentResolver().openFileDescriptor(
                 Uri.parse("content://" + mAuthority + "/launcher_layout"), "w");
@@ -125,5 +130,19 @@ public class DefaultLayoutProviderTest extends AbstractLauncherUiTest {
             builder.build(writer);
         }
         clearLauncherData();
+    }
+
+    private void initProviderByAddWidget() throws Throwable {
+        lockRotation(true);
+        clearHomescreen();
+        mActivityMonitor.startLauncher();
+
+        final LauncherAppWidgetProviderInfo widgetInfo =
+                TestViewHelpers.findWidgetProvider(this, false);
+        final UiObject2 widgetContainer = TestViewHelpers.openWidgetsTray();
+        // Drag widget to homescreen
+        UiObject2 widget = scrollAndFind(widgetContainer, By.clazz(WidgetCell.class)
+                .hasDescendant(By.text(widgetInfo.getLabel(mTargetContext.getPackageManager()))));
+        TestViewHelpers.dragToWorkspace(widget, false);
     }
 }

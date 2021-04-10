@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"না পড়া ব্যাজ" </string>
+<string name="unread_call">ফোন</string>
+<string name="unread_sms">"এসএমএস"</string>
+<string name="unread_email">ইমেইল</string>
+<string name="unread_calendar">ক্যালেন্ডার</string>
+<string name="unread_hint">"<xliff:g id="unread_type">%1$s</xliff:g> প্রয়োজনীয় অনুমতি মিস হয়েছে, অনুগ্রহ করে প্রথমে অনুমতির জন্য আবেদন করুন "</string>
+<string name="pref_missed_call_count_title">মিসড কল</string>
+<string name="pref_missed_call_count_summary">"একটি ফোন অ্যাপ নির্বাচন করুন, তাতে মিসড কলের নম্বরগুলি ডিসপ্লে করুন"</string>
+<string name="pref_unread_sms_count_title">"না পড়া বার্তা"</string>
+<string name="pref_unread_sms_count_summary">"একটি এসএমএস অ্যাপ নির্বাচন করুন, তাতে না পড়া বার্তার সংখ্যা ডিসপ্লে করুন" </string>
+<string name="pref_unread_email_count_title">"না পড়া ই-মেল"</string>
+<string name="pref_unread_email_count_summary">"একটি ই-মেল অ্যাপ নির্বাচন করুন, তাতে না পড়া ই-মেলের সংখ্যা ডিসপ্লে করুন"</string>
+<string name="pref_unread_calendar_count_title">"না পড়া ক্যালেন্ডার"</string>
+<string name="pref_unread_calendar_count_summary">"একটি ক্যালেন্ডার অ্যাপ নির্বাচন করুন, তাতে না পড়া ক্যালেন্ডারের ঘটনাগুলি ডিসপ্লে করুন" </string>
+<string name="selected_text">"নির্বাচিত"</string>
+<string name="dynamic_icon_title">"ডাইনামিক আইকোন"</string>
+<string name="allow_circular_sliding_title">"হোম স্ক্রিন লুপ"</string>
+<string name="allow_circular_sliding_summary">"যদি কাস্টম লেফট পেজ থাকে, তবে হোম স্ক্রীন লুপকে অনুমতি দেয় না"</string>
+<string name="pull_down_action_pref_title">"পুল ডাউন ক্রিয়া"</string>
+<string name="pull_down_do_nothing">"কিছু করবেন না"</string>
+<string name="pull_down_notification">বিজ্ঞপ্তি দেখান</string>
+<string name="pull_down_search">"মুক্ত অনুসন্ধান"</string>
+<string name="home_screen_style_title">"হোম স্ক্রিন স্টাইল"</string>
+<string name="home_screen_style_single">"একক স্তর"</string>
+<string name="home_screen_style_dual">"দুই স্তর"</string>
+<string name="home_screen_style_notification">"হোম স্ক্রিনের স্টাইল পরিবর্তন প্রয়োগ করা হচ্ছে"</string>
+<string name="folder_icon_model_pref_title">"ফোল্ডার আইকন স্টাইল"</string>
+<string name="auto_model">স্বত</string>
+<string name="annular_model">"অ্যানুলার"</string>
+<string name="grid_model">"গ্রিড"</string>
+<string name="desktop_grid">"ডেক্সটপ গ্রিড"</string>
+<string name="notification_dots_ext_title">"বিজ্ঞপ্তি বিন্দুগুলির নম্বর দেখান"</string>
+<string name="notification_dots_ext_summary">"যখন বিজ্ঞপ্তি বিন্দুগুলির সংখ্যা"</string>
+</resources>

@@ -17,7 +17,6 @@
 package com.android.launcher3.uioverrides;
 
 import static android.app.Activity.RESULT_CANCELED;
-
 import static com.android.launcher3.AbstractFloatingView.TYPE_ALL;
 import static com.android.launcher3.AbstractFloatingView.TYPE_HIDE_BACK_BUTTON;
 import static com.android.launcher3.LauncherState.ALL_APPS;
@@ -37,6 +36,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.android.launcher3.AbstractFloatingView;
@@ -97,7 +97,8 @@ public class UiFactory extends RecentsUiFactory {
         OverviewInteractionState.INSTANCE.get(launcher)
                 .setBackButtonAlpha(shouldBackButtonBeHidden ? 0 : 1, true /* animate */);
         if (launcher != null && launcher.getDragLayer() != null) {
-            launcher.getRootView().setDisallowBackGesture(shouldBackButtonBeHidden);
+            launcher.getRootView().setDisallowBackGesture(
+                    shouldBackButtonBeHidden && SysUINavigationMode.getMode(launcher).hasGestures);
         }
     }
 
@@ -176,7 +177,12 @@ public class UiFactory extends RecentsUiFactory {
         }, cancellationSignal);
     }
 
-    public static boolean dumpActivity(Activity activity, PrintWriter writer) {
+    public static boolean dumpActivity(Activity activity, PrintWriter writer, String[] args) {
+        boolean isAll = args.length > 0 && TextUtils.equals(args[0], "--all");
+        RecentsModel.INSTANCE.get(activity).dumpState(writer, isAll);
+        if (!isAll) {
+            return true;
+        }
         if (!Utilities.IS_DEBUG_DEVICE) {
             return false;
         }

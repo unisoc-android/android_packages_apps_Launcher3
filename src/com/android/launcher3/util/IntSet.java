@@ -78,4 +78,9 @@ public class IntSet {
         Arrays.sort(set.mArray.mValues, 0, set.mArray.mSize);
         return set;
     }
+
+    @Override
+    public String toString() {
+        return mArray.toConcatString();
+    }
 }

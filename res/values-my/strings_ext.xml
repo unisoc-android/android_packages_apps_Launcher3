@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"မဖတ်ရသေးကြောင်း အမှတ်တံဆိပ်"</string>
+<string name="unread_call">"ဖုန်း"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">"အီးမေးလ်"</string>
+<string name="unread_calendar">"ပြက္ခဒိန်"</string>
+<string name="unread_hint">"လိုအပ်သော <xliff:g id="unread_type">%1$s</xliff:g> ခွင့်ပြုချက်နှင့် လွဲသွားသည်၊ ခွင့်ပြုချက် သက်ရောက်အောင် ဦးစွာ လုပ်ပေးပါ။"</string>
+<string name="pref_missed_call_count_title">"မဖြေဆိုထားသောဖုန်း"</string>
+<string name="pref_missed_call_count_summary">"ဖုန်းအက်ပ်တစ်ခုကို ရွေးပါ။ လွဲသွားသော ဖုန်းများအရေအတွက်ကို ၎င်းပေါ်တွင် ပြသည်"</string>
+<string name="pref_unread_sms_count_title">"မဖတ်ရသေးသော မက်ဆေ့ဂ်ျ"</string>
+<string name="pref_unread_sms_count_summary">"SMS အက်ပ်တစ်ခုကို ရွေးပါ။ မဖတ်ရသေးသော အရေအတွက်ကို ၎င်းပေါ်တွင် ပြသသည်"</string>
+<string name="pref_unread_email_count_title">"မဖတ်ရသေးသော အီးမေးလ်"</string>
+<string name="pref_unread_email_count_summary">"အီးမေးလ် အက်ပ်တစ်ခုကို ရွေးပါ။ မဖတ်ရသေးသော အီးမေးလ်အရေအတွက်ကို ၎င်းပေါ်တွင်ပြသည်"</string>
+<string name="pref_unread_calendar_count_title">"မဖတ်ရသေးသော ပြက္ခဒိန်"</string>
+<string name="pref_unread_calendar_count_summary">"ပြက္ခဒိန်အက်တစ်ခုကို ရွေးပါ။ မဖတ်ရသေးသော ပြက္ခဒိန် အရေအတွက်ကို ၎င်းပေါ်တွင်ပြသည်"</string>
+<string name="selected_text">"ရွေးချယ်ပြီး"</string>
+<string name="dynamic_icon_title">"ဒိုင်းနမစ် အိုင်ကွန်"</string>
+<string name="allow_circular_sliding_title">"ပင်မ စခရင် ပြန်ကျော့ရန်"</string>
+<string name="allow_circular_sliding_summary">"စိတ်ကြိုက် ဘယ်အစွန်ဆုံး စာမျက်နှာ ရှိပါက ပင်မ စခရင် ပြန်ကျော့ခြင်းကို ခွင့်မပြုပါနှင့်"</string>
+<string name="pull_down_action_pref_title">"ဆွဲချသော ဆောင်ရွက်မှု"</string>
+<string name="pull_down_do_nothing">"ဘာမျှမလုပ်ပါ"</string>
+<string name="pull_down_notification">"သတိပေးချက်များ ဖော်ပြပါ"</string>
+<string name="pull_down_search">"ရှာဖွေရေးကို ဖွင့်ပါ"</string>
+<string name="home_screen_style_title">"ပင်မစခရင် စတိုင်"</string>
+<string name="home_screen_style_single">"တစ်လွှာ"</string>
+<string name="home_screen_style_dual">"နှစ်လွှာ"</string>
+<string name="home_screen_style_notification">"ပင်မစခရင် စတိုင်ပြောင်းခြင်းများ သက်ရောက်နေသည်"</string>
+<string name="folder_icon_model_pref_title">"ဖိုင်တွဲ အိုင်ကွန် စတိုင်"</string>
+<string name="auto_model">"အလိုအလျောက်"</string>
+<string name="annular_model">"ကွင်းဖြစ်နေ"</string>
+<string name="grid_model">"ဂရစ်"</string>
+<string name="desktop_grid">"ဒက်စတော့ပ် ဂရစ်မျဉ်း"</string>
+<string name="notification_dots_ext_title">"အသိပေးချက်အစက်များ အရေအတွက်ကိုပြရန်"</string>
+<string name="notification_dots_ext_summary">"အသိပေးချက်အစက်များကို ဖွင့်ထားချိန်တွင်"</string>
+</resources>

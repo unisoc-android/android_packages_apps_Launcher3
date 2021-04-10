@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="unread_notifier_title">"نشان خوانده نشده"</string>
+    <string name="unread_call">"تلفن"</string>
+    <string name="unread_sms">"پیامک"</string>
+    <string name="unread_email">"ایمیل"</string>
+    <string name="unread_calendar">"تقویم"</string>
+    <string name="unread_hint">"مجوز <xliff:g id="unread_type">‪‎%1$s‬</xliff:g> الزامی وجود ندارد، لطفاً ابتدا برای مجوز درخواست بدهید."</string>
+    <string name="pref_missed_call_count_title">"تماس بی پاسخ"</string>
+    <string name="pref_missed_call_count_summary">"برنامه تلفن را انتخاب کنید، تعداد تماس‌های ناموفق در آن نمایش داده می‌شود"</string>
+    <string name="pref_unread_sms_count_title">"پیام خوانده نشده"</string>
+    <string name="pref_unread_sms_count_summary">"برنامه پیامک را انتخاب کنید، تعداد پیام‌های خوانده نشده در آن نمایش داده می‌شود"</string>
+    <string name="pref_unread_email_count_title">"ایمیل خوانده نشده"</string>
+    <string name="pref_unread_email_count_summary">"برنامه ایمیل را انتخاب کنید، تعداد ایمیل‌های خوانده نشده در آن نمایش داده می‌شود"</string>
+    <string name="pref_unread_calendar_count_title">"تقویم خوانده نشده"</string>
+    <string name="pref_unread_calendar_count_summary">"برنامه تقویم را انتخاب کنید، رویدادهای تقویم خوانده نشده در آن نمایش داده می‌شود"</string>
+    <string name="selected_text">"انتخاب شد"</string>
+    <string name="dynamic_icon_title">"آیکون پویا"</string>
+    <string name="allow_circular_sliding_title">"چرخش صفحه اصلی"</string>
+    <string name="allow_circular_sliding_summary">"تنظیم محتوای سفارشی صفحه چپ اجازه چرخش صفحه اصلی را نمی‌دهد"</string>
+    <string name="pull_down_action_pref_title">"اقدام پایین کشیدن"</string>
+    <string name="pull_down_do_nothing">"كاری انجام نشود"</string>
+    <string name="pull_down_notification">"نمایش اعلان‌ها"</string>
+    <string name="pull_down_search">"باز کردن جستجو"</string>
+    <string name="home_screen_style_title">"سبک صفحه اصلی"</string>
+    <string name="home_screen_style_single">"لایه تکی"</string>
+    <string name="home_screen_style_dual">"دولایه"</string>
+    <string name="home_screen_style_notification">"اعمال تغییرات سبک صفحه اصلی"</string>
+    <string name="folder_icon_model_pref_title">"سبک آیکون پوشه"</string>
+    <string name="auto_model">"خودکار"</string>
+    <string name="annular_model">"حلقوى"</string>
+    <string name="grid_model">"شبکه"</string>
+    <string name="desktop_grid">"شبکه دسک‌تاپ"</string>
+    <string name="notification_dots_ext_title">"نمایش‌دادن تعداد نقاط اعلان"</string>
+    <string name="notification_dots_ext_summary">"هنگامی‌که نقاط اعلان روشن است"</string>
+</resources>

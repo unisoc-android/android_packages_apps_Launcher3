@@ -42,6 +42,7 @@ import android.view.View;
 import com.android.launcher3.CellLayout;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.R;
+import com.android.launcher3.graphics.IconShape.Circle;
 import com.android.launcher3.views.ActivityContext;
 
 /**
@@ -220,6 +221,11 @@ public class PreviewBackground {
 
     public void drawShadow(Canvas canvas) {
         if (mShadowShader == null) {
+            return;
+        }
+
+        // RadialGradient only adapts to circle folder icon.
+        if (!(getShape() instanceof Circle)) {
             return;
         }
 

@@ -24,6 +24,7 @@ import com.android.launcher3.ItemInfo;
 import com.android.launcher3.PromiseAppInfo;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.PackageUserKey;
+import com.sprd.ext.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,6 +109,10 @@ public class AllAppsStore {
     private void notifyUpdate() {
         if (mDeferUpdatesFlags != 0) {
             mUpdatePending = true;
+            if (LogUtils.DEBUG_ALL) {
+                LogUtils.d("AllAppsStore", "notifyUpdate mDeferUpdatesFlags:"
+                        + Integer.toBinaryString(mDeferUpdatesFlags));
+            }
             return;
         }
         int count = mUpdateListeners.size();
@@ -156,12 +161,26 @@ public class AllAppsStore {
     private void updateAllIcons(Consumer<BubbleTextView> action) {
         for (int i = mIconContainers.size() - 1; i >= 0; i--) {
             ViewGroup parent = mIconContainers.get(i);
-            int childCount = parent.getChildCount();
 
-            for (int j = 0; j < childCount; j++) {
-                View child = parent.getChildAt(j);
-                if (child instanceof BubbleTextView) {
-                    action.accept((BubbleTextView) child);
+            if (parent instanceof AllAppsRecyclerView) {
+                AlphabeticalAppsList apps = ((AllAppsRecyclerView) parent).getApps();
+                if (null != apps) {
+                    List<AlphabeticalAppsList.AdapterItem> items = apps.getAdapterItems();
+                    for (int j = 0; j < items.size(); j++) {
+                        BubbleTextView child = items.get(j).iconView;
+                        if (null != child) {
+                            action.accept(child);
+                        }
+                    }
+                }
+            } else {
+                int childCount = parent.getChildCount();
+
+                for (int j = 0; j < childCount; j++) {
+                    View child = parent.getChildAt(j);
+                    if (child instanceof BubbleTextView) {
+                        action.accept((BubbleTextView) child);
+                    }
                 }
             }
         }

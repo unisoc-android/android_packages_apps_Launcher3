@@ -69,6 +69,7 @@ import com.android.launcher3.util.Thunk;
 import com.android.launcher3.views.ActivityContext;
 import com.android.launcher3.views.Transposable;
 import com.android.launcher3.widget.LauncherAppWidgetHostView;
+import com.sprd.ext.LogUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -710,7 +711,7 @@ public class CellLayout extends ViewGroup implements Transposable {
      *
      * @param result Array of 2 ints to hold the x and y coordinate of the point
      */
-    void cellToCenterPoint(int cellX, int cellY, int[] result) {
+    public void cellToCenterPoint(int cellX, int cellY, int[] result) {
         regionToCenterPoint(cellX, cellY, 1, 1, result);
     }
 
@@ -1113,6 +1114,9 @@ public class CellLayout extends ViewGroup implements Transposable {
 
         if (minSpanX <= 0 || minSpanY <= 0 || spanX <= 0 || spanY <= 0 ||
                 spanX < minSpanX || spanY < minSpanY) {
+            // Return -1, -1 if no search
+            bestXY[0] = -1;
+            bestXY[1] = -1;
             return bestXY;
         }
 
@@ -2564,6 +2568,7 @@ public class CellLayout extends ViewGroup implements Transposable {
         if (x < mCountX && y < mCountY) {
             return mOccupied.cells[x][y];
         } else {
+            LogUtils.e(TAG, "x = " + x + ", y = " + y + ", mCountX = " + mCountX + ", mCountY = " + mCountY);
             throw new RuntimeException("Position exceeds the bound of this CellLayout");
         }
     }
@@ -2716,7 +2721,7 @@ public class CellLayout extends ViewGroup implements Transposable {
     public static final class CellInfo extends CellAndSpan {
         public final View cell;
         final int screenId;
-        final int container;
+        public final int container;
 
         public CellInfo(View v, ItemInfo info) {
             cellX = info.cellX;

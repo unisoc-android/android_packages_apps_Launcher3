@@ -127,7 +127,7 @@ public class WidgetPreviewLoader {
         private static final String COLUMN_PREVIEW_BITMAP = "preview_bitmap";
 
         public CacheDb(Context context) {
-            super(context, LauncherFiles.WIDGET_PREVIEWS_DB, DB_VERSION, TABLE_NAME);
+            super(context, LauncherFiles.getWidgetPreviewsDB(context), DB_VERSION, TABLE_NAME);
         }
 
         @Override

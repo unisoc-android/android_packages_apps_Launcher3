@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- new feature of quick cleaning. -->
+    <string name="recents_memory_avail"><xliff:g id="count">%1$s</xliff:g> available</string>
+    <string name="recents_clean_finished_toast">Release <xliff:g id="count">%1$s</xliff:g> memory, <xliff:g id="count">%2$s</xliff:g> available now.</string>
+    <string name="recents_nothing_to_clear">Nothing to clear in cache</string>
+</resources>

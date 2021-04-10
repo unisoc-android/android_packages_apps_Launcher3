@@ -80,7 +80,7 @@ public abstract class InternalStateHandler extends Binder {
             if (stateBinder instanceof InternalStateHandler) {
                 InternalStateHandler handler = (InternalStateHandler) stateBinder;
                 if (!handler.init(launcher, alreadyOnHome)) {
-                    intent.getExtras().remove(EXTRA_STATE_HANDLER);
+                    intent.removeExtra(EXTRA_STATE_HANDLER);
                 }
                 result = true;
             }

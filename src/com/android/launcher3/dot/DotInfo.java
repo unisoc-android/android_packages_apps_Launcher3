@@ -16,10 +16,13 @@
 
 package com.android.launcher3.dot;
 
+import androidx.annotation.NonNull;
+
 import com.android.launcher3.notification.NotificationInfo;
 import com.android.launcher3.notification.NotificationKeyData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -82,5 +85,14 @@ public class DotInfo {
 
     public int getNotificationCount() {
         return Math.min(mTotalCount, MAX_COUNT);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "DotInfo{ " +
+                "mNotificationKeys = " + Arrays.toString(mNotificationKeys.toArray()) +
+                ", mTotalCount = " + mTotalCount +
+                " }";
     }
 }

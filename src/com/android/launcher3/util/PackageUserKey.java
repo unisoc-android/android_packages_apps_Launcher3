@@ -3,6 +3,8 @@ package com.android.launcher3.util;
 import android.os.UserHandle;
 import android.service.notification.StatusBarNotification;
 
+import androidx.annotation.NonNull;
+
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.shortcuts.DeepShortcutManager;
 
@@ -55,5 +57,11 @@ public class PackageUserKey {
         if (!(obj instanceof PackageUserKey)) return false;
         PackageUserKey otherKey = (PackageUserKey) obj;
         return mPackageName.equals(otherKey.mPackageName) && mUser.equals(otherKey.mUser);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "PackageUserKey{ mPackageName = " + mPackageName + ", mUser = " + mUser + " }";
     }
 }

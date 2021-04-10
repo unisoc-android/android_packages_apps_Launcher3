@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"<xliff:g id="count">%1$s</xliff:g> ലഭ്യമാണ്"</string>
+<string name="recents_clean_finished_toast">"<xliff:g id="count">%1$s</xliff:g>  മെമ്മറി സ്വതന്ത്രമാക്കുക, ഇപ്പോൾ <xliff:g id="count">%2$s</xliff:g> ലഭ്യമാണ്."</string>
+<string name="recents_nothing_to_clear">"കാഷിൽ ക്ലിയർ ചെയ്യാനായി ഒന്നുംതന്നെയില്ല"</string>
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"വായിക്കാത്ത ബാഡ്ജ്"</string>
+<string name="unread_call">"ഫോണ്‍"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">"ഇമെയില്‍"</string>
+<string name="unread_calendar">"കലണ്ടര്‍"</string>
+<string name="unread_hint">"ആവശ്യമായ <xliff:g id="unread_type">%1$s</xliff:g> അനുമതി നഷ്ടമായിരിക്കുന്നു, ദയവായി അനുമതിക്ക് ആദ്യം അപേക്ഷിക്കുക"</string>
+<string name="pref_missed_call_count_title">"മിസ്ഡ് കോള്‍"</string>
+<string name="pref_missed_call_count_summary">"ഒരു ഫോൺ ആപ്പ്‌ തിരഞ്ഞെടുക്കുക, അതിൽ മിസ്ഡ് കോളുകളുടെ എണ്ണം പ്രദർശിപ്പിക്കുക"</string>
+<string name="pref_unread_sms_count_title">"വായിക്കാത്ത സന്ദേശം"</string>
+<string name="pref_unread_sms_count_summary">"ഒരു SMS ആപ്പ്‌ തിരഞ്ഞെടുക്കുക, അതിൽ വായിക്കാത്ത സന്ദേശങ്ങളുടെ എണ്ണം പ്രദർശിപ്പിക്കുക"</string>
+<string name="pref_unread_email_count_title">"വായിക്കാത്ത ഇമെയിൽ"</string>
+<string name="pref_unread_email_count_summary">"ഒരു ഇമെയിൽ ആപ്പ്‌ തിരഞ്ഞെടുക്കുക, അതിൽ വായിക്കാത്ത മെയിൽ നമ്പർ പ്രദർശിപ്പിക്കുക"</string>
+<string name="pref_unread_calendar_count_title">"വായിക്കാത്ത കലണ്ടർ"</string>
+<string name="pref_unread_calendar_count_summary">"ഒരു കലണ്ടർ ആപ്പ്‌ തിരഞ്ഞെടുക്കുക, അതിൽ വായിക്കാത്ത കലണ്ടർ ഈവന്റുകൾ പ്രദർശിപ്പിക്കുക"</string>
+<string name="selected_text">"തെരഞ്ഞെടുത്തു"</string>
+<string name="dynamic_icon_title">"ഡൈനാമിക് ഐകൺ"</string>
+<string name="allow_circular_sliding_title">"ഹോം സ്ക്രീൻ ലൂപ്പ്"</string>
+<string name="allow_circular_sliding_summary">"ഇഷ്ടാനുസൃത ഇടത് പേജ് ഉണ്ടെങ്കിൽ, ഹോം സ്ക്രീൻ ലൂപ്പ് അനുവദിക്കുകയില്ല"</string>
+<string name="pull_down_action_pref_title">"താഴേക്ക് വലിയ്ക്കല്‍ പ്രവർത്തനം"</string>
+<string name="pull_down_do_nothing">"ഒന്നും ചെയ്യേണ്ട"</string>
+<string name="pull_down_notification">"നോട്ടിഫിക്കേഷനുകള്‍ കാണിക്കുക"</string>
+<string name="pull_down_search">"തിരയൽ തുറക്കുക"</string>
+<string name="home_screen_style_title">"ഹോം സ്ക്രീനിന്റെ രൂപഘടന"</string>
+<string name="home_screen_style_single">"ഒറ്റ തലം"</string>
+<string name="home_screen_style_dual">"ഇരട്ട തലം"</string>
+<string name="home_screen_style_notification">"ഹോം സ്ക്രിനിൽ വരുത്തിയ രൂപഘടനാ മാറ്റങ്ങൾ പ്രയോഗിക്കുന്നു"</string>
+<string name="folder_icon_model_pref_title">"ഫോൾഡർ ഐക്കണിന്റെ രൂപഘടന"</string>
+<string name="auto_model">"സ്വയം"</string>
+<string name="annular_model">"വളയാകൃതി"</string>
+<string name="grid_model">"ഗ്രിഡ്"</string>
+<string name="desktop_grid">"ഡസ്ക്ടോപ് ചട്ടക്കൂട്"</string>
+<string name="notification_dots_ext_title">"നോട്ടിഫിക്കേഷൻ ഡോട്ടുകളുടെ എണ്ണം കാണിക്കുക"</string>
+<string name="notification_dots_ext_summary">"നോട്ടിഫിക്കേഷൻ ഡോട്ടുകൾ ഓൺ ആകുമ്പോൾ"</string>
+</resources>

@@ -25,6 +25,9 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import com.android.launcher3.util.MainThreadInitializedObject;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.UtilitiesExt;
+import com.sprd.ext.navigationbar.NavigationBarController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +79,9 @@ public class SysUINavigationMode {
                 Mode oldMode = mMode;
                 initializeMode();
                 if (mMode != oldMode) {
+                    if (LogUtils.DEBUG_EXTERNAL_MSG) {
+                        LogUtils.d(TAG, "mode changed:" + oldMode + " -> " + mMode);
+                    }
                     dispatchModeChange();
                 }
             }
@@ -84,6 +90,16 @@ public class SysUINavigationMode {
 
     private void initializeMode() {
         int modeInt = getSystemIntegerRes(mContext, NAV_BAR_INTERACTION_MODE_RES_NAME);
+        LogUtils.d(TAG, "initializeMode:" + modeInt);
+        /** unisoc:no navigationBar devices use the legacy Mode
+         * {@link com.android.systemui.shared.system.QuickStepContract#isLegacyMode}.*/
+        int legacyModeInt = Mode.THREE_BUTTONS.resValue;
+        if (modeInt != legacyModeInt && (!NavigationBarController.hasNavigationBar(mContext)
+                || UtilitiesExt.isInUltraSavingMode(mContext))) {
+            LogUtils.d(TAG, "initializeMode, Change gesture mode : " + modeInt + " -> " + legacyModeInt);
+            modeInt = legacyModeInt;
+        }
+
         for(Mode m : Mode.values()) {
             if (m.resValue == modeInt) {
                 mMode = m;

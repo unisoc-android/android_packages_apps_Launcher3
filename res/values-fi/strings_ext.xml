@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"Lukemattomat-merkintä"</string>
+<string name="unread_call">"Puhelin"</string>
+<string name="unread_sms">"Tekstiviesti"</string>
+<string name="unread_email">"sähköposti"</string>
+<string name="unread_calendar">"Kalenteri"</string>
+<string name="unread_hint">"Tarvittava <xliff:g id="unread_type">%1$s</xliff:g> -käyttöoikeus puuttuu, pyydä ensin käyttöoikeus."</string>
+<string name="pref_missed_call_count_title">"Vastaamatta jäänyt puhelu"</string>
+<string name="pref_missed_call_count_summary">"Valitse puhelinsovellus, tuo näkyviin vastaamattomien puheluiden määrä"</string>
+<string name="pref_unread_sms_count_title">"Lukematon viesti"</string>
+<string name="pref_unread_sms_count_summary">"Valitse tekstiviestisovellus, tuo näkyviin lukemattomien viestien määrä"</string>
+<string name="pref_unread_email_count_title">"Lukematon sähköposti"</string>
+<string name="pref_unread_email_count_summary">"Valitse sähköpostisovellus, tuo näkyviin lukemattomien viestien määrä"</string>
+<string name="pref_unread_calendar_count_title">"Lukematon kalenteri"</string>
+<string name="pref_unread_calendar_count_summary">"Valitse kalenterisovellus, tuo näkyviin kalenteritapahtumat, joita ei ole luettu"</string>
+<string name="selected_text">"Valittu"</string>
+<string name="dynamic_icon_title">"Dynaaminen kuvake"</string>
+<string name="allow_circular_sliding_title">"Paluu aloitusnäyttöön"</string>
+<string name="allow_circular_sliding_summary">"Jos käytössä on mukautettu vasen sivu, aloitusnäyttöön paluu ei onnistu"</string>
+<string name="pull_down_action_pref_title">"Alasvetotoiminto"</string>
+<string name="pull_down_do_nothing">"Älä tee mitään"</string>
+<string name="pull_down_notification">"Näytä ilmoitukset"</string>
+<string name="pull_down_search">"Avaa haku"</string>
+<string name="home_screen_style_title">"Aloitusnäytön tyyli"</string>
+<string name="home_screen_style_single">"Yksi kerros"</string>
+<string name="home_screen_style_dual">"Kaksi kerrosta"</string>
+<string name="home_screen_style_notification">"Otetaan käyttöön aloitusnäytön tyylimuutoksia"</string>
+<string name="folder_icon_model_pref_title">"Kansiokuvakkeen tyyli"</string>
+<string name="auto_model">"auto"</string>
+<string name="annular_model">"Pyöreä"</string>
+<string name="grid_model">"ruudukko"</string>
+<string name="desktop_grid">"Työpöytäruudukko"</string>
+<string name="notification_dots_ext_title">"Näytä ilmoituspisteiden määrä"</string>
+<string name="notification_dots_ext_summary">"Kun ilmoituspisteet ovat päällä"</string>
+</resources>

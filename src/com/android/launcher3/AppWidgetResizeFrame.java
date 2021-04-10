@@ -9,10 +9,12 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.appwidget.AppWidgetHostView;
+import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -27,7 +29,8 @@ import com.android.launcher3.widget.LauncherAppWidgetHostView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppWidgetResizeFrame extends AbstractFloatingView implements View.OnKeyListener {
+public class AppWidgetResizeFrame extends AbstractFloatingView implements View.OnKeyListener,
+        Insettable{
     private static final int SNAP_DURATION = 150;
     private static final float DIMMED_HANDLE_ALPHA = 0f;
     private static final float RESIZE_THRESHOLD = 0.66f;
@@ -345,10 +348,27 @@ public class AppWidgetResizeFrame extends AbstractFloatingView implements View.O
     }
 
     static void updateWidgetSizeRanges(AppWidgetHostView widgetView, Launcher launcher,
-            int spanX, int spanY) {
+                                       int spanX, int spanY, boolean isDensityChanged) {
+        if (isDensityChanged) {
+            // The widget option is always updated when resolution is switched, even if newOption and oldOption are equal.
+            // So first set an error oldOption to avoid newOption and oldOption equal.
+            AppWidgetManager widgetManager = AppWidgetManager.getInstance(launcher);
+            Bundle oldOption = widgetManager.getAppWidgetOptions(widgetView.getAppWidgetId());
+            oldOption.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, -1);
+            widgetView.updateAppWidgetOptions(oldOption);
+        }
+        updateWidgetSizeRanges(widgetView, launcher, spanX, spanY);
+    }
+
+    static void updateWidgetSizeRanges(AppWidgetHostView widgetView, Launcher launcher,
+                                       int spanX, int spanY) {
         getWidgetSizeRanges(launcher, spanX, spanY, sTmpRect);
         widgetView.updateAppWidgetSize(null, sTmpRect.left, sTmpRect.top,
                 sTmpRect.right, sTmpRect.bottom);
+    }
+
+    public static void resetWidgetCellSize() {
+        sCellSize = null;
     }
 
     public static Rect getWidgetSizeRanges(Context context, int spanX, int spanY, Rect rect) {
@@ -546,6 +566,15 @@ public class AppWidgetResizeFrame extends AbstractFloatingView implements View.O
     @Override
     protected boolean isOfType(int type) {
         return (type & TYPE_WIDGET_RESIZE_FRAME) != 0;
+    }
+
+    @Override
+    public void setInsets(Rect insets) {
+        int oldOrientation = mLauncher.getOrientation();
+        int curOrientation = mLauncher.getResources().getConfiguration().orientation;
+        if (oldOrientation == curOrientation) {
+            post(() -> snapToWidget(false));
+        }
     }
 
     /**

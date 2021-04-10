@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- add for launcher app icon-->
+    <color name="ic_launcher_background">#00ce7e</color>
+
+    <!-- add for dynamic icon feature, start-->
+    <color name="dynamic_calendar_week">#FFFF1744</color>
+    <color name="dynamic_calendar_date">#FF424242</color>
+    <!-- add for dynamic icon feature, end-->
+    <!-- add for unread dot feature, start-->
+    <color name="unread_dot_bg_color">#FFFF0000</color>
+    <color name="unread_dot_text_color">#FFFFFFFF</color>
+    <!-- add for unread dot feature, end-->
+</resources>

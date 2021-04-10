@@ -18,7 +18,6 @@ package com.android.launcher3.folder;
 
 import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.ENTER_INDEX;
 import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.EXIT_INDEX;
-import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.MAX_NUM_ITEMS_IN_PREVIEW;
 import static com.android.launcher3.folder.FolderIcon.DROP_IN_ANIMATION_DURATION;
 
 import android.animation.Animator;
@@ -116,6 +115,13 @@ public class PreviewItemManager {
         }
     }
 
+    public void computePreviewDrawingParamsIfNeeded() {
+        if (mReferenceDrawable != null) {
+            mIcon.mPreviewLayoutRule.init(mIcon.mBackground.previewSize,
+                    mReferenceDrawable.getIntrinsicWidth(), Utilities.isRtl(mIcon.getResources()));
+        }
+    }
+
     PreviewItemDrawingParams computePreviewItemDrawingParams(int index, int curNumItems,
             PreviewItemDrawingParams params) {
         // We use an index of -1 to represent an icon on the workspace for the destroy and
@@ -190,7 +196,7 @@ public class PreviewItemManager {
         // If there are more params than visible in the preview, they are used for enter/exit
         // animation purposes and they were added to the front of the list.
         // To index the params properly, we need to skip these params.
-        index = index + Math.max(mFirstPageParams.size() - MAX_NUM_ITEMS_IN_PREVIEW, 0);
+        index = index + Math.max(mFirstPageParams.size() - mIcon.getLayoutRule().getMaxNumItemsInPreview(), 0);
 
         PreviewItemDrawingParams params = index < mFirstPageParams.size() ?
                 mFirstPageParams.get(index) : null;
@@ -211,7 +217,7 @@ public class PreviewItemManager {
             params.add(new PreviewItemDrawingParams(0, 0, 0, 0));
         }
 
-        int numItemsInFirstPagePreview = page == 0 ? items.size() : MAX_NUM_ITEMS_IN_PREVIEW;
+        int numItemsInFirstPagePreview = page == 0 ? items.size() : mIcon.getLayoutRule().getMaxNumItemsInPreview();
         for (int i = 0; i < params.size(); i++) {
             PreviewItemDrawingParams p = params.get(i);
             p.drawable = items.get(i).getCompoundDrawables()[1];
@@ -273,7 +279,7 @@ public class PreviewItemManager {
         }
     }
 
-    void updatePreviewItems(boolean animate) {
+    public void updatePreviewItems(boolean animate) {
         buildParamsForPage(0, mFirstPageParams, animate);
     }
 
@@ -333,18 +339,24 @@ public class PreviewItemManager {
         // Old preview items that need to be moved out.
         List<BubbleTextView> moveOut = new ArrayList<>(oldParams);
         moveOut.removeAll(newParams);
+        boolean hasNoInPreviewParams = false;
         for (int i = 0; i < moveOut.size(); ++i) {
             BubbleTextView item = moveOut.get(i);
             int oldIndex = oldParams.indexOf(item);
             PreviewItemDrawingParams p = computePreviewItemDrawingParams(oldIndex, numItems, null);
             updateTransitionParam(p, item, oldIndex, EXIT_INDEX, numItems);
             params.add(0, p); // We want these items first so that they are on drawn last.
+            hasNoInPreviewParams = true;
         }
 
         for (int i = 0; i < params.size(); ++i) {
             if (params.get(i).anim != null) {
                 params.get(i).anim.start();
             }
+        }
+        if (hasNoInPreviewParams) {
+            // The item is not in preview, only use the anim, do not save to mFirstPageParams.
+            params.remove(0);
         }
     }
 

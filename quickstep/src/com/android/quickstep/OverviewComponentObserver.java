@@ -33,6 +33,7 @@ import android.content.pm.ResolveInfo;
 
 import com.android.systemui.shared.system.PackageManagerWrapper;
 
+import com.sprd.ext.LogUtils;
 import java.util.ArrayList;
 
 /**
@@ -40,6 +41,7 @@ import java.util.ArrayList;
  * and provide callers the relevant classes.
  */
 public final class OverviewComponentObserver {
+    private static final String TAG = "OverviewComponentObserver";
     private final BroadcastReceiver mUserPreferenceChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -68,7 +70,12 @@ public final class OverviewComponentObserver {
                 .addCategory(Intent.CATEGORY_HOME)
                 .setPackage(mContext.getPackageName());
         ResolveInfo info = context.getPackageManager().resolveActivity(myHomeIntent, 0);
-        mMyHomeComponent = new ComponentName(context.getPackageName(), info.activityInfo.name);
+        if (info != null) {
+            mMyHomeComponent = new ComponentName(context.getPackageName(), info.activityInfo.name);
+        } else {
+            LogUtils.w(TAG, "can't get home activity from launcher, set mMyHomeComponent null.");
+            mMyHomeComponent = null;
+        }
 
         mContext.registerReceiver(mUserPreferenceChangeReceiver,
                 new IntentFilter(ACTION_PREFERRED_ACTIVITY_CHANGED));
@@ -97,7 +104,7 @@ public final class OverviewComponentObserver {
         mHomeIntent = null;
 
         if ((mSystemUiStateFlags & SYSUI_STATE_HOME_DISABLED) == 0 &&
-                (defaultHome == null || mMyHomeComponent.equals(defaultHome))) {
+                (defaultHome == null || (mMyHomeComponent != null && mMyHomeComponent.equals(defaultHome)))) {
             // User default home is same as out home app. Use Overview integrated in Launcher.
             overviewComponent = mMyHomeComponent;
             mActivityControlHelper = new LauncherActivityControllerHelper();

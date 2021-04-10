@@ -140,8 +140,8 @@ public abstract class BaseItemDragListener extends InternalStateHandler implemen
         if (TestProtocol.sDebugTracing) {
             Log.d(TestProtocol.NO_DRAG_TAG, "BIDL.shouldStartDrag");
         }
-        // Stay in pre-drag mode, if workspace is locked.
-        return !mLauncher.isWorkspaceLocked();
+        // Stay in pre-drag mode, if workspace is locked or launcher not resumed.
+        return !mLauncher.isWorkspaceLocked() && mLauncher.hasBeenResumed();
     }
 
     @Override

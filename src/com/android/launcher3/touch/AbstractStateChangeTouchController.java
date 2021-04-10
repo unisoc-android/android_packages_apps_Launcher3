@@ -50,6 +50,8 @@ import com.android.launcher3.userevent.nano.LauncherLogProto.Action.Touch;
 import com.android.launcher3.util.FlingBlockCheck;
 import com.android.launcher3.util.PendingAnimation;
 import com.android.launcher3.util.TouchController;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.multimode.MultiModeController;
 
 /**
  * TouchController for handling state changes
@@ -160,13 +162,18 @@ public abstract class AbstractStateChangeTouchController
     private int getSwipeDirection() {
         LauncherState fromState = mLauncher.getStateManager().getState();
         int swipeDirection = 0;
-        if (getTargetState(fromState, true /* isDragTowardPositive */) != fromState) {
+        if (getTargetStateExt(fromState, true /* isDragTowardPositive */) != fromState) {
             swipeDirection |= SwipeDetector.DIRECTION_POSITIVE;
         }
-        if (getTargetState(fromState, false /* isDragTowardPositive */) != fromState) {
+        if (getTargetStateExt(fromState, false /* isDragTowardPositive */) != fromState) {
             swipeDirection |= SwipeDetector.DIRECTION_NEGATIVE;
         }
         return swipeDirection;
+    }
+
+    private LauncherState getTargetStateExt(LauncherState fromState, boolean isDragTowardPositive) {
+        LauncherState targetState = getTargetState(fromState, isDragTowardPositive);
+        return MultiModeController.isSingleLayerMode() && targetState == ALL_APPS ? fromState : targetState;
     }
 
     @Override
@@ -195,10 +202,12 @@ public abstract class AbstractStateChangeTouchController
     private boolean reinitCurrentAnimation(boolean reachedToState, boolean isDragTowardPositive) {
         LauncherState newFromState = mFromState == null ? mLauncher.getStateManager().getState()
                 : reachedToState ? mToState : mFromState;
-        LauncherState newToState = getTargetState(newFromState, isDragTowardPositive);
+        LauncherState newToState = getTargetStateExt(newFromState, isDragTowardPositive);
 
         if (newFromState == mFromState && newToState == mToState || (newFromState == newToState)) {
-            return false;
+            if (mCurrentAnimation != null) {
+                return false;
+            }
         }
 
         mFromState = newFromState;
@@ -271,6 +280,7 @@ public abstract class AbstractStateChangeTouchController
         }
         mCanBlockFling = mFromState == NORMAL;
         mFlingBlockCheck.unblockFling();
+        LogUtils.d(TAG, "onDragStart,state change with anim: " + mFromState + " -> " + mToState);
     }
 
     @Override
@@ -297,7 +307,6 @@ public abstract class AbstractStateChangeTouchController
         } else {
             mFlingBlockCheck.onEvent();
         }
-
         return true;
     }
 

@@ -37,8 +37,8 @@ import com.android.launcher3.uioverrides.touchcontrollers.LandscapeEdgeSwipeCont
 import com.android.launcher3.uioverrides.touchcontrollers.NavBarToHomeTouchController;
 import com.android.launcher3.uioverrides.touchcontrollers.OverviewToAllAppsTouchController;
 import com.android.launcher3.uioverrides.touchcontrollers.PortraitStatesTouchController;
-import com.android.launcher3.uioverrides.touchcontrollers.StatusBarTouchController;
 import com.android.launcher3.uioverrides.touchcontrollers.QuickSwitchTouchController;
+import com.android.launcher3.uioverrides.touchcontrollers.StatusBarTouchController;
 import com.android.launcher3.uioverrides.touchcontrollers.TaskViewTouchController;
 import com.android.launcher3.uioverrides.touchcontrollers.TransposedQuickSwitchTouchController;
 import com.android.launcher3.util.TouchController;
@@ -49,6 +49,7 @@ import com.android.quickstep.SysUINavigationMode.Mode;
 import com.android.quickstep.TouchInteractionService;
 import com.android.quickstep.views.RecentsView;
 import com.android.systemui.shared.system.WindowManagerWrapper;
+import com.sprd.ext.multimode.MultiModeController;
 
 import java.util.ArrayList;
 
@@ -147,7 +148,13 @@ public abstract class RecentsUiFactory {
         if (mode == NO_BUTTON) {
             list.add(new QuickSwitchTouchController(launcher));
             list.add(new NavBarToHomeTouchController(launcher));
-            list.add(new FlingAndHoldTouchController(launcher));
+            // Single layer mode, we do not need all apps fling and hold.
+            if (MultiModeController.isSingleLayerMode()) {
+                list.add(new PortraitStatesTouchController(launcher,
+                        mode.hasGestures /* allowDragToOverview */));
+            } else {
+                list.add(new FlingAndHoldTouchController(launcher));
+            }
         } else {
             if (launcher.getDeviceProfile().isVerticalBarLayout()) {
                 list.add(new OverviewToAllAppsTouchController(launcher));
@@ -162,6 +169,12 @@ public abstract class RecentsUiFactory {
                     list.add(new QuickSwitchTouchController(launcher));
                 }
             }
+        }
+
+        if (FeatureFlags.PULL_DOWN_STATUS_BAR && Utilities.IS_DEBUG_DEVICE
+                && !launcher.getDeviceProfile().isMultiWindowMode
+                && !launcher.getDeviceProfile().isVerticalBarLayout()) {
+            list.add(new StatusBarTouchController(launcher));
         }
 
         list.add(new LauncherTaskViewController(launcher));

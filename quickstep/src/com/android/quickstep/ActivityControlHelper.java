@@ -136,6 +136,10 @@ public interface ActivityControlHelper<T extends BaseDraggingActivity> {
          * @param animate Whether to animate recents to/from its new attached state.
          */
         default void setRecentsAttachedToAppWindow(boolean attached, boolean animate) { }
+
+        default void createActivityControllerWithoutAttachedToWindow(long transitionLength) {
+            createActivityController(transitionLength);
+        }
     }
 
     interface HomeAnimationFactory {

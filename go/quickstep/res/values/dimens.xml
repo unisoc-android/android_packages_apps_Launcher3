@@ -15,8 +15,7 @@
      limitations under the License.
 -->
 <resources>
-    <dimen name="recents_list_width">320dp</dimen>
-
+    <dimen name="recents_list_horiz_padding">0dp</dimen>
     <dimen name="task_item_height">60dp</dimen>
     <dimen name="task_item_top_margin">16dp</dimen>
     <dimen name="task_thumbnail_icon_horiz_margin">16dp</dimen>
@@ -27,4 +26,7 @@
     <dimen name="clear_all_item_view_top_margin">20dp</dimen>
     <dimen name="clear_all_item_view_bottom_margin">20dp</dimen>
     <dimen name="clear_all_button_width">106dp</dimen>
+
+    <dimen name="task_item_menu_width">240dp</dimen>
+
 </resources>

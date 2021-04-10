@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"చదవని బ్యాడ్జ్"</string>
+<string name="unread_call">"ఫోను"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">ఇమెయిల్</string>
+<string name="unread_calendar">"కాలెండర్"</string>
+<string name="unread_hint">"కావలసిన అనుమతి <xliff:g id="unread_type">%1$s</xliff:g> లేదు, దయచేసి మొదట అనుమతి కొరకు అడగండి."</string>
+<string name="pref_missed_call_count_title">"మిస్డ్ కాల్"</string>
+<string name="pref_missed_call_count_summary">"ఫోన్ యాప్ ఎంచుకోండి, దానిలో మిస్ అయిన కాల్స్ డిస్ప్లే చేయండి"</string>
+<string name="pref_unread_sms_count_title">"చదవని మెసేజ్"</string>
+<string name="pref_unread_sms_count_summary">"SMS యాప్ ఎంచుకోండి, దానిలో చదవని మెసేజుల నంబరు డిస్ప్లే చేయండి"</string>
+<string name="pref_unread_email_count_title">"చదవని ఇమెయిల్"</string>
+<string name="pref_unread_email_count_summary">"ఇమెయిల్ యాప్ ఎంచుకోండి, దానిలో చదవని మెయిల్ నంబరు డిస్ప్లే చేయండి"</string>
+<string name="pref_unread_calendar_count_title">"చదవని క్యాలెండర్"</string>
+<string name="pref_unread_calendar_count_summary">"క్యాలెండర్ యాప్ ఎంచుకోండి, దానిలో చదవని క్యాలెండర్ ఈవెంట్స్ డిస్ప్లే చేయండి"</string>
+<string name="selected_text">"ఎంచుకోబడినవి"</string>
+<string name="dynamic_icon_title">"డైనమిక్ ఐకాన్"</string>
+<string name="allow_circular_sliding_title">"హోమ్ స్క్రీన్ లూప్"</string>
+<string name="allow_circular_sliding_summary">"కస్టమ్ ఎడమ పేజి ఉంటే, హోమ్ స్క్రీన్ లూప్ అనుమతించవద్దు"</string>
+<string name="pull_down_action_pref_title">"చర్యను క్రిందికి లాగండి"</string>
+<string name="pull_down_do_nothing">"ఏమి చెయ్యవద్దు"</string>
+<string name="pull_down_notification">ప్రకటనలను చూపించు</string>
+<string name="pull_down_search">"శోధన తెరవండి"</string>
+<string name="home_screen_style_title">"హోమ్ స్క్రీన్ స్టైల్"</string>
+<string name="home_screen_style_single">"ఒంటి పొర"</string>
+<string name="home_screen_style_dual">"ద్వంద్వ పొర"</string>
+<string name="home_screen_style_notification">"హోమ్ స్క్రీన్ శైలి మార్పులను వర్తింపజేస్తున్నాం"</string>
+<string name="folder_icon_model_pref_title">"ఫోల్డర్ ఐకాన్ స్టైల్"</string>
+<string name="auto_model">"ఆటో"</string>
+<string name="annular_model">"యాన్యులర్"</string>
+<string name="grid_model">"గ్రిడ్"</string>
+<string name="desktop_grid">"డెస్క్‌టాప్ గ్రిడ్"</string>
+<string name="notification_dots_ext_title">"నోటిఫికేషన్ చుక్కల సంఖ్యను చూపించు"</string>
+<string name="notification_dots_ext_summary">"నోటిఫికేషన్ చుక్కలు ఆన్‌లో ఉన్నప్పుడు"</string>
+</resources>

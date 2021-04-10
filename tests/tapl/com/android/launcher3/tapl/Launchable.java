@@ -39,7 +39,7 @@ abstract class Launchable {
         mLauncher = launcher;
     }
 
-    UiObject2 getObject() {
+    public UiObject2 getObject() {
         return mObject;
     }
 
@@ -82,6 +82,52 @@ abstract class Launchable {
                 getLongPressIndicator());
         try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
                 "dragged launchable to workspace")) {
+            return new Workspace(mLauncher);
+        }
+    }
+
+    /**
+     * Drags an object to the position of workspace.
+     */
+    public void dragToWorkspacePosition(Point position) {
+        Workspace.dragIconToWorkspace(
+                mLauncher,
+                this,
+                position,
+                getLongPressIndicator());
+        try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
+                "dragged launchable to workspace new screen.")) {
+            new Workspace(mLauncher);
+        }
+    }
+
+    /**
+     * Drags an object over exist icon with folder.
+     */
+    public Workspace dragToHotseatOverExistIcon(Point center) {
+        Workspace.dragIconToHotseat(
+                mLauncher,
+                this,
+                center,
+                getLongPressIndicator());
+        try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
+                "dragged launchable over exist icon with folder.")) {
+            return new Workspace(mLauncher);
+        }
+    }
+
+    /**
+     * Drags a app icon over another icon to create folder.
+     */
+    public Workspace createFolderFromDragToAppIcon(String appName) {
+        Point point = TestUtils.getAppVisibleCenter(appName);
+        TestUtils.dragAppIconToCreateFolder(
+                mLauncher,
+                this,
+                point,
+                getLongPressIndicator());
+        try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
+                "create folder from drag a app icon to another app icon.")) {
             return new Workspace(mLauncher);
         }
     }

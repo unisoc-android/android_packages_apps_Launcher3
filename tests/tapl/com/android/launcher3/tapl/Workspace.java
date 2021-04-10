@@ -24,6 +24,7 @@ import android.graphics.Point;
 import android.os.SystemClock;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +33,8 @@ import androidx.test.uiautomator.Direction;
 import androidx.test.uiautomator.UiObject2;
 
 import com.android.launcher3.testing.TestProtocol;
+
+import java.util.regex.Pattern;
 
 /**
  * Operations on the workspace screen.
@@ -116,6 +119,43 @@ public final class Workspace extends Home {
                         AppIcon.getAppIconSelector(appName, mLauncher)));
     }
 
+    public void interruptDragHotseatIconToWorkspace(String pkgName) {
+        final UiObject2 workspace = verifyActiveContainer();
+        try (LauncherInstrumentation.Closable c = mLauncher.addContextLayer(
+                "interrupt dragging icon to workspace before action up.")) {
+            mLauncher.getTestInfo(TestProtocol.REQUEST_ENABLE_DEBUG_TRACING);
+            LauncherInstrumentation.log("dragIconToWorkspace: begin");
+            final Point launchableCenter = getHotseatAppIcon(pkgName).getObject().getVisibleCenter();
+            final long downTime = SystemClock.uptimeMillis();
+            mLauncher.sendPointer(downTime, downTime, MotionEvent.ACTION_DOWN, launchableCenter);
+            LauncherInstrumentation.log("dragIconToWorkspace: sent down");
+            mLauncher.waitForLauncherObject("deep_shortcuts_container");
+            LauncherInstrumentation.log("dragIconToWorkspace: indicator");
+            mLauncher.movePointer(
+                    downTime, SystemClock.uptimeMillis(), DRAG_DURACTION, launchableCenter,
+                    new Point(mLauncher.getDevice().getDisplayWidth() / 2,
+                            workspace.getVisibleBounds().centerY()));
+            LauncherInstrumentation.log("dragIconToWorkspace: moved pointer");
+            mLauncher.getDevice().pressBack();
+            verifyActiveContainer();
+        }
+    }
+
+    public void dragIconToHotseatIfCanInset(String pkgName) {
+        try (LauncherInstrumentation.Closable c =
+                     mLauncher.addContextLayer("dragging icon to hotseat center.")) {
+            verifyActiveContainer();
+            final UiObject2 hotseat = mHotseat;
+            dragIconToHotseat(
+                    mLauncher,
+                    getWorkspaceAppIcon(pkgName),
+                    hotseat.getVisibleCenter(),
+                    "deep_shortcuts_container"
+            );
+
+        }
+    }
+
     /**
      * Ensures that workspace is scrollable. If it's not, drags an icon icons from hotseat to the
      * second screen.
@@ -149,9 +189,21 @@ public final class Workspace extends Home {
     }
 
     @NonNull
+    public AppIcon getHotseatAppIcon(Pattern appName) {
+        return new AppIcon(mLauncher, mLauncher.getObjectInContainer(
+                mHotseat, By.clazz(TextView.class).text(appName).pkg(mLauncher.getLauncherPackageName())));
+    }
+
+    @NonNull
     public Folder getHotseatFolder(String appName) {
         return new Folder(mLauncher, mLauncher.getObjectInContainer(
                 mHotseat, Folder.getSelector(appName, mLauncher)));
+    }
+
+    static void dragIconToHotseat(
+            LauncherInstrumentation launcher, Launchable launchable, Point dest,
+            String longPressIndicator) {
+        dragIconToWorkspace(launcher, launchable, dest, longPressIndicator);
     }
 
     static void dragIconToWorkspace(
@@ -237,4 +289,36 @@ public final class Workspace extends Home {
                 By.clazz("com.android.launcher3.widget.PendingAppWidgetHostView"), timeout);
         return widget != null ? new Widget(mLauncher, widget) : null;
     }
+
+    public void touchLeftToRight(Point start, Point dest, boolean sendTouchUp) {
+        LauncherInstrumentation.log("touchLeftToRight: begin");
+        final long downTime = SystemClock.uptimeMillis();
+        mLauncher.sendPointer(downTime, downTime, MotionEvent.ACTION_DOWN, start);
+        LauncherInstrumentation.log("touchLeftToRight: sent down");
+        mLauncher.movePointer(
+                downTime, SystemClock.uptimeMillis(), DRAG_DURACTION, start, dest);
+        LauncherInstrumentation.log("touchLeftToRight: moved pointer");
+        if (sendTouchUp) {
+            mLauncher.sendPointer(
+                    downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, dest);
+            LauncherInstrumentation.log("touchLeftToRight: end");
+        }
+    }
+
+    /**
+     * Swip down in workspace.
+     */
+    @NonNull
+    public void swipDownInWorkspace() {
+        mLauncher.getTestInfo(TestProtocol.REQUEST_ENABLE_DEBUG_TRACING);
+        LauncherInstrumentation.log("swip down : begin");
+        final Point startPoint = mLauncher.getRealDisplaySize();
+        final Point endPoint = mLauncher.getRealDisplaySize();
+        startPoint.y /= 2;
+        startPoint.x /= 2;
+        endPoint.x = startPoint.x;
+        endPoint.y -= 100;
+        mLauncher.getDevice().swipe(startPoint.x, startPoint.y, endPoint.x, endPoint.y, 50);
+    }
+
 }

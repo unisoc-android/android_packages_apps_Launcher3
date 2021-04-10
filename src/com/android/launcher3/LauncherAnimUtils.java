@@ -22,13 +22,15 @@ import android.util.Property;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 
+import static com.sprd.ext.FeatureOption.SPRD_APP_REMOTE_ANIM_SUPPORT;
+
 public class LauncherAnimUtils {
     /**
      * Durations for various state animations. These are not defined in resources to allow
      * easier access from static classes and enums
      */
     public static final int ALL_APPS_TRANSITION_MS = 320;
-    public static final int OVERVIEW_TRANSITION_MS = 250;
+    public static final int OVERVIEW_TRANSITION_MS = SPRD_APP_REMOTE_ANIM_SUPPORT.get() ? 250 : 180;
     public static final int SPRING_LOADED_TRANSITION_MS = 150;
     public static final int SPRING_LOADED_EXIT_DELAY = 500;
 

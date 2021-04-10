@@ -35,18 +35,19 @@ import com.android.launcher3.uioverrides.WallpaperColorInfo;
  */
 public class Themes {
 
-    public static int getActivityThemeRes(Context context) {
-        WallpaperColorInfo wallpaperColorInfo = WallpaperColorInfo.getInstance(context);
-        boolean darkTheme;
+    public static boolean isDarkTheme(Context context, WallpaperColorInfo wallpaperColorInfo) {
         if (Utilities.ATLEAST_Q) {
             Configuration configuration = context.getResources().getConfiguration();
             int nightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
-            darkTheme = nightMode == Configuration.UI_MODE_NIGHT_YES;
+            return nightMode == Configuration.UI_MODE_NIGHT_YES;
         } else {
-            darkTheme = wallpaperColorInfo.isDark();
+            return wallpaperColorInfo.isDark();
         }
+    }
 
-        if (darkTheme) {
+    public static int getActivityThemeRes(Context context) {
+        WallpaperColorInfo wallpaperColorInfo = WallpaperColorInfo.getInstance(context);
+        if (isDarkTheme(context, wallpaperColorInfo)) {
             return wallpaperColorInfo.supportsDarkText() ?
                     R.style.AppTheme_Dark_DarkText : wallpaperColorInfo.isMainColorDark() ?
                             R.style.AppTheme_Dark_DarkMainColor : R.style.AppTheme_Dark;

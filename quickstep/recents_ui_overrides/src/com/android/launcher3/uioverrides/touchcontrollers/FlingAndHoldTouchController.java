@@ -175,4 +175,10 @@ public class FlingAndHoldTouchController extends PortraitStatesTouchController {
             builder.addFlag(AnimatorSetBuilder.FLAG_DONT_ANIMATE_OVERVIEW);
         }
     }
+
+    @Override
+    protected void clearState() {
+        mMotionPauseDetector.clear();
+        super.clearState();
+    }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="unread_notifier_title">"未讀標記"</string>
+    <string name="unread_call">"本機"</string>
+    <string name="unread_sms">"訊息"</string>
+    <string name="unread_email">"電郵"</string>
+    <string name="unread_calendar">"日曆"</string>
+    <string name="unread_hint">"缺乏必要的<xliff:g id="unread_type">%1$s</xliff:g>權限，請先申請權限。"</string>
+    <string name="pref_missed_call_count_title">"未接來電"</string>
+    <string name="pref_missed_call_count_summary">"請選擇電話應用程式以顯示未接來電數目"</string>
+    <string name="pref_unread_sms_count_title">"未讀訊息"</string>
+    <string name="pref_unread_sms_count_summary">"請選擇短訊應用程式以顯示未接訊息數目"</string>
+    <string name="pref_unread_email_count_title">"未讀電子郵件"</string>
+    <string name="pref_unread_email_count_summary">"請選擇電子郵件應用程式以顯示未讀電子郵件數目"</string>
+    <string name="pref_unread_calendar_count_title">"未讀日曆"</string>
+    <string name="pref_unread_calendar_count_summary">"請選擇日曆應用程式以顯示未讀日曆事件數目"</string>
+    <string name="selected_text">已選擇</string>
+    <string name="dynamic_icon_title">"動態圖示"</string>
+    <string name="allow_circular_sliding_title">"主螢幕循環顯示"</string>
+    <string name="allow_circular_sliding_summary">"開啟自訂左頁將不允許主螢幕循環顯示"</string>
+    <string name="pull_down_action_pref_title">"下拉操作"</string>
+    <string name="pull_down_do_nothing">"不執行任何操作"</string>
+    <string name="pull_down_notification">"顯示通知"</string>
+    <string name="pull_down_search">"開啟搜尋"</string>
+    <string name="home_screen_style_title">"主螢幕風格"</string>
+    <string name="home_screen_style_single">"單層"</string>
+    <string name="home_screen_style_dual">"雙層"</string>
+    <string name="home_screen_style_notification">"正在應用主螢幕風格變更"</string>
+    <string name="folder_icon_model_pref_title">"資料夾圖示風格"</string>
+    <string name="auto_model">"自動"</string>
+    <string name="annular_model">"環形"</string>
+    <string name="grid_model">"九宮格"</string>
+    <string name="desktop_grid">"桌面網格"</string>
+    <string name="notification_dots_ext_title">通知圓點中顯示數目</string>
+    <string name="notification_dots_ext_summary">通知圓點開啟時</string>
+</resources>

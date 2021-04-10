@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"અનરીડ બેજ"</string>
+<string name="unread_call">ફોનીક્સ</string>
+<string name="unread_sms">SMS</string>
+<string name="unread_email">ઇમેઇલ</string>
+<string name="unread_calendar">કેલેન્ડર</string>
+<string name="unread_hint">"આવશ્યક <xliff:g id="unread_type">%1$s</xliff:g> પરવાનગી ચુકી ગયા છો, કૃપા કરી પરવાનગી માટે અરજી કરો."</string>
+<string name="pref_missed_call_count_title">ચૂકાઇ ગયેલ કોલ</string>
+<string name="pref_missed_call_count_summary">"ફોનની એક એપ પસંદ કરો, તેના પર મિસ્ડ કોલ્સ નંબર ડિસ્પ્લે થાય છે"</string>
+<string name="pref_unread_sms_count_title">"નહીં વંચાયેલ સંદેશ"</string>
+<string name="pref_unread_sms_count_summary">"SMS એપ પસંદ કરો, તેના પર નહીં વંચાયેલા સંદેશાના નંબર ડિસપ્લે થશે"</string>
+<string name="pref_unread_email_count_title">"નહીં વંચાયેલ ઈમેલ"</string>
+<string name="pref_unread_email_count_summary">"ઈમેલ એપ પસંદ કરો, તેના પર નહીં વંચાયેલા મેઈલ નંબર ડિસ્પ્લે થાય છે"</string>
+<string name="pref_unread_calendar_count_title">"નહીં વંચાયેલ કેલેન્ડર"</string>
+<string name="pref_unread_calendar_count_summary">"કેલેન્ડર એપ પસંદ કરો, તેના પર નહીં વંચાયેલ કેલેન્ડરના ઈવેન્ટ"</string>
+<string name="selected_text">"પસંદગી કરવામાં આવી છે"</string>
+<string name="dynamic_icon_title">"ડાઈનામિક આઈકોન"</string>
+<string name="allow_circular_sliding_title">"હોમ સ્ક્રીન લૂપ"</string>
+<string name="allow_circular_sliding_summary">"જો કસ્ટમ પેજ ડાબી બાજુ હોય તો, તે હોમ સ્ક્રીનને લૂપની પરવાનગી આપતું નથી"</string>
+<string name="pull_down_action_pref_title">"પગલાંને નીચે કરો"</string>
+<string name="pull_down_do_nothing">"કંઈ કરો નહી"</string>
+<string name="pull_down_notification">નોટીફિકેશન્સ દર્શાવો </string>
+<string name="pull_down_search">"શોધવા ખોલો"</string>
+<string name="home_screen_style_title">"હોમ સ્ક્રીનની સ્ટાઇલ"</string>
+<string name="home_screen_style_single">"એક સ્તર"</string>
+<string name="home_screen_style_dual">"બેવડું સ્તર"</string>
+<string name="home_screen_style_notification">"હોમ સ્ક્રીન સ્ટાઇલના ફેરફારોને લાગુ કરી રહ્યું છે"</string>
+<string name="folder_icon_model_pref_title">"ફોલ્ડરના આઇકનની સ્ટાઇલ"</string>
+<string name="auto_model">પ્રમાણિકરણનો પ્રકાર</string>
+<string name="annular_model">"વલયાકાર"</string>
+<string name="grid_model">"ગ્રીડ"</string>
+<string name="desktop_grid">"ડેસ્કટૉપની ગ્રિડ"</string>
+<string name="notification_dots_ext_title">"નોટિફિકેશન ડૉટ્સના નંબર દર્શાવો"</string>
+<string name="notification_dots_ext_summary">"જ્યારે નોટિફિકેશનના ડૉટ્સ ચાલુ હોય"</string>
+</resources>

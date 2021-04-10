@@ -240,7 +240,12 @@ public class ClipAnimationHelper {
         } else {
             TransactionCompat t = new TransactionCompat();
             for (SurfaceParams param : params) {
-                SyncRtSurfaceTransactionApplierCompat.applyParams(t, param);
+                if (null != param
+                        && null != param.surface
+                        && null != param.surface.getSurfaceControl()
+                        && param.surface.getSurfaceControl().isValid()) {
+                    SyncRtSurfaceTransactionApplierCompat.applyParams(t, param);
+                }
             }
             t.setEarlyWakeup();
             t.apply();

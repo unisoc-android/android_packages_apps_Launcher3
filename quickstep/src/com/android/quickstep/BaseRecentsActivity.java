@@ -30,6 +30,9 @@ import com.android.launcher3.R;
 import com.android.launcher3.uioverrides.UiFactory;
 import com.android.launcher3.util.SystemUiController;
 import com.android.launcher3.util.Themes;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.clearall.ClearAllController;
+import com.sprd.ext.meminfo.MeminfoController;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -44,6 +47,8 @@ import java.io.PrintWriter;
 public abstract class BaseRecentsActivity extends BaseDraggingActivity {
 
     private Configuration mOldConfig;
+    private MeminfoController mMeminfoController;
+    private ClearAllController mClearAllController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,12 @@ public abstract class BaseRecentsActivity extends BaseDraggingActivity {
         mOldConfig = new Configuration(getResources().getConfiguration());
         initDeviceProfile();
         initViews();
-
+        if (MeminfoController.IS_SUPPORT_SHOW_MEMINFO) {
+            mMeminfoController = new MeminfoController(this);
+        }
+        if (ClearAllController.IS_SUPPORT_CLEAR_ALL_ON_BOTTOM) {
+            mClearAllController = new ClearAllController(this);
+        }
         getSystemUiController().updateUiState(SystemUiController.UI_STATE_BASE_WINDOW,
                 Themes.getAttrBoolean(this, R.attr.isWorkspaceDarkText));
         RecentsActivityTracker.onRecentsActivityCreate(this);
@@ -158,5 +168,16 @@ public abstract class BaseRecentsActivity extends BaseDraggingActivity {
         super.dump(prefix, fd, writer, args);
         writer.println(prefix + "Misc:");
         dumpMisc(writer);
+    }
+
+    @Override
+    protected void onResume() {
+        if (mMeminfoController != null) {
+            mMeminfoController.showImmediately();
+        }
+        if (mClearAllController != null) {
+            mClearAllController.showImmediately();
+        }
+        super.onResume();
     }
 }

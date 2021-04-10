@@ -31,6 +31,7 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.model.AppLaunchTracker;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.PackageManagerHelper;
+import com.sprd.ext.FeatureOption;
 
 import java.util.ArrayList;
 
@@ -66,6 +67,7 @@ public class AllAppsSearchBarController
         mInput.setOnBackKeyListener(this);
         mInput.setOnFocusChangeListener(this);
         mSearchAlgorithm = searchAlgorithm;
+        mSearchAlgorithm.setFuzzySearchEnable(FeatureOption.SPRD_ALLAPP_FUZZY_SEARCH_SUPPORT.get());
     }
 
     @Override

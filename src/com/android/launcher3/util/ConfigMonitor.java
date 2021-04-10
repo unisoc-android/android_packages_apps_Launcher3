@@ -30,6 +30,9 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.android.launcher3.MainThreadExecutor;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.resolution.SRController;
 
 import java.util.function.Consumer;
 
@@ -54,6 +57,8 @@ public class ConfigMonitor extends BroadcastReceiver implements DisplayListener 
 
     private Consumer<Context> mCallback;
 
+    private SRController mSRController;
+
     public ConfigMonitor(Context context, Consumer<Context> callback) {
         mContext = context;
 
@@ -73,6 +78,11 @@ public class ConfigMonitor extends BroadcastReceiver implements DisplayListener 
 
         mCallback = callback;
 
+        mSRController = LauncherAppMonitor.getInstance(mContext).getSRController();
+        if (mSRController != null) {
+            mSRController.setConfigMonitor(this);
+        }
+
         // Listen for configuration change
         mContext.registerReceiver(this, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
 
@@ -85,7 +95,7 @@ public class ConfigMonitor extends BroadcastReceiver implements DisplayListener 
     public void onReceive(Context context, Intent intent) {
         Configuration config = context.getResources().getConfiguration();
         if (mFontScale != config.fontScale || mDensity != config.densityDpi) {
-            Log.d(TAG, "Configuration changed.");
+            LogUtils.d(TAG, "Configuration changed.");
             notifyChange();
         }
     }
@@ -105,24 +115,32 @@ public class ConfigMonitor extends BroadcastReceiver implements DisplayListener 
         display.getRealSize(mTmpPoint1);
 
         if (!mRealSize.equals(mTmpPoint1) && !mRealSize.equals(mTmpPoint1.y, mTmpPoint1.x)) {
-            Log.d(TAG, String.format("Display size changed from %s to %s", mRealSize, mTmpPoint1));
+            LogUtils.d(TAG, String.format("Display size changed from %s to %s", mRealSize, mTmpPoint1));
             notifyChange();
             return;
         }
 
         display.getCurrentSizeRange(mTmpPoint1, mTmpPoint2);
         if (!mSmallestSize.equals(mTmpPoint1) || !mLargestSize.equals(mTmpPoint2)) {
-            Log.d(TAG, String.format("Available size changed from [%s, %s] to [%s, %s]",
+            LogUtils.d(TAG, String.format("Available size changed from [%s, %s] to [%s, %s]",
                     mSmallestSize, mLargestSize, mTmpPoint1, mTmpPoint2));
             notifyChange();
         }
     }
 
-    private synchronized void notifyChange() {
+    public synchronized void notifyChange() {
+        if (mSRController != null && mSRController.isResolutionSwitching()) {
+            LogUtils.d(TAG, "Resolution is switching, do not notify change.");
+            return;
+        }
+
         if (mCallback != null) {
             Consumer<Context> callback = mCallback;
             mCallback = null;
-            new MainThreadExecutor().execute(() -> callback.accept(mContext));
+            new MainThreadExecutor().execute(() -> {
+                LauncherAppMonitor.getInstance(mContext).onUIConfigChanged();
+                callback.accept(mContext);
+            });
         }
     }
 

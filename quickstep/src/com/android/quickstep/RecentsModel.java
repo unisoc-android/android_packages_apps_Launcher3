@@ -16,15 +16,13 @@
 package com.android.quickstep;
 
 import static com.android.quickstep.TaskUtils.checkCurrentOrManagedUserId;
-import static com.android.systemui.shared.system.QuickStepContract.KEY_EXTRA_SUPPORTS_WINDOW_CORNERS;
-import static com.android.systemui.shared.system.QuickStepContract.KEY_EXTRA_WINDOW_CORNER_RADIUS;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.ComponentCallbacks2;
+import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.Process;
 import android.os.RemoteException;
@@ -35,9 +33,11 @@ import com.android.systemui.shared.recents.ISystemUiProxy;
 import com.android.systemui.shared.recents.model.Task;
 import com.android.systemui.shared.recents.model.ThumbnailData;
 import com.android.systemui.shared.system.ActivityManagerWrapper;
-import com.android.systemui.shared.system.QuickStepContract;
 import com.android.systemui.shared.system.TaskStackChangeListener;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.lockicon.TaskLockStatus;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -215,5 +215,37 @@ public class RecentsModel extends TaskStackChangeListener {
     public interface TaskThumbnailChangeListener {
 
         Task onTaskThumbnailChanged(int taskId, ThumbnailData thumbnailData);
+    }
+
+    public void markTaskStackChanged() {
+        mTaskList.onTaskStackChanged();
+    }
+
+    public void dumpState(PrintWriter writer, boolean dumpAll) {
+        ArrayList<Task> curTasks = new ArrayList<>(mTaskList.mTasks);
+        int N = curTasks.size();
+        writer.println();
+        writer.println(TAG + ": Recent Task size:" + N);
+        for (int i = 0; i < N; i++) {
+            Task t = curTasks.get(i);
+            if (t != null && t.key != null) {
+                ComponentName cn = t.key.getComponent();
+                String name = cn != null ? cn.flattenToShortString() : t.key.getPackageName();
+                StringBuilder sb = new StringBuilder("Task[" + i + "] = ");
+
+                sb.append("Key:[" + t.key + "] ");
+                if (dumpAll) {
+                    sb.append("Name:[" + name + "] " );
+                    sb.append("isDockable:[" + t.isDockable + "] ");
+                    sb.append("isLocked:[" + t.isLocked + "] " );
+                }
+                if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+                    sb.append("ViewLocked:[" + TaskLockStatus.isSavedLockedTask(mContext,
+                            TaskLockStatus.makeTaskStringKey(mContext, t)) + "]");
+                }
+                writer.println(sb);
+            }
+        }
+        writer.println();
     }
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recent_task_option_split_screen">"Tela dividida"</string>
+<string name="recent_task_option_pin">"Fixar guia"</string>
+<string name="recent_task_option_freeform">"Forma livre"</string>
+<string name="accessibility_desc_recent_apps">"Visão geral"</string>
+<string name="recents_empty_message">"Nenhum item recente"</string>
+<string name="accessibility_close_task">"Fechar"</string>
+<string name="accessibility_app_usage_settings">"Configurações de uso do aplicativo"</string>
+<string name="recents_clear_all">"Limpar tudo"</string>
+<string name="accessibility_recent_apps">"Aplicativos recentes"</string>
+<string name="task_contents_description_with_remaining_time">"<xliff:g id="task_description" example="GMail">%1$s</xliff:g>, <xliff:g id="remaining_time" example="7 minutes left today">%2$s</xliff:g>"</string>
+<string name="shorter_duration_less_than_one_minute">"&lt; 1 minuto"</string>
+<string name="time_left_for_app">"<xliff:g id="time" example="7 minutes">%1$s</xliff:g> restantes hoje"</string>
+<string name="title_app_suggestions">"Sugestões de aplicativos"</string>
+<string name="all_apps_label">"Todos os apps"</string>
+<string name="all_apps_prediction_tip">"Seus aplicativos favoritos"</string>
+</resources>

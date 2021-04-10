@@ -90,6 +90,10 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo
                 (resizeMode & RESIZE_VERTICAL) != 0 ? minSpanY : -1);
     }
 
+    public boolean supportResize() {
+        return (resizeMode & RESIZE_BOTH) != 0;
+    }
+
     public boolean isCustomWidget() {
         return provider.getClassName().startsWith(CLS_CUSTOM_WIDGET_PREFIX);
     }

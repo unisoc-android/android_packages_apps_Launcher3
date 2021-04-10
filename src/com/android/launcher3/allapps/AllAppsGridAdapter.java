@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.android.launcher3.AppInfo;
 import com.android.launcher3.BubbleTextView;
+import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
 import com.android.launcher3.allapps.AlphabeticalAppsList.AdapterItem;
@@ -36,6 +37,7 @@ import com.android.launcher3.model.AppLaunchTracker;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.touch.ItemLongClickListener;
 import com.android.launcher3.util.PackageManagerHelper;
+import com.sprd.ext.FeatureOption;
 
 import java.util.List;
 
@@ -180,7 +182,7 @@ public class AllAppsGridAdapter extends RecyclerView.Adapter<AllAppsGridAdapter.
     private final GridLayoutManager mGridLayoutMgr;
     private final GridSpanSizer mGridSizer;
 
-    private final int mAppsPerRow;
+    private int mAppsPerRow;
 
     private BindViewCallback mBindViewCallback;
     private OnFocusChangeListener mIconFocusListener;
@@ -202,6 +204,13 @@ public class AllAppsGridAdapter extends RecyclerView.Adapter<AllAppsGridAdapter.
 
         mAppsPerRow = mLauncher.getDeviceProfile().inv.numColumns;
         mGridLayoutMgr.setSpanCount(mAppsPerRow);
+    }
+
+    void updateAppsPerRowAndSpanCount(int numColumns) {
+        if (mAppsPerRow != numColumns) {
+            mAppsPerRow = numColumns;
+            mGridLayoutMgr.setSpanCount(mAppsPerRow);
+        }
     }
 
     public static boolean isDividerViewType(int viewType) {
@@ -254,6 +263,10 @@ public class AllAppsGridAdapter extends RecyclerView.Adapter<AllAppsGridAdapter.
                 icon.setOnLongClickListener(ItemLongClickListener.INSTANCE_ALL_APPS);
                 icon.setLongPressTimeoutFactor(1f);
                 icon.setOnFocusChangeListener(mIconFocusListener);
+                // All apps bg transparent need change text color same with workspace
+                if (FeatureOption.SPRD_ALLAPP_BG_TRANSPARENT_SUPPORT.get()) {
+                    icon.setTextAppearance(R.style.TransBgAppIcon);
+                }
 
                 // Ensure the all apps icon height matches the workspace icons in portrait mode.
                 icon.getLayoutParams().height = mLauncher.getDeviceProfile().allAppsCellHeightPx;
@@ -282,10 +295,12 @@ public class AllAppsGridAdapter extends RecyclerView.Adapter<AllAppsGridAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_ICON:
-                AppInfo info = mApps.getAdapterItems().get(position).appInfo;
+                AlphabeticalAppsList.AdapterItem item = mApps.getAdapterItems().get(position);
+                AppInfo info = item.appInfo;
                 BubbleTextView icon = (BubbleTextView) holder.itemView;
                 icon.reset();
                 icon.applyFromApplicationInfo(info);
+                item.iconView = icon;
                 break;
             case VIEW_TYPE_EMPTY_SEARCH:
                 TextView emptyViewText = (TextView) holder.itemView;

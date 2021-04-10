@@ -29,7 +29,7 @@ public final class Folder {
     Folder(LauncherInstrumentation launcher, UiObject2 icon) {
     }
 
-    static BySelector getSelector(String folderName, LauncherInstrumentation launcher) {
+    public static BySelector getSelector(String folderName, LauncherInstrumentation launcher) {
         return By.clazz(FrameLayout.class).desc(folderName).pkg(launcher.getLauncherPackageName());
     }
 }

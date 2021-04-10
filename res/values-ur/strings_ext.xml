@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"غیر ریڈ شدہ بیج"</string>
+<string name="unread_call">"فون"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">"ای میل"</string>
+<string name="unread_calendar">"کیلنڈر"</string>
+<string name="unread_hint">"مس <xliff:g id="unread_type">%1$s</xliff:g> کو اجازت کی ضرورت ہے، براہ کرم پہلے اجازت کے لیے درخواست کریں۔."</string>
+<string name="pref_missed_call_count_title">"مسڈ کال"</string>
+<string name="pref_missed_call_count_summary">"کسی فون ایپ کا انتخاب کریں، مسڈ کال کا نمبر اس پر دکھائيں"</string>
+<string name="pref_unread_sms_count_title">"بنا پڑھا ہوا میسیج"</string>
+<string name="pref_unread_sms_count_summary">"کسی SMS ایپ کا انتخاب کریں اور بنا پڑھا ہوا میسیج اس پر دکھائیں"</string>
+<string name="pref_unread_email_count_title">"بنا پڑھا ہوا ای میل"</string>
+<string name="pref_unread_email_count_summary">"کسی ای میل ایپ کا انتخاب کریں، بنا پڑھا ہوا ای میل اس پر دکھائيں"</string>
+<string name="pref_unread_calendar_count_title">"بنا پڑھا ہوا کلینڈر"</string>
+<string name="pref_unread_calendar_count_summary">"کسی کلینڈر ایپ کا انتخاب کریں، اور اس کے اوپر بنا پڑھے ہوئے کلینڈر ایوینٹس دکھائيں"</string>
+<string name="selected_text">منتخب ہوگیا۔</string>
+<string name="dynamic_icon_title">"متحرک آئکن"</string>
+<string name="allow_circular_sliding_title">"ہوم اسکرین لوپ"</string>
+<string name="allow_circular_sliding_summary">"اگر گاہک نے پیج چھوڑ دیا تو ہوم اسکرین لوپ کی اجازت نہیں ہے"</string>
+<string name="pull_down_action_pref_title">"کارروائی کو ختم کرو"</string>
+<string name="pull_down_do_nothing">"کچھ نہ کریں"</string>
+<string name="pull_down_notification">"اطلاعات دکھائیں"</string>
+<string name="pull_down_search">"تلاش شروع کریں"</string>
+<string name="home_screen_style_title">" ہوم اسکرین کا طرز"</string>
+<string name="home_screen_style_single">" ایک پرت"</string>
+<string name="home_screen_style_dual">" دوہری پرت"</string>
+<string name="home_screen_style_notification">" ہوم اسکرین کا استعمال کرتے ہوئے طرز تبدیل کریں"</string>
+<string name="folder_icon_model_pref_title">" فولڈر آئیکن طرز"</string>
+<string name="auto_model">"خودکار"</string>
+<string name="annular_model">"چھلا نما"</string>
+<string name="grid_model">"گرڈ"</string>
+<string name="desktop_grid">" ڈیسکٹاپ گرڈ"</string>
+<string name="notification_dots_ext_title">"نوٹیفیکیشن ڈاٹس کی تعداد دکھائيں"</string>
+<string name="notification_dots_ext_summary">"جب نوٹیفیکیشن ڈاٹس چالو ہوں"</string>
+</resources>

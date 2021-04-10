@@ -30,8 +30,11 @@ import com.android.launcher3.shortcuts.DeepShortcutManager;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.PackageUserKey;
 import com.android.launcher3.widget.WidgetListRowEntry;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.notificationdots.NotifyDotsNumUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -80,6 +83,9 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
                 newDotInfo.addOrUpdateNotificationKey(notificationKey);
                 mPackageUserToDotInfos.put(postedPackageUserKey, newDotInfo);
                 dotShouldBeRefreshed = true;
+                if (LogUtils.DEBUG_ALL) {
+                    LogUtils.d(TAG, "onNotificationPosted()  newDotInfo=" + newDotInfo);
+                }
             } else {
                 dotShouldBeRefreshed = false;
             }
@@ -91,8 +97,13 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
                 mPackageUserToDotInfos.remove(postedPackageUserKey);
             }
         }
+        if (LogUtils.DEBUG_ALL) {
+            LogUtils.d(TAG, "onNotificationPosted() shouldBeFilteredOut=" + shouldBeFilteredOut
+                    +" dotShouldBeRefreshed=" + dotShouldBeRefreshed + " dotInfo=" + dotInfo);
+        }
         if (dotShouldBeRefreshed) {
             updateNotificationDots(t -> postedPackageUserKey.equals(t));
+            mChangeListener.closePopupWindowIfNeeded(postedPackageUserKey);
         }
     }
 
@@ -100,6 +111,9 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
     public void onNotificationRemoved(PackageUserKey removedPackageUserKey,
             NotificationKeyData notificationKey) {
         DotInfo oldDotInfo = mPackageUserToDotInfos.get(removedPackageUserKey);
+        if (LogUtils.DEBUG_ALL) {
+            LogUtils.d(TAG, "onNotificationRemoved() oldDotInfo=" + oldDotInfo);
+        }
         if (oldDotInfo != null && oldDotInfo.removeNotificationKey(notificationKey)) {
             if (oldDotInfo.getNotificationKeys().size() == 0) {
                 mPackageUserToDotInfos.remove(removedPackageUserKey);
@@ -112,6 +126,11 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
     @Override
     public void onNotificationFullRefresh(List<StatusBarNotification> activeNotifications) {
         if (activeNotifications == null) return;
+        if (LogUtils.DEBUG_ALL) {
+            // adb shell dumpsys activity com.android.launcher3.Launcher --all
+            LogUtils.d(TAG, "onNotificationFullRefresh size: " + activeNotifications.size()
+                    + " you can dumpsys.");
+        }
         // This will contain the PackageUserKeys which have updated dots.
         HashMap<PackageUserKey, DotInfo> updatedDots = new HashMap<>(mPackageUserToDotInfos);
         mPackageUserToDotInfos.clear();
@@ -125,11 +144,16 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
             dotInfo.addOrUpdateNotificationKey(NotificationKeyData.fromNotification(notification));
         }
 
+        // If open or close notification dots number, we need to refresh all dots.
+        boolean isNeedFullFresh = NotifyDotsNumUtils.isFullFreshEnabled(mLauncher);
         // Add and remove from updatedDots so it contains the PackageUserKeys of updated dots.
-        for (PackageUserKey packageUserKey : mPackageUserToDotInfos.keySet()) {
+        for (HashMap.Entry<PackageUserKey, DotInfo> entry : mPackageUserToDotInfos.entrySet()) {
+            PackageUserKey packageUserKey = entry.getKey();
             DotInfo prevDot = updatedDots.get(packageUserKey);
-            DotInfo newDot = mPackageUserToDotInfos.get(packageUserKey);
-            if (prevDot == null) {
+            DotInfo newDot = entry.getValue();
+            if (isNeedFullFresh || prevDot == null || newDot == null
+                    || (NotifyDotsNumUtils.showNotifyDotsNum(mLauncher)
+                    && prevDot.getNotificationCount() != newDot.getNotificationCount())) {
                 updatedDots.put(packageUserKey, newDot);
             } else {
                 // No need to update the dot if it already existed (no visual change).
@@ -143,6 +167,9 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
             updateNotificationDots(updatedDots::containsKey);
         }
         trimNotifications(updatedDots);
+        if (isNeedFullFresh) {
+            NotifyDotsNumUtils.setFullFreshEnabled(mLauncher, false);
+        }
     }
 
     private void trimNotifications(Map<PackageUserKey, DotInfo> updatedDots) {
@@ -226,6 +253,14 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
         return null;
     }
 
+    public String dumpDotInfosMap() {
+        StringBuilder sb = new StringBuilder(" " + TAG + " ");
+        for (Map.Entry<PackageUserKey, DotInfo> entry : mPackageUserToDotInfos.entrySet()) {
+            sb.append('\n').append(entry.getKey().toString()).append(entry.getValue().toString());
+        }
+        return sb.toString();
+    }
+
     public interface PopupDataChangeListener {
 
         PopupDataChangeListener INSTANCE = new PopupDataChangeListener() { };
@@ -235,5 +270,7 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
         default void trimNotifications(Map<PackageUserKey, DotInfo> updatedDots) { }
 
         default void onWidgetsBound() { }
+
+        default void closePopupWindowIfNeeded(PackageUserKey postedPackageUserKey) {}
     }
 }

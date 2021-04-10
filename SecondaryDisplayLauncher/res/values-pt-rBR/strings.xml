@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="couldnt_launch">"Não foi possível iniciar a atividade"</string>
+<string name="add_app_shortcut">"Adicionar atalho de aplicativo"</string>
+<string name="set_wallpaper">"definir plano de fundo"</string>
+</resources>

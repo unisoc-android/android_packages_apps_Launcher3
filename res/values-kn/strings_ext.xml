@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"ಓದಿರದ ಬ್ಯಾಡ್ಜ್"</string>
+<string name="unread_call">"ಫೋನ್"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">"ಇಮೇಯ್ಲ್"</string>
+<string name="unread_calendar">"ದಿನಚರಿ ಪುಸ್ತಕ"</string>
+<string name="unread_hint">"ಅವಶ್ಯಕತೆಯ ಕೊರತೆ ಇದೆ <xliff:g id="unread_type">%1$s</xliff:g>  ಅನುಮತಿ, ದಯವಿಟ್ಟು ಮೊದಲು ಅನುಮತಿಗಾಗಿ ಅರ್ಜಿ ನೀಡಿ."</string>
+<string name="pref_missed_call_count_title">"ಬಿಟ್ಟಿಹೋಗಿರುವ ಕರೆ"</string>
+<string name="pref_missed_call_count_summary">"ಫೋನ್ ಆ್ಯಪ್  ಆಯ್ಕೆಮಾಡಿ, ಅದರಲ್ಲಿ ತಪ್ಪಿದ ಕರೆಗಳ ಸಂಖ್ಯೆಯನ್ನು ಪ್ರದರ್ಶಿಸಿ"</string>
+<string name="pref_unread_sms_count_title">"ಓದದ ಸಂದೇಶ"</string>
+<string name="pref_unread_sms_count_summary">"SMS ಆ್ಯಪ್  ಆಯ್ಕೆ ಮಾಡಿ, ಅದರಲ್ಲಿ ಓದಿರದ ಸಂದೇಶಗ ಸಂಖ್ಯೆಯನ್ನು ಪ್ರದರ್ಶಿಸಿ"</string>
+<string name="pref_unread_email_count_title">"ಓದದ ಇಮೇಲ್"</string>
+<string name="pref_unread_email_count_summary">"ಇಮೇಲ್ ಆ್ಯಪ್   ಆಯ್ಕೆಮಾಡಿ,ಅದರಲ್ಲಿರುವ ಓದಿರದ ಮೇಲ್ ಸಂಖ್ಯೆಯನ್ನು ಪ್ರದರ್ಶಿಸಿ"</string>
+<string name="pref_unread_calendar_count_title">"ಓದದ ಕ್ಯಾಲೆಂಡರ್"</string>
+<string name="pref_unread_calendar_count_summary">"ಕ್ಯಾಲೆಂಡರ್ ಆ್ಯಪ್  ಆಯ್ಕೆ ಮಾಡಿ, ಅದರಲ್ಲಿ ಓದಿರದ ಕ್ಯಾಲೆಂಡರ್ ಈವೆಂಟ್‌ಗಳನ್ನು ಪ್ರದರ್ಶಿಸಿ"</string>
+<string name="selected_text">"ಆಯ್ಕೆ ಮಾಡಲಾಯಿತು"</string>
+<string name="dynamic_icon_title">"ಡೈನಮಿಕ್ ಐಕಾನ್"</string>
+<string name="allow_circular_sliding_title">"ಹೋಮ್ ಸ್ಕ್ರೀನ್ ಲೂಪ್"</string>
+<string name="allow_circular_sliding_summary">"ಕಸ್ಟಮ್ ಎಡ ಪುಟವನ್ನು ಹೊಂದಿದ್ದರೆ, ಹೋಮ್ ಸ್ಕ್ರೀನ್ ಲೂಪ್ ಅನುಮತಿಸುವುದಿಲ್ಲ"</string>
+<string name="pull_down_action_pref_title">"ಪುಲ್ ಡೌನ್ ಆಕ್ಷನ್"</string>
+<string name="pull_down_do_nothing">"ಏನೂ ಮಾಡಬೇಡಿ"</string>
+<string name="pull_down_notification">"ನೋಟಿಫಿಕೇಷನ್ ಗಳನ್ನು ತೋರಿಸಿ"</string>
+<string name="pull_down_search">"ಸರ್ಚ್ ತೆರೆಯಿರಿ"</string>
+<string name="home_screen_style_title">"ಹೋಮ್ ಸ್ಕ್ರೀನ್ ಶೈಲಿ"</string>
+<string name="home_screen_style_single">"ಸಿಂಗಲ್ ಲೇಯರ್"</string>
+<string name="home_screen_style_dual">"ಡ್ಯುಯಲ್ ಲೇಯರ್"</string>
+<string name="home_screen_style_notification">"ಹೋಮ್ ಸ್ಕ್ರೀನ್ ಶೈಲಿಯ ಬದಲಾವಣೆಗಳನ್ನು ಅನ್ವಯಿಸಲಾಗುತ್ತಿದೆ"</string>
+<string name="folder_icon_model_pref_title">"ಫೋಲ್ಡರ್ ಐಕಾನ್ ಶೈಲಿ"</string>
+<string name="auto_model">"ಸ್ವಯಂಚಾಲನೆ"</string>
+<string name="annular_model">"ಆನ್ಯುಲರ್"</string>
+<string name="grid_model">"ಗ್ರಿಡ್"</string>
+<string name="desktop_grid">"ಡೆಸ್ಕ್ಟಾಪ್ ಗ್ರಿಡ್"</string>
+<string name="notification_dots_ext_title">"ಅಧಿಸೂಚನೆ ಚುಕ್ಕೆಗಳ ಸಂಖ್ಯೆಯನ್ನು ತೋರಿಸಿ"</string>
+<string name="notification_dots_ext_summary">"ಅಧಿಸೂಚನೆ ಚುಕ್ಕೆಗಳು ಆನ್ ಆಗಿರುವಾಗ"</string>
+</resources>

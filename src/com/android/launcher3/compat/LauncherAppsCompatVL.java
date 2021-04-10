@@ -34,6 +34,7 @@ import android.util.ArrayMap;
 
 import com.android.launcher3.compat.ShortcutConfigActivityInfo.ShortcutConfigActivityInfoVL;
 import com.android.launcher3.util.PackageUserKey;
+import com.sprd.ext.UtilitiesExt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
 
     @Override
     public void addOnAppsChangedCallback(LauncherAppsCompat.OnAppsChangedCallbackCompat callback) {
+        if (UtilitiesExt.isRoboUnitTest()) return;
         WrappedCallback wrappedCallback = new WrappedCallback(callback);
         synchronized (mCallbacks) {
             mCallbacks.put(callback, wrappedCallback);
@@ -124,6 +126,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
 
     @Override
     public boolean isPackageEnabledForProfile(String packageName, UserHandle user) {
+        if (UtilitiesExt.isRoboUnitTest()) return true;
         return mLauncherApps.isPackageEnabled(packageName, user);
     }
 

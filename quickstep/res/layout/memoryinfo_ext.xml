@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.sprd.ext.meminfo.MeminfoView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recents_memoryinfo"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/recents_meminfo_height"
+    android:layout_gravity="bottom"
+    android:gravity="center"
+    android:singleLine="true"
+    android:textColor="?attr/workspaceTextColor"
+    android:textSize="@dimen/recents_meminfo_text_size"
+    android:visibility="gone" />

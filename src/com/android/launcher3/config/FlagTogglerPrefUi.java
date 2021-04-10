@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.android.launcher3.R;
 import com.android.launcher3.config.BaseFlags.TogglableFlag;
+import com.sprd.ext.UtilitiesExt;
 
 import androidx.preference.PreferenceDataStore;
 import androidx.preference.PreferenceFragment;
@@ -123,7 +124,7 @@ public final class FlagTogglerPrefUi {
             mSharedPreferences.edit().commit();
             Log.e(TAG,
                     "Killing launcher process " + Process.myPid() + " to apply new flag values");
-            System.exit(0);
+            UtilitiesExt.exitLauncher();
         }
     }
 

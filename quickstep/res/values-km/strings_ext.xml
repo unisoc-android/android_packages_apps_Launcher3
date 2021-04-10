@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"ទំហំទំនេរ <xliff:g id="count">%1$s</xliff:g>"</string>
+<string name="recents_clean_finished_toast">"ធ្វើឲ្យចងចាំមានទំហំទំនេរ <xliff:g id="count">%1$s</xliff:g> នៅសល់ទំហំទំនេរ <xliff:g id="count">%2$s</xliff:g> ពេលនេះ។"</string>
+<string name="recents_nothing_to_clear">"គ្មានអ្វីត្រូវសម្អាតនៅក្នុងឃ្លាំងសម្ងាត់ទេ "</string>
+</resources>

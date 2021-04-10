@@ -45,11 +45,22 @@ public class AddWorkspaceItemsTask extends BaseModelUpdateTask {
 
     private final List<Pair<ItemInfo, Object>> mItemList;
 
+    private boolean mAnimated = true;//default need show animate
+
     /**
      * @param itemList items to add on the workspace
      */
     public AddWorkspaceItemsTask(List<Pair<ItemInfo, Object>> itemList) {
         mItemList = itemList;
+    }
+
+    public AddWorkspaceItemsTask(List<Pair<ItemInfo, Object>> itemList, boolean ignoreLoaded) {
+        this(itemList);
+        mIgnoreLoaded = ignoreLoaded;
+    }
+
+    public void setEnableAnimated(boolean animated) {
+        mAnimated = animated;
     }
 
     @Override
@@ -112,6 +123,7 @@ public class AddWorkspaceItemsTask extends BaseModelUpdateTask {
         }
 
         if (!addedItemsFinal.isEmpty()) {
+            final boolean animated = mAnimated;
             scheduleCallbackTask(new CallbackTask() {
                 @Override
                 public void execute(Callbacks callbacks) {
@@ -121,7 +133,7 @@ public class AddWorkspaceItemsTask extends BaseModelUpdateTask {
                         ItemInfo info = addedItemsFinal.get(addedItemsFinal.size() - 1);
                         int lastScreenId = info.screenId;
                         for (ItemInfo i : addedItemsFinal) {
-                            if (i.screenId == lastScreenId) {
+                            if (i.screenId == lastScreenId && animated) {
                                 addAnimated.add(i);
                             } else {
                                 addNotAnimated.add(i);

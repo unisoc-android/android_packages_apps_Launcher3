@@ -37,6 +37,8 @@ import com.android.launcher3.icons.ComponentWithLabel;
 import com.android.launcher3.icons.IconCache;
 import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.R;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.grid.HotseatController;
 
 /**
  * Wrapper class for representing a shortcut configure activity.
@@ -82,6 +84,12 @@ public abstract class ShortcutConfigActivityInfo implements ComponentWithLabel {
                 .setComponent(getComponent());
         try {
             activity.startActivityForResult(intent, requestCode);
+            HotseatController hc = LauncherAppMonitor.getInstance(activity).getHotseatController();
+            if (hc != null) {
+                // set true means do not clear empty grid right now, clear after set false.
+                // Example: add 1 * 1 widget to hotseat.
+                hc.setDelayClearEmptyGridFlag(true);
+            }
             return true;
         } catch (ActivityNotFoundException e) {
             Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();

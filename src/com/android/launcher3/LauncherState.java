@@ -43,12 +43,15 @@ import android.view.animation.Interpolator;
 
 import com.android.launcher3.anim.AnimatorSetBuilder;
 import com.android.launcher3.states.SpringLoadedState;
+import com.android.launcher3.testing.TestProtocol;
 import com.android.launcher3.uioverrides.UiFactory;
 import com.android.launcher3.uioverrides.states.AllAppsState;
 import com.android.launcher3.uioverrides.states.OverviewState;
 import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
 
 import java.util.Arrays;
+
+import androidx.annotation.NonNull;
 
 
 /**
@@ -270,6 +273,8 @@ public class LauncherState {
      */
     public void onStateTransitionEnd(Launcher launcher) {
         if (this == NORMAL) {
+            AbstractFloatingView.closeOpenViews(launcher,
+                    false, AbstractFloatingView.TYPE_TASK_MENU);
             // Clear any rotation locks when going to normal state
             launcher.getRotationHelper().setCurrentStateRequest(REQUEST_NONE);
         }
@@ -348,5 +353,12 @@ public class LauncherState {
             this.translationX = translationX;
             this.translationY = translationY;
         }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        String stateOrdinal = TestProtocol.stateOrdinalToString(ordinal);
+        return stateOrdinal != null ? stateOrdinal : Integer.toString(ordinal);
     }
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"<xliff:g id="count">%1$s</xliff:g> ಲಭ್ಯ"</string>
+<string name="recents_clean_finished_toast">"ಬಿಡುಗಡೆ <xliff:g id="count">%1$s</xliff:g>ಸ್ಮರಣೆ,<xliff:g id="count">%2$s</xliff:g>ಈಗ ಲಭ್ಯವಿದೆ."</string>
+<string name="recents_nothing_to_clear">"ಕ್ಯಾಚಿ ಯಲ್ಲಿ ಕ್ಲಿಯರ್ ಮಾಡಲು ಏನುಇಲ್ಲ"</string>
+</resources>

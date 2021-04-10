@@ -26,6 +26,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
+import com.sprd.ext.FeatureOption;
+
 import java.util.function.Consumer;
 
 /**
@@ -71,6 +73,11 @@ public final class TaskSwipeCallback extends ItemTouchHelper.SimpleCallback {
         if (viewHolder.getItemViewType() == ITEM_TYPE_CLEAR_ALL) {
             // Clear all button should not be swipable.
             return 0;
+        }
+        if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+            TaskHolder taskHolder = (TaskHolder) viewHolder;
+            return taskHolder.getTaskItemView().isLocked() ?
+                    0 : super.getSwipeDirs(recyclerView, viewHolder);
         }
         return super.getSwipeDirs(recyclerView, viewHolder);
     }

@@ -80,7 +80,7 @@ final class AppToOverviewAnimationProvider<T extends BaseDraggingActivity> imple
                     anim.start();
                 });
         factory.onRemoteAnimationReceived(null);
-        factory.createActivityController(RECENTS_LAUNCH_DURATION);
+        factory.createActivityControllerWithoutAttachedToWindow(RECENTS_LAUNCH_DURATION);
         mActivity = activity;
         mRecentsView = mActivity.getOverviewPanel();
         return false;

@@ -35,6 +35,7 @@ import com.android.launcher3.LauncherModel;
 import com.android.launcher3.util.IntSet;
 import com.android.launcher3.util.PackageUserKey;
 import com.android.launcher3.util.SecureSettingsObserver;
+import com.sprd.ext.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +60,7 @@ public class NotificationListener extends NotificationListenerService {
     private static final int MSG_NOTIFICATION_POSTED = 1;
     private static final int MSG_NOTIFICATION_REMOVED = 2;
     private static final int MSG_NOTIFICATION_FULL_REFRESH = 3;
+    private static final int MSG_NOTIFICATION_PART_REFRESH = 4;
 
     private static NotificationListener sNotificationListenerInstance = null;
     private static NotificationsChangedListener sNotificationsChangedListener;
@@ -87,6 +89,9 @@ public class NotificationListener extends NotificationListenerService {
                     mUiHandler.obtainMessage(message.what, message.obj).sendToTarget();
                     break;
                 case MSG_NOTIFICATION_REMOVED:
+                    mUiHandler.obtainMessage(message.what, message.obj).sendToTarget();
+                    break;
+                case MSG_NOTIFICATION_PART_REFRESH:
                     mUiHandler.obtainMessage(message.what, message.obj).sendToTarget();
                     break;
                 case MSG_NOTIFICATION_FULL_REFRESH:
@@ -128,6 +133,7 @@ public class NotificationListener extends NotificationListenerService {
                         sNotificationsChangedListener.onNotificationRemoved(pair.first, pair.second);
                     }
                     break;
+                case MSG_NOTIFICATION_PART_REFRESH:
                 case MSG_NOTIFICATION_FULL_REFRESH:
                     if (sNotificationsChangedListener != null) {
                         sNotificationsChangedListener.onNotificationFullRefresh(
@@ -193,6 +199,7 @@ public class NotificationListener extends NotificationListenerService {
     public void onListenerConnected() {
         super.onListenerConnected();
         sIsConnected = true;
+        LogUtils.d(TAG, "onListenerConnected()");
 
         mNotificationDotsObserver =
                 newNotificationSettingsObserver(this, this::onNotificationSettingsChanged);
@@ -204,7 +211,11 @@ public class NotificationListener extends NotificationListenerService {
 
     private void onNotificationSettingsChanged(boolean areNotificationDotsEnabled) {
         if (!areNotificationDotsEnabled && sIsConnected) {
-            requestUnbind();
+            try {
+                requestUnbind();
+            } catch (SecurityException e) {
+                LogUtils.d(TAG, "failed to unbind Notification", e);
+            }
         }
     }
 
@@ -216,7 +227,10 @@ public class NotificationListener extends NotificationListenerService {
     public void onListenerDisconnected() {
         super.onListenerDisconnected();
         sIsConnected = false;
-        mNotificationDotsObserver.unregister();
+        LogUtils.d(TAG, "onListenerDisconnected()");
+        if (mNotificationDotsObserver != null) {
+            mNotificationDotsObserver.unregister();
+        }
     }
 
     @Override
@@ -225,6 +239,9 @@ public class NotificationListener extends NotificationListenerService {
         if (sbn == null) {
             // There is a bug in platform where we can get a null notification; just ignore it.
             return;
+        }
+        if (LogUtils.DEBUG_ALL) {
+            LogUtils.d(TAG, " onNotificationPosted, " + sbnToString(sbn));
         }
         mWorkerHandler.obtainMessage(MSG_NOTIFICATION_POSTED, new NotificationPostedMsg(sbn))
             .sendToTarget();
@@ -254,6 +271,9 @@ public class NotificationListener extends NotificationListenerService {
         if (sbn == null) {
             // There is a bug in platform where we can get a null notification; just ignore it.
             return;
+        }
+        if (LogUtils.DEBUG_ALL) {
+            LogUtils.d(TAG, " onNotificationRemoved, " + sbnToString(sbn));
         }
         Pair<PackageUserKey, NotificationKeyData> packageUserKeyAndNotificationKey
             = new Pair<>(PackageUserKey.fromNotification(sbn),
@@ -290,9 +310,13 @@ public class NotificationListener extends NotificationListenerService {
     public void onNotificationRankingUpdate(RankingMap rankingMap) {
         super.onNotificationRankingUpdate(rankingMap);
         String[] keys = rankingMap.getOrderedKeys();
-        for (StatusBarNotification sbn : getActiveNotifications(keys)) {
+        StatusBarNotification[] sbns = getActiveNotifications(keys);
+        List<StatusBarNotification> updateSbns = filterNotifications(sbns);
+        for (StatusBarNotification sbn : sbns) {
             updateGroupKeyIfNecessary(sbn);
         }
+        mWorkerHandler.obtainMessage(MSG_NOTIFICATION_PART_REFRESH, updateSbns).sendToTarget();
+
     }
 
     private void updateGroupKeyIfNecessary(StatusBarNotification sbn) {
@@ -369,11 +393,25 @@ public class NotificationListener extends NotificationListenerService {
 
         getCurrentRanking().getRanking(sbn.getKey(), mTempRanking);
         if (!mTempRanking.canShowBadge()) {
+            if (LogUtils.DEBUG_ALL) {
+                LogUtils.d(TAG, "Filter out, canShowBadge is false, " + sbnToString(sbn));
+            }
             return true;
         }
+
+        if (mTempRanking.getChannel() == null) {
+            if (LogUtils.DEBUG_ALL) {
+                LogUtils.d(TAG, "Filter out, TempRank channel is null. " + sbnToString(sbn));
+            }
+            return true;
+        }
+
         if (mTempRanking.getChannel().getId().equals(NotificationChannel.DEFAULT_CHANNEL_ID)) {
             // Special filtering for the default, legacy "Miscellaneous" channel.
             if ((notification.flags & Notification.FLAG_ONGOING_EVENT) != 0) {
+                if (LogUtils.DEBUG_ALL) {
+                    LogUtils.d(TAG, "Filter out, legacy Miscellaneous channel. " + sbnToString(sbn));
+                }
                 return true;
             }
         }
@@ -382,6 +420,9 @@ public class NotificationListener extends NotificationListenerService {
         CharSequence text = notification.extras.getCharSequence(Notification.EXTRA_TEXT);
         boolean missingTitleAndText = TextUtils.isEmpty(title) && TextUtils.isEmpty(text);
         boolean isGroupHeader = (notification.flags & Notification.FLAG_GROUP_SUMMARY) != 0;
+        if (LogUtils.DEBUG_ALL && (isGroupHeader || missingTitleAndText)) {
+            LogUtils.d(TAG, "Filter out, " + sbnToString(sbn));
+        }
         return (isGroupHeader || missingTitleAndText);
     }
 
@@ -396,5 +437,16 @@ public class NotificationListener extends NotificationListenerService {
     public interface StatusBarNotificationsChangedListener {
         void onNotificationPosted(StatusBarNotification sbn);
         void onNotificationRemoved(StatusBarNotification sbn);
+    }
+
+    private static String sbnToString(StatusBarNotification sbn) {
+        Notification notification = sbn.getNotification();
+        CharSequence title = notification.extras.getCharSequence(Notification.EXTRA_TITLE);
+        CharSequence text = notification.extras.getCharSequence(Notification.EXTRA_TEXT);
+        boolean isGroupHeader = (notification.flags & Notification.FLAG_GROUP_SUMMARY) != 0;
+        StringBuilder str = new StringBuilder("isGroupHeader=" + isGroupHeader + " Title=" + title + " Text=" + text
+                + " Number=" + sbn.getNotification().number);
+        str = isGroupHeader ? str : str.append(", sbn=").append(sbn);
+        return  str.toString();
     }
 }

@@ -43,6 +43,7 @@
         android:textSize="12sp"
         android:textColor="?android:attr/textColorPrimary"
         android:fontFamily="sans-serif"
+        android:singleLine ="true"
         android:gravity="center_horizontal"
         android:layout_gravity="center_horizontal"
         android:focusable="false" />

@@ -52,6 +52,7 @@ import com.android.quickstep.RecentsModel;
 import com.android.quickstep.TouchInteractionService;
 import com.android.quickstep.util.LayoutUtils;
 import com.android.systemui.shared.system.QuickStepContract;
+import com.sprd.ext.multimode.MultiModeController;
 
 /**
  * Touch controller for handling various state transitions in portrait UI.
@@ -267,7 +268,7 @@ public class PortraitStatesTouchController extends AbstractStateChangeTouchContr
             mFinishFastOnSecondTouch = true;
         } else  if (mFromState == NORMAL && mToState == OVERVIEW && targetState == OVERVIEW) {
             mFinishFastOnSecondTouch = true;
-            if (isFling && expectedDuration != 0) {
+            if (isFling && expectedDuration != 0 && !MultiModeController.isSingleLayerMode()) {
                 // Update all apps interpolator to add a bit of overshoot starting from currFraction
                 final float currFraction = mCurrentAnimation.getProgressFraction();
                 mAllAppsInterpolatorWrapper.baseInterpolator = Interpolators.clampToProgress(

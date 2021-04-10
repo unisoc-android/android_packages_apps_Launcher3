@@ -139,4 +139,11 @@ public class FallbackRecentsView extends RecentsView<RecentsActivity> {
         TRANSLATION_Y.set(this, Utilities.mapRange(mZoomInProgress, 0, mZoomTranslationY));
         FULLSCREEN_PROGRESS.set(this, mZoomInProgress);
     }
+
+    @Override
+    protected void onTaskStackUpdated() {
+        if (mClearAllController != null) {
+            mClearAllController.onTaskStackUpdated(getTaskViewCount() > 0);
+        }
+    }
 }

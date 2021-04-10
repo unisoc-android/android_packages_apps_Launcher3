@@ -15,8 +15,6 @@
      limitations under the License.
 -->
 <resources>
-    <dimen name="recents_list_width">480dp</dimen>
-
     <dimen name="task_item_height">90dp</dimen>
     <dimen name="task_item_top_margin">24dp</dimen>
     <dimen name="task_thumbnail_icon_horiz_margin">24dp</dimen>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="recents_memory_avail">"<xliff:g id="count">%1$s</xliff:g> ພ້ອມໃຊ້ງານ"</string>
+<string name="recents_clean_finished_toast">"ເພີ່ມໜ່ວຍຄວາມຈໍາ <xliff:g id="count">%1$s</xliff:g>, <xliff:g id="count">%2$s</xliff:g> ພ້ອມໃຊ້ງານໃນຕອນນີ້."</string>
+<string name="recents_nothing_to_clear">"ບໍ່ມີຫຍັງໃຫ້ລຶບໃນແຄຊ"</string>
+</resources>

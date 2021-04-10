@@ -18,6 +18,7 @@ package com.android.quickstep;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assume.assumeFalse;
 
 import android.app.prediction.AppPredictor;
 import android.app.prediction.AppTarget;
@@ -59,6 +60,7 @@ public class AppPredictionsUITests extends AbstractQuickStepTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        assumeFalse(isInSingleMode);
 
         List<LauncherActivityInfo> activities = LauncherAppsCompat.getInstance(mTargetContext)
                 .getActivityList(null, Process.myUserHandle());

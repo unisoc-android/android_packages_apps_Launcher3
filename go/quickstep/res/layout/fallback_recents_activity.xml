@@ -20,6 +20,8 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <include layout="@layout/memoryinfo_ext" />
+
     <include
         android:id="@+id/overview_panel"
         layout="@layout/overview_panel"

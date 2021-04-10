@@ -283,7 +283,6 @@ public abstract class ArrowPopup extends AbstractFloatingView {
 
         // Insets are added later, so subtract them now.
         x -= insets.left;
-        y -= insets.top;
 
         mGravity = 0;
         if (y + height > dragLayer.getBottom() - insets.bottom) {
@@ -311,6 +310,9 @@ public abstract class ArrowPopup extends AbstractFloatingView {
             }
             mIsAboveIcon = true;
         }
+
+        // Insets are added later, so subtract them now.
+        y -= insets.top;
 
         setX(x);
         if (Gravity.isVertical(mGravity)) {

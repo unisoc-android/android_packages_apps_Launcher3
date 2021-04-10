@@ -38,6 +38,8 @@
             android:theme="@style/HomeScreenElementTheme"
             launcher:pageIndicator="@+id/page_indicator" />
 
+        <include layout="@layout/memoryinfo_ext" />
+
         <!-- DO NOT CHANGE THE ID -->
         <include
             android:id="@+id/hotseat"
@@ -50,12 +52,16 @@
 
         <!-- Keep these behind the workspace so that they are not visible when
          we go into AllApps -->
-        <com.android.launcher3.pageindicators.WorkspacePageIndicator
+        <com.sprd.ext.pageindicators.WorkspacePageIndicatorLine
             android:id="@+id/page_indicator"
             android:layout_width="match_parent"
             android:layout_height="@dimen/vertical_drag_handle_size"
-            android:layout_gravity="bottom|center_horizontal"
+            android:layout_gravity="bottom"
             android:theme="@style/HomeScreenElementTheme" />
+
+        <include
+            android:id="@+id/page_indicator_customize"
+            layout="@layout/page_indicator_customize" />
 
         <include
             android:id="@+id/drop_target_bar"

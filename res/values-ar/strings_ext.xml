@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="unread_notifier_title">"شارة غير مقروءة"</string>
+    <string name="unread_call">"الهاتف"</string>
+    <string name="unread_sms">"الرسائل القصيرة SMS"</string>
+    <string name="unread_email">"إرسال رسالة إلكترونية"</string>
+    <string name="unread_calendar">"تقويم"</string>
+    <string name="unread_hint">"إذن <xliff:g id="unread_type">‪‎%1$s‬</xliff:g> المطلوب غير موجود، يُرجى طلب الإذن أولاً."</string>
+    <string name="pref_missed_call_count_title">"مكالمة فائتة"</string>
+    <string name="pref_missed_call_count_summary">"حدد تطبيق الهاتف، واستعرض عدد المكالمات الفائتة عليه"</string>
+    <string name="pref_unread_sms_count_title">"رسالة غير مقروءة"</string>
+    <string name="pref_unread_sms_count_summary">"حدد تطبيق SMS، واستعرض عدد الرسائل غير المقروءة عليه"</string>
+    <string name="pref_unread_email_count_title">"بريد إلكتروني غير مقروء"</string>
+    <string name="pref_unread_email_count_summary">"حدد تطبيق البريد الإلكتروني، واستعرض عدد رسائل البريد غير المقروءة عليه"</string>
+    <string name="pref_unread_calendar_count_title">"تقويم غير مقروء"</string>
+    <string name="pref_unread_calendar_count_summary">"حدد تطبيق التقويم، واستعرض أحداث التقويم غير المقروءة عليه"</string>
+    <string name="selected_text">"تم الاختيار"</string>
+    <string name="dynamic_icon_title">"أيقونة ديناميكي"</string>
+    <string name="allow_circular_sliding_title">"مجمع الشاشات الرئيسية"</string>
+    <string name="allow_circular_sliding_summary">"لا يسمح إعداد الصفحة اليسرى المخصصة للمحتوى بمجمع الشاشات الرئيسية"</string>
+    <string name="pull_down_action_pref_title">"إجراء يظهر ضمن قائمة منسدلة"</string>
+    <string name="pull_down_do_nothing">"عدم اتخاذ أي إجراء"</string>
+    <string name="pull_down_notification">"إظهار الإشعارات"</string>
+    <string name="pull_down_search">"فتح البحث"</string>
+    <string name="home_screen_style_title">"نمط الشاشة الرئيسية"</string>
+    <string name="home_screen_style_single">"طبقة مفردة"</string>
+    <string name="home_screen_style_dual">"طبقة مزدوجة"</string>
+    <string name="home_screen_style_notification">"تطبيق تغييرات نمط الشاشة الرئيسية"</string>
+    <string name="folder_icon_model_pref_title">"نمط أيقونة المجلد"</string>
+    <string name="auto_model">"تلقائي"</string>
+    <string name="annular_model">"حلقي"</string>
+    <string name="grid_model">"الشبكة"</string>
+    <string name="desktop_grid">"شبكة سطح المكتب"</string>
+    <string name="notification_dots_ext_title">"إظهار رقم نقاط الإشعار"</string>
+    <string name="notification_dots_ext_summary">"عندما تكون نقاط الإشعار قيد التشغيل"</string>
+</resources>

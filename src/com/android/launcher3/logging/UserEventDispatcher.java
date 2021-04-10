@@ -326,7 +326,7 @@ public class UserEventDispatcher implements ResourceBasedOverride {
 
     public void logDeepShortcutsOpen(View icon) {
         LogContainerProvider provider = StatsLogUtils.getLaunchProviderRecursive(icon);
-        if (icon == null || !(icon.getTag() instanceof ItemInfo || provider == null)) {
+        if (icon == null || !(icon.getTag() instanceof ItemInfo) || provider == null) {
             return;
         }
         ItemInfo info = (ItemInfo) icon.getTag();

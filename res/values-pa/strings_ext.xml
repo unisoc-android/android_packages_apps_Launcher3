@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<string name="unread_notifier_title">"ਨਾ ਪੜ੍ਹਿਆ ਹੋਇਆ ਬੈਜ"</string>
+<string name="unread_call">"ਫ਼ੋਨ ਨੰਬਰ"</string>
+<string name="unread_sms">"SMS"</string>
+<string name="unread_email">ਈਮੇਲ</string>
+<string name="unread_calendar">ਕੈਲੇਂਡਰ</string>
+<string name="unread_hint">"ਲੋੜੀਂਦੀ ਮਨਜ਼ੂਰੀ <xliff:g id="unread_type">%1$s</xliff:g> ਮੌਜੂਦ ਨਹੀਂ ਹੈ, ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਮਨਜ਼ੂਰੀ ਲਈ ਬੇਨਤੀ ਕਰੋ।"</string>
+<string name="pref_missed_call_count_title">ਮਿਸਡ ਕਾੱਲਾਂ</string>
+<string name="pref_missed_call_count_summary">"ਫ਼ੋਨ ਐਪ ਚੁਣੋ, ਇਸ \'ਤੇ ਮਿਸਡ ਕਾਲ ਨੰਬਰ ਦਿਖਾਓ"</string>
+<string name="pref_unread_sms_count_title">"ਨਾ ਪੜ੍ਹਿਆ ਹੋਇਆ ਸੰਦੇਸ਼"</string>
+<string name="pref_unread_sms_count_summary">"SMS ਐਪ ਚੁਣੋ, ਇਸ \'ਤੇ ਨਾ ਪੜ੍ਹੇ ਸੰਦੇਸ਼ਾਂ ਦੇ ਨੰਬਰ ਦਿਖਾਓ"</string>
+<string name="pref_unread_email_count_title">"ਨਾ ਪੜ੍ਹੀ ਈਮੇਲ"</string>
+<string name="pref_unread_email_count_summary">"ਈਮੇਲ ਐਪ ਚੁਣੋ, ਇਸ \'ਤੇ ਨਾ ਪੜ੍ਹੀ ਮੇਲ ਦਾ ਨੰਬਰ ਦਿਖਾਓ"</string>
+<string name="pref_unread_calendar_count_title">"ਨਾ ਪੜ੍ਹਿਆ ਕੈਲੰਡਰ"</string>
+<string name="pref_unread_calendar_count_summary">"ਕੈਲੰਡਰ ਐਪ ਚੁਣੋ, ਇਸ \'ਤੇ ਨਾ ਪੜ੍ਹੀਆਂ ਕੈਲੰਡਰ ਘਟਨਾਵਾਂ ਦਿਖਾਓ"</string>
+<string name="selected_text">ਚੁਣੀ ਗਈ</string>
+<string name="dynamic_icon_title">"ਡਾਇਨੈਮਿਕ ਆਈਕਨ"</string>
+<string name="allow_circular_sliding_title">"ਹੋਮ ਸਕ੍ਰੀਨ ਲੂਪ"</string>
+<string name="allow_circular_sliding_summary">"ਜੇ ਇਸ ਵਿੱਚ ਕਸਟਮ ਖੱਬਾ ਪੇਜ ਹੈ ਤਾਂ ਇਹ ਹੋਮ ਸਕ੍ਰੀਨ ਲੂਪ ਦੀ ਮਨਜ਼ੂਰੀ ਨਹੀਂ ਦਿੰਦਾ"</string>
+<string name="pull_down_action_pref_title">"ਪੁਲ ਡਾਊਨ ਐਕਸ਼ਨ"</string>
+<string name="pull_down_do_nothing">"ਕੁਝ ਨਾ ਕਰੋ"</string>
+<string name="pull_down_notification">ਸੂਚਨਾਵਾਂ ਦਿਖਾਓ</string>
+<string name="pull_down_search">"ਓਪਨ ਸਰਚ"</string>
+<string name="home_screen_style_title">"ਹੋਮ ਸਕ੍ਰੀਨ ਸਟਾਈਲ"</string>
+<string name="home_screen_style_single">"ਸਿੰਗਲ ਲੇਅਰ"</string>
+<string name="home_screen_style_dual">"ਡਿਊਲ ਲੇਅਰ"</string>
+<string name="home_screen_style_notification">"ਹੋਮ ਸਕ੍ਰੀਨ ਸਟਾਈਲ ਵਿੱਚ ਤਬਦੀਲੀਆਂ ਲਾਗੂ ਕਰ ਰਿਹਾ ਹੈ"</string>
+<string name="folder_icon_model_pref_title">"ਫੋਲਡਰ ਆਈਕਨ ਸਟਾਈਲ"</string>
+<string name="auto_model">ਸਵੈਚਾਲਿਤ</string>
+<string name="annular_model">"ਗੋਲਾਕਾਰ"</string>
+<string name="grid_model">"ਗ੍ਰਿਡ"</string>
+<string name="desktop_grid">"ਡੈਸਕਟਾਪ ਗ੍ਰਿਡ"</string>
+<string name="notification_dots_ext_title">"ਨੋਟੀਫਿਕੇਸ਼ਨ ਡਾਟਸ ਨੰਬਰ ਦਿਖਾਓ"</string>
+<string name="notification_dots_ext_summary">"ਜਦੋਂ ਨੋਟੀਫਿਕੇਸ਼ਨ ਡਾਟਸ ਚਾਲੂ ਹੋਣ"</string>
+</resources>

@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.text.TextUtils;
 import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -33,6 +34,7 @@ import com.android.launcher3.logging.LoggerUtils;
 import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
 import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.Themes;
+import com.sprd.ext.UtilitiesExt;
 
 import java.net.URISyntaxException;
 
@@ -228,6 +230,12 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
         }
         // else: mCurrentAccessibilityAction == UNINSTALL
 
+        ComponentName componentName = info != null ? info.getTargetComponent() : null;
+        String pkg = componentName != null ? componentName.getPackageName() : null;
+        if (TextUtils.isEmpty(pkg) || !UtilitiesExt.isAppInstalled(mLauncher, pkg, info.user)) {
+            Toast.makeText(mLauncher, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+            return null;
+        }
         ComponentName cn = getUninstallTarget(info);
         if (cn == null) {
             // System applications cannot be installed. For now, show a toast explaining that.

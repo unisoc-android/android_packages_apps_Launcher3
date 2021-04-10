@@ -19,6 +19,7 @@ import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 import static androidx.recyclerview.widget.LinearLayoutManager.VERTICAL;
 
+import static com.android.launcher3.InvariantDeviceProfile.CHANGE_FLAG_ICON_PARAMS;
 import static com.android.launcher3.anim.Interpolators.ACCEL_2;
 import static com.android.quickstep.TaskAdapter.CHANGE_EVENT_TYPE_EMPTY_TO_CONTENT;
 import static com.android.quickstep.TaskAdapter.ITEM_TYPE_CLEAR_ALL;
@@ -35,6 +36,7 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Matrix;
 import android.graphics.Rect;
@@ -62,6 +64,7 @@ import androidx.recyclerview.widget.RecyclerView.OnChildAttachStateChangeListene
 
 import com.android.launcher3.BaseActivity;
 import com.android.launcher3.Insettable;
+import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.R;
 import com.android.launcher3.util.Themes;
 import com.android.quickstep.ContentFillItemAnimator;
@@ -72,11 +75,19 @@ import com.android.quickstep.TaskAdapter;
 import com.android.quickstep.TaskHolder;
 import com.android.quickstep.TaskListLoader;
 import com.android.quickstep.TaskSwipeCallback;
+import com.android.quickstep.util.LayoutUtils;
 import com.android.quickstep.util.MultiValueUpdateListener;
 import com.android.systemui.shared.recents.model.Task;
 import com.android.systemui.shared.system.RemoteAnimationTargetCompat;
 import com.android.systemui.shared.system.SyncRtSurfaceTransactionApplierCompat;
 import com.android.systemui.shared.system.SyncRtSurfaceTransactionApplierCompat.SurfaceParams;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.LauncherAppMonitor;
+import com.sprd.ext.LauncherAppMonitorCallback;
+import com.sprd.ext.LogUtils;
+import com.sprd.ext.clearall.ClearAllController;
+import com.sprd.ext.meminfo.MeminfoHelper;
+import com.sprd.ext.lockicon.TaskLockSwipeCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +98,9 @@ import java.util.Optional;
  * Root view for the icon recents view. Acts as the main interface to the rest of the Launcher code
  * base.
  */
-public final class IconRecentsView extends FrameLayout implements Insettable {
+public final class IconRecentsView extends FrameLayout implements Insettable,
+        ClearAllController.Callbacks, InvariantDeviceProfile.OnIDPChangeListener {
+    private static final String TAG = "IconRecentsView";
 
     public static final FloatProperty<IconRecentsView> CONTENT_ALPHA =
             new FloatProperty<IconRecentsView>("contentAlpha") {
@@ -193,6 +206,20 @@ public final class IconRecentsView extends FrameLayout implements Insettable {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        InvariantDeviceProfile.INSTANCE.get(mContext).addOnChangeListener(this);
+        LauncherAppMonitor.getInstance(mContext).registerCallback(mAppMonitorCallback);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        InvariantDeviceProfile.INSTANCE.get(mContext).removeOnChangeListener(this);
+        LauncherAppMonitor.getInstance(mContext).unregisterCallback(mAppMonitorCallback);
+    }
+
+    @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         if (mTaskRecyclerView == null) {
@@ -207,6 +234,11 @@ public final class IconRecentsView extends FrameLayout implements Insettable {
                         }
                     }));
             helper.attachToRecyclerView(mTaskRecyclerView);
+            if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+                ItemTouchHelper lockHelper = new ItemTouchHelper(new TaskLockSwipeCallback(
+                        getResources().getDimension(R.dimen.recents_tasklock_enddisplacement)));
+                lockHelper.attachToRecyclerView(mTaskRecyclerView);
+            }
             mTaskRecyclerView.addOnChildAttachStateChangeListener(
                     new OnChildAttachStateChangeListener() {
                         @Override
@@ -408,8 +440,8 @@ public final class IconRecentsView extends FrameLayout implements Insettable {
      * @param showStatusBarForegroundScrim true to show the scrim, false to hide
      */
     public void setShowStatusBarForegroundScrim(boolean showStatusBarForegroundScrim) {
-        mShowStatusBarForegroundScrim = showStatusBarForegroundScrim;
         if (mShowStatusBarForegroundScrim != showStatusBarForegroundScrim) {
+            mShowStatusBarForegroundScrim = showStatusBarForegroundScrim;
             updateStatusBarScrim();
         }
     }
@@ -519,7 +551,7 @@ public final class IconRecentsView extends FrameLayout implements Insettable {
                 }
                 setEnabled(true);
                 mContentView.setVisibility(GONE);
-                mTaskActionController.clearAllTasks();
+                clearAllTasks();
             }
         });
         clearAnim.start();
@@ -767,7 +799,10 @@ public final class IconRecentsView extends FrameLayout implements Insettable {
             @NonNull View thumbnailView) {
         // Identify where the entering remote app should animate to.
         Rect endRect = new Rect();
-        thumbnailView.getGlobalVisibleRect(endRect);
+        if (!thumbnailView.getGlobalVisibleRect(endRect)) {
+            LogUtils.w(TAG, "Get the thumbnailView globalVisibleRect is empty.");
+            return;
+        }
         Rect appBounds = appTarget.sourceContainerBounds;
         RectF currentAppRect = new RectF();
 
@@ -925,7 +960,15 @@ public final class IconRecentsView extends FrameLayout implements Insettable {
     @Override
     public void setInsets(Rect insets) {
         mInsets = insets;
-        mTaskRecyclerView.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+        int height = Math.round(LayoutUtils.getOverviewBottomItemsHeight(getResources()));
+        LayoutParams lp = (LayoutParams) mTaskRecyclerView.getLayoutParams();
+        lp.leftMargin = insets.left;
+        lp.topMargin = insets.top;
+        lp.rightMargin = insets.right;
+        lp.bottomMargin = insets.bottom + height;
+        setLayoutParams(lp);
+        int horizontalPadding = getResources().getDimensionPixelSize(R.dimen.recents_list_horiz_padding);
+        mTaskRecyclerView.setPadding(horizontalPadding, 0, horizontalPadding, 0);
         mTaskRecyclerView.invalidateItemDecorations();
         if (mInsets.top != 0) {
             updateStatusBarScrim();
@@ -939,4 +982,55 @@ public final class IconRecentsView extends FrameLayout implements Insettable {
 
         void onReadyForRemoteAnim();
     }
+
+    public void clearAllTasks() {
+        boolean isRemoved;
+        if (FeatureOption.SPRD_TASK_LOCK_SUPPORT.get()) {
+            isRemoved = mTaskActionController.clearAllUnlockedTasks(getContext());
+            mShowingContentView = null;
+            mTaskAdapter.notifyDataSetChanged();
+        } else {
+            mTaskActionController.clearAllTasks();
+            isRemoved = true;
+        }
+        MeminfoHelper.getInstance(mContext).showReleaseMemoryToast(isRemoved);
+    }
+
+    @Override
+    public void bindClearAllController(ClearAllController controller) {
+        controller.setClearAllOnClickListener(view -> animateClearAllTasks());
+        mTaskAdapter.registerAdapterDataObserver(new AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                controller.onTaskStackUpdated(
+                        (mTaskAdapter.getItemCount() - TASKS_START_POSITION) > 0);
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                controller.onTaskStackUpdated(
+                        (mTaskAdapter.getItemCount() - TASKS_START_POSITION) > 0);
+            }
+        });
+    }
+
+    @Override
+    public void onIdpChanged(int changeFlags, InvariantDeviceProfile idp) {
+        if ((changeFlags & CHANGE_FLAG_ICON_PARAMS) == 0) {
+            return;
+        }
+        RecentsModel.INSTANCE.get(mContext).getIconCache().clear();
+        mTaskAdapter.notifyDataSetChanged();
+    }
+
+    private LauncherAppMonitorCallback mAppMonitorCallback = new LauncherAppMonitorCallback() {
+        @Override
+        public void onReceive(Intent intent) {
+            final String action = intent.getAction();
+            if (Intent.ACTION_LOCALE_CHANGED.equals(action)) {
+                RecentsModel.INSTANCE.get(mContext).getIconCache().clear();
+                mTaskAdapter.notifyDataSetChanged();
+            }
+        }
+    };
 }

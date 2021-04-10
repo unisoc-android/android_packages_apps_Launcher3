@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.LauncherProvider;
 
 /**
@@ -23,6 +24,11 @@ public class TestLauncherProvider extends LauncherProvider {
         }
     }
 
+    public DatabaseHelper getDataBaseHelper() {
+        createDbIfNotExists();
+        return mOpenHelper;
+    }
+
     public SQLiteDatabase getDb() {
         createDbIfNotExists();
         return mOpenHelper.getWritableDatabase();
@@ -33,7 +39,7 @@ public class TestLauncherProvider extends LauncherProvider {
 
     private static class MyDatabaseHelper extends DatabaseHelper {
         public MyDatabaseHelper(Context context) {
-            super(context, null, null);
+            super(context, null, LauncherFiles.getLauncherDb(context));
             initIds();
         }
 

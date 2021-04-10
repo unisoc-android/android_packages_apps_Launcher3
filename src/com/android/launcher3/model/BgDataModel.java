@@ -27,6 +27,7 @@ import com.android.launcher3.InstallShortcutReceiver;
 import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherAppWidgetInfo;
 import com.android.launcher3.LauncherSettings;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.WorkspaceItemInfo;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.config.FeatureFlags;
@@ -247,6 +248,8 @@ public class BgDataModel {
                 Log.d(TAG, MessageNano.toByteArray(proto).length + "Bytes");
             } catch (IOException e) {
                 Log.e(TAG, "Exception writing dumpsys --proto", e);
+            } finally {
+                Utilities.closeSilently(fos);
             }
         }
     }

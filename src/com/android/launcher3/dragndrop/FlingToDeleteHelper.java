@@ -109,7 +109,7 @@ public class FlingToDeleteHelper {
         if (mDropTarget == null) {
             mDropTarget = (ButtonDropTarget) mLauncher.findViewById(R.id.delete_target_text);
         }
-        if (mDropTarget == null || !mDropTarget.isDropEnabled()) return null;
+        if (mDropTarget == null || !mDropTarget.isDropEnabled() || mVelocityTracker == null) return null;
         ViewConfiguration config = ViewConfiguration.get(mLauncher);
         mVelocityTracker.computeCurrentVelocity(1000, config.getScaledMaximumFlingVelocity());
         PointF vel = new PointF(mVelocityTracker.getXVelocity(), mVelocityTracker.getYVelocity());

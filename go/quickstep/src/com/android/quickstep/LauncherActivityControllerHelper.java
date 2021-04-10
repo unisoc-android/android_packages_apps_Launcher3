@@ -23,6 +23,7 @@ import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherInitListener;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.anim.AnimatorPlaybackController;
+import com.android.launcher3.uioverrides.UiFactory;
 import com.android.launcher3.userevent.nano.LauncherLogProto;
 import com.android.quickstep.views.IconRecentsView;
 
@@ -95,6 +96,7 @@ public final class LauncherActivityControllerHelper extends GoActivityControlHel
                 LauncherLogProto.ContainerType.TASKSWITCHER);
         launcher.getStateManager().goToState(OVERVIEW,
                 launcher.getStateManager().shouldAnimateStateChange(), onCompleteCallback);
+        UiFactory.resetOverview(launcher);
         return true;
     }
 

@@ -33,6 +33,7 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.RectEvaluator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -62,6 +63,8 @@ import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.MultiValueAlpha.AlphaProperty;
 import com.android.launcher3.util.Themes;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.multimode.MultiModeController;
 
 import java.util.List;
 
@@ -102,7 +105,7 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
     protected final Launcher mLauncher;
     private final WallpaperColorInfo mWallpaperColorInfo;
     private final AccessibilityManager mAM;
-    protected final int mEndScrim;
+    protected int mEndScrim;
 
     protected float mMaxScrimAlpha;
 
@@ -131,6 +134,15 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
         mLauncher = Launcher.getLauncher(context);
         mWallpaperColorInfo = WallpaperColorInfo.getInstance(context);
         mEndScrim = Themes.getAttrColor(context, R.attr.allAppsScrimColor);
+        if (FeatureOption.SPRD_ALLAPP_BG_TRANSPARENT_SUPPORT.get()) {
+            // Use dark Scrim color for a better experience
+            TypedArray array = mLauncher.getTheme().obtainStyledAttributes(
+                    R.style.LauncherTheme_Dark, new int[]{R.attr.allAppsScrimColor});
+            mEndScrim = array.getColor(0, mEndScrim);
+            array.recycle();
+            mEndScrim = setColorAlphaBound(mEndScrim,
+                    context.getResources().getInteger(R.integer.allapps_bg_alpha));
+        }
 
         mMaxScrimAlpha = 0.7f;
 
@@ -334,6 +346,8 @@ public class ScrimView extends View implements Insettable, OnChangeListener,
 
     private void updateDragHandleVisibility(Drawable recycle) {
         boolean visible = mLauncher.getDeviceProfile().isVerticalBarLayout() || mAM.isEnabled();
+        // Single layer should hide up arrow.
+        visible &= !MultiModeController.isSingleLayerMode();
         boolean wasVisible = mDragHandle != null;
         if (visible != wasVisible) {
             if (visible) {

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/unread_pref_customize_padding">
+
+    <ImageView
+        android:id="@+id/app_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:maxWidth="?android:attr/listPreferredItemHeight"
+        android:maxHeight="?android:attr/listPreferredItemHeight"
+        android:padding="@dimen/unread_pref_customize_padding"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/app_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:paddingEnd="@dimen/unread_pref_customize_padding"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:attr/textColorAlertDialogListItem" />
+
+    <TextView
+        android:id="@+id/select_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:paddingEnd="@dimen/unread_pref_customize_padding"
+        android:text="@string/selected_text"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="gone" />
+</LinearLayout>

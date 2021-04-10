@@ -523,7 +523,9 @@ public class WindowTransformSwipeHandler<T extends BaseDraggingActivity>
                     if (activity != mActivity) {
                         return;
                     }
-
+                    if (mStateCallback.hasStates(STATE_HANDLER_INVALIDATED)) {
+                        return;
+                    }
                     mStateCallback.setState(STATE_LAUNCHER_DRAWN);
                 }
             });

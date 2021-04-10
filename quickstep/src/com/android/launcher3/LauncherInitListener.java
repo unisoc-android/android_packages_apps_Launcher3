@@ -16,6 +16,7 @@
 package com.android.launcher3;
 
 import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -27,6 +28,7 @@ import com.android.launcher3.states.InternalStateHandler;
 import com.android.quickstep.ActivityControlHelper.ActivityInitListener;
 import com.android.quickstep.OverviewCallbacks;
 import com.android.quickstep.util.RemoteAnimationProvider;
+import com.sprd.ext.LogUtils;
 
 import java.util.function.BiPredicate;
 
@@ -86,6 +88,10 @@ public class LauncherInitListener extends InternalStateHandler implements Activi
         register();
 
         Bundle options = animProvider.toActivityOptions(handler, duration).toBundle();
-        context.startActivity(addToIntent(new Intent((intent))), options);
+        try {
+            context.startActivity(addToIntent(new Intent((intent))), options);
+        } catch(ActivityNotFoundException exception) {
+            LogUtils.w("LauncherInitListener", "activity not found :" + intent);
+        }
     }
 }

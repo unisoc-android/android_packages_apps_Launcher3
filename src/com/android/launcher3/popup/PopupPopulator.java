@@ -31,6 +31,7 @@ import com.android.launcher3.notification.NotificationKeyData;
 import com.android.launcher3.shortcuts.DeepShortcutManager;
 import com.android.launcher3.shortcuts.DeepShortcutView;
 import com.android.launcher3.util.PackageUserKey;
+import com.sprd.ext.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +48,7 @@ import androidx.annotation.VisibleForTesting;
  */
 public class PopupPopulator {
 
+    private static final String TAG = "PopupPopulator";
     public static final int MAX_SHORTCUTS = 4;
     @VisibleForTesting static final int NUM_DYNAMIC = 2;
     public static final int MAX_SHORTCUTS_IF_NOTIFICATIONS = 2;
@@ -156,6 +158,14 @@ public class PopupPopulator {
 
                 final DeepShortcutView view = shortcutViews.get(i);
                 uiHandler.post(() -> view.applyShortcutInfo(si, shortcut, container));
+                if (LogUtils.DEBUG_ALL) {
+                    LogUtils.d(TAG, "ShortLabel:" + shortcut.getShortLabel()
+                            + " LongLabel:" + shortcut.getLongLabel());
+                }
+            }
+            if (LogUtils.DEBUG_ALL) {
+                LogUtils.d(TAG, "Load {" + activity.flattenToShortString() + " }"
+                        + " deepShort done, size: " + shortcuts.size());
             }
 
             // This ensures that mLauncher.getWidgetsForPackageUser()

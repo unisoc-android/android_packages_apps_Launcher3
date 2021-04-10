@@ -57,13 +57,13 @@ public class OverviewInputConsumer<T extends BaseDraggingActivity>
         mStartingInActivityBounds = startingInActivityBounds;
 
         mTarget = activity.getDragLayer();
+        mTarget.getLocationOnScreen(mLocationOnScreen);
         if (startingInActivityBounds) {
             mEventReceiver = mTarget::dispatchTouchEvent;
             mProxyTouch = true;
         } else {
             // Only proxy touches to controllers if we are starting touch from nav bar.
             mEventReceiver = mTarget::proxyTouchEvent;
-            mTarget.getLocationOnScreen(mLocationOnScreen);
             mProxyTouch = mTarget.prepareProxyEventStarting();
         }
     }

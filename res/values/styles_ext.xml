@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BaseSettingsTheme" parent="@android:style/Theme.DeviceDefault.Settings" />
+
+    <!-- add for all apps bg transparent icon -->
+    <style name="TransBgAppIcon" parent="BaseIcon.Workspace">
+        <item name="android:textColor">?attr/workspaceTextColor</item>
+    </style>
+
+    <style name="GridFolderItemStyle" parent="@style/BaseIcon">
+        <item name="android:shadowRadius">2.0</item>
+        <item name="android:shadowColor">?attr/workspaceShadowColor</item>
+        <item name="ambientShadowColor">?attr/workspaceAmbientShadowColor</item>
+        <item name="ambientShadowBlur">2.5dp</item>
+        <item name="keyShadowColor">?attr/workspaceKeyShadowColor</item>
+        <item name="keyShadowBlur">1dp</item>
+        <item name="keyShadowOffset">.5dp</item>
+        <item name="android:textColor">?attr/workspaceTextColor</item>
+        <item name="android:textColorHighlight">?android:attr/colorControlHighlight</item>
+    </style>
+
+    <style name="GridFolderNameStyle">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">?attr/workspaceTextColor</item>
+        <item name="android:textColorHighlight">?android:attr/colorControlHighlight</item>
+        <item name="android:textColorHint">?attr/workspaceTextColor</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:shadowRadius">2.0</item>
+        <item name="android:shadowColor">?attr/workspaceShadowColor</item>
+        <item name="ambientShadowColor">?attr/workspaceAmbientShadowColor</item>
+        <item name="ambientShadowBlur">2.5dp</item>
+        <item name="keyShadowColor">?attr/workspaceKeyShadowColor</item>
+        <item name="keyShadowBlur">1dp</item>
+        <item name="keyShadowOffset">.5dp</item>
+    </style>
+</resources>

@@ -132,6 +132,11 @@ public class DefaultLayoutParser extends AutoInstallsLayout {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                     Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 
+            if (intent.getComponent() != null) {
+                // Remove the package, consistent with the all app.
+                intent.setPackage(null);
+            }
+
             return addShortcut(info.loadLabel(mPackageManager).toString(), intent,
                     Favorites.ITEM_TYPE_APPLICATION);
         }

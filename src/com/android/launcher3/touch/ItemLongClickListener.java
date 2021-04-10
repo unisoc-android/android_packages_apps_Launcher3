@@ -106,6 +106,8 @@ public class ItemLongClickListener {
         if (launcher == null) {
             return false;
         }
+        // Return if launcher not resumed.
+        if(!launcher.hasBeenResumed()) return false;
         // We prevent dragging when we are loading the workspace as it is possible to pick up a view
         // that is subsequently removed from the workspace in startBinding().
         if (launcher.isWorkspaceLocked()) return false;

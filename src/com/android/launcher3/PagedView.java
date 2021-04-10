@@ -64,7 +64,8 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
     private static final String TAG = "PagedView";
     private static final boolean DEBUG = false;
 
-    protected static final int INVALID_PAGE = -1;
+    // Change this to -2 for loop slide, -1 is temp page
+    protected static final int INVALID_PAGE = -2;
     protected static final ComputePageScrollsLogic SIMPLE_SCROLL_LOGIC = (v) -> v.getVisibility() != GONE;
 
     public static final int PAGE_SNAP_ANIMATION_DURATION = 750;
@@ -80,13 +81,14 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
 
     // The following constants need to be scaled based on density. The scaled versions will be
     // assigned to the corresponding member variables below.
-    private static final int FLING_THRESHOLD_VELOCITY = 500;
+    // UNISOC: Change 500 to 200 to sensitive the velocity.
+    private static final int FLING_THRESHOLD_VELOCITY = 200;
     private static final int MIN_SNAP_VELOCITY = 1500;
     private static final int MIN_FLING_VELOCITY = 250;
 
     public static final int INVALID_RESTORE_PAGE = -1001;
 
-    private boolean mFreeScroll = false;
+    protected boolean mFreeScroll = false;
 
     protected int mFlingThresholdVelocity;
     protected int mMinFlingVelocity;
@@ -267,7 +269,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
         }
     }
 
-    private int validateNewPage(int newPage) {
+    protected int validateNewPage(int newPage, boolean isSnapTo) {
         newPage = ensureWithinScrollBounds(newPage);
         // Ensure that it is clamped by the actual set of children in all cases
         return Utilities.boundToRange(newPage, 0, getPageCount() - 1);
@@ -318,7 +320,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
             return;
         }
         int prevPage = overridePrevPage != INVALID_PAGE ? overridePrevPage : mCurrentPage;
-        mCurrentPage = validateNewPage(currentPage);
+        mCurrentPage = validateNewPage(currentPage, false);
         updateCurrentPageScroll();
         notifyPageSwitchListener(prevPage);
         invalidate();
@@ -332,7 +334,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
         updatePageIndicator();
     }
 
-    private void updatePageIndicator() {
+    protected void updatePageIndicator() {
         if (mPageIndicator != null) {
             mPageIndicator.setActiveMarker(getNextPage());
         }
@@ -351,7 +353,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
         }
     }
 
-    protected boolean isPageInTransition() {
+    public boolean isPageInTransition() {
         return mIsPageInTransition;
     }
 
@@ -383,8 +385,8 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
     public void scrollTo(int x, int y) {
         mUnboundedScrollX = x;
 
-        boolean isXBeforeFirstPage = mIsRtl ? (x > mMaxScrollX) : (x < mMinScrollX);
-        boolean isXAfterLastPage = mIsRtl ? (x < mMinScrollX) : (x > mMaxScrollX);
+        boolean isXBeforeFirstPage = isXBeforeFirstPage(x);
+        boolean isXAfterLastPage = isXAfterLastPage(x);
 
         if (!isXBeforeFirstPage && !isXAfterLastPage) {
             mSpringOverScrollX = 0;
@@ -463,7 +465,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
             sendScrollAccessibilityEvent();
 
             int prevPage = mCurrentPage;
-            mCurrentPage = validateNewPage(mNextPage);
+            mCurrentPage = validateCycleNewPage();
             mNextPage = INVALID_PAGE;
             notifyPageSwitchListener(prevPage);
 
@@ -708,7 +710,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
     @Override
     public void onViewRemoved(View child) {
         super.onViewRemoved(child);
-        mCurrentPage = validateNewPage(mCurrentPage);
+        mCurrentPage = validateNewPage(mCurrentPage, false);
         dispatchPageCountChanged();
     }
 
@@ -986,11 +988,8 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
             adjacentPage = page - 1;
         }
 
-        if (adjacentPage < 0 || adjacentPage > count - 1) {
-            totalDistance = v.getMeasuredWidth() + mPageSpacing;
-        } else {
-            totalDistance = Math.abs(getScrollForPage(adjacentPage) - getScrollForPage(page));
-        }
+        totalDistance = computeTotalDistance(v, adjacentPage, page);
+        delta = recomputeDelta(delta, screenCenter, page, totalDistance);
 
         float scrollProgress = delta / (totalDistance * 1.0f);
         scrollProgress = Math.min(scrollProgress, MAX_SCROLL_PROGRESS);
@@ -1185,12 +1184,13 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
                     // move to the left and fling to the right will register as a fling to the right.
 
                     if (((isSignificantMove && !isDeltaXLeft && !isFling) ||
-                            (isFling && !isVelocityXLeft)) && mCurrentPage > 0) {
+                            (isFling && !isVelocityXLeft))
+                            && mCurrentPage > getMinPageIndex()) {
                         finalPage = returnToOriginalPage ? mCurrentPage : mCurrentPage - 1;
                         snapToPageWithVelocity(finalPage, velocityX);
                     } else if (((isSignificantMove && isDeltaXLeft && !isFling) ||
                             (isFling && isVelocityXLeft)) &&
-                            mCurrentPage < getChildCount() - 1) {
+                            mCurrentPage < getMaxPageIndex()) {
                         finalPage = returnToOriginalPage ? mCurrentPage : mCurrentPage + 1;
                         snapToPageWithVelocity(finalPage, velocityX);
                     } else {
@@ -1405,7 +1405,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
     }
 
     protected boolean snapToPageWithVelocity(int whichPage, int velocity) {
-        whichPage = validateNewPage(whichPage);
+        whichPage = validateNewPage(whichPage, true);
         int halfScreenSize = getMeasuredWidth() / 2;
 
         final int newX = getScrollForPage(whichPage);
@@ -1460,7 +1460,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
 
     protected boolean snapToPage(int whichPage, int duration, boolean immediate,
             TimeInterpolator interpolator) {
-        whichPage = validateNewPage(whichPage);
+        whichPage = validateNewPage(whichPage, true);
 
         int newX = getScrollForPage(whichPage);
         final int delta = newX - getUnboundedScrollX();
@@ -1483,7 +1483,7 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
                     Settings.Global.WINDOW_ANIMATION_SCALE, 1);
         }
 
-        whichPage = validateNewPage(whichPage);
+        whichPage = validateNewPage(whichPage, true);
 
         mNextPage = whichPage;
 
@@ -1661,5 +1661,40 @@ public abstract class PagedView<T extends View & PageIndicator> extends ViewGrou
         mTmpIntPair[0] = leftChild;
         mTmpIntPair[1] = rightChild;
         return mTmpIntPair;
+    }
+
+    // SPRD: add for circular sliding. adjust if need circular slide
+    protected boolean isXBeforeFirstPage(int x) {
+        return mIsRtl ? (x > mMaxScrollX) : (x < 0);
+    }
+
+    protected boolean isXAfterLastPage(int x) {
+        return mIsRtl ? (x < 0) : (x > mMaxScrollX);
+    }
+
+    protected int getMinPageIndex() {
+        return 0;
+    }
+
+    protected int getMaxPageIndex() {
+        return getChildCount() - 1;
+    }
+
+    protected int validateCycleNewPage() {
+        return validateNewPage(mNextPage, false);
+    }
+
+    protected int computeTotalDistance(View v, int adjacentPage, int page) {
+        int totalDistance;
+        if (adjacentPage < 0 || adjacentPage > getChildCount() - 1) {
+            totalDistance = v.getMeasuredWidth() + mPageSpacing;
+        } else {
+            totalDistance = Math.abs(getScrollForPage(adjacentPage) - getScrollForPage(page));
+        }
+        return totalDistance;
+    }
+
+    protected int recomputeDelta(int delta, int screenCenter, int page, int totalDistance) {
+        return delta;
     }
 }

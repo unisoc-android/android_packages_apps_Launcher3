@@ -9,6 +9,7 @@ import com.android.launcher3.LauncherProvider;
 import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.util.TestLauncherProvider;
 
+import org.junit.After;
 import org.junit.Before;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
@@ -27,6 +28,8 @@ public abstract class BaseGridChangesTestCase {
 
     public static final String TEST_PACKAGE = "com.android.launcher3.validpackage";
 
+    protected int mScreenIndexOffset = 0;
+
     public Context mContext;
     public TestLauncherProvider mProvider;
     public SQLiteDatabase mDb;
@@ -39,6 +42,11 @@ public abstract class BaseGridChangesTestCase {
         mProvider = Robolectric.setupContentProvider(TestLauncherProvider.class);
         ShadowContentResolver.registerProviderInternal(LauncherProvider.AUTHORITY, mProvider);
         mDb = mProvider.getDb();
+    }
+
+    @After
+    public void tearDownBaseCase() {
+        mProvider.getDataBaseHelper().close();
     }
 
     /**
@@ -90,6 +98,7 @@ public abstract class BaseGridChangesTestCase {
      * @return the same grid representation where each entry is the corresponding item id.
      */
     public int[][][] createGrid(int[][][] typeArray, int startScreen) {
+        mScreenIndexOffset = startScreen;
         LauncherSettings.Settings.call(mContext.getContentResolver(),
                 LauncherSettings.Settings.METHOD_CREATE_EMPTY_DB);
         int[][][] ids = new int[typeArray.length][][];

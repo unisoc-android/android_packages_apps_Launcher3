@@ -72,8 +72,13 @@ public class AllApps extends LauncherInstrumentation.VisibleContainer {
 
     private boolean iconCenterInSearchBox(UiObject2 allAppsContainer, UiObject2 icon) {
         final Point iconCenter = icon.getVisibleCenter();
-        return getSearchBox(allAppsContainer).getVisibleBounds().contains(
-                iconCenter.x, iconCenter.y);
+        UiObject2 searchBox = getSearchBox(allAppsContainer);
+        if (searchBox != null) {
+            return searchBox.getVisibleBounds().contains(
+                    iconCenter.x, iconCenter.y);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -92,7 +97,7 @@ public class AllApps extends LauncherInstrumentation.VisibleContainer {
                     "apps_list_view");
             allAppsContainer.setGestureMargins(
                     0,
-                    getSearchBox(allAppsContainer).getVisibleBounds().bottom + 1,
+                    getAllAppsTopMargin(allAppsContainer),
                     0,
                     ResourceUtils.getNavbarSize(ResourceUtils.NAVBAR_BOTTOM_GESTURE_SIZE,
                             mLauncher.getResources()) + 1);
@@ -131,10 +136,10 @@ public class AllApps extends LauncherInstrumentation.VisibleContainer {
                 "want to scroll back in all apps")) {
             LauncherInstrumentation.log("Scrolling to the beginning");
             final UiObject2 allAppsContainer = verifyActiveContainer();
-            final UiObject2 searchBox = getSearchBox(allAppsContainer);
 
             int attempts = 0;
-            final Rect margins = new Rect(0, searchBox.getVisibleBounds().bottom + 1, 0, 5);
+            final Rect margins = new Rect(0,
+                    getAllAppsTopMargin(allAppsContainer), 0, 5);
 
             for (int scroll = getScroll(allAppsContainer);
                     scroll != 0;
@@ -160,7 +165,17 @@ public class AllApps extends LauncherInstrumentation.VisibleContainer {
     }
 
     private UiObject2 getSearchBox(UiObject2 allAppsContainer) {
-        return mLauncher.waitForObjectInContainer(allAppsContainer, "search_container_all_apps");
+        return allAppsContainer.findObject(
+                mLauncher.getLauncherObjectSelector("search_container_all_apps"));
+    }
+
+    private int getAllAppsTopMargin(UiObject2 allAppsContainer) {
+        UiObject2 searchBox = getSearchBox(allAppsContainer);
+        if (searchBox != null) {
+            return searchBox.getVisibleBounds().bottom + 1;
+        } else {
+            return mLauncher.getStatusBarHeight() + 1;
+        }
     }
 
     /**

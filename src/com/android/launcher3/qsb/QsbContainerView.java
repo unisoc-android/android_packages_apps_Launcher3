@@ -45,6 +45,10 @@ import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.graphics.FragmentWithPreview;
+import com.sprd.ext.FeatureOption;
+import com.sprd.ext.LogUtils;
+
+import java.util.List;
 
 /**
  * A frame layout which contains a QSB. This internally uses fragment to bind the view, which
@@ -80,6 +84,7 @@ public class QsbContainerView extends FrameLayout {
      * A fragment to display the QSB.
      */
     public static class QsbFragment extends FragmentWithPreview {
+        private static final String TAG = "QsbFragment";
 
         public static final int QSB_WIDGET_HOST_ID = 1026;
         private static final int REQUEST_BIND_QSB = 1;
@@ -262,18 +267,60 @@ public class QsbContainerView extends FrameLayout {
             AppWidgetProviderInfo defaultWidgetForSearchPackage = null;
 
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getContext());
-            for (AppWidgetProviderInfo info : appWidgetManager.getInstalledProviders()) {
+            List<AppWidgetProviderInfo> widgets = appWidgetManager.getInstalledProviders();
+
+            String customSearch = getContext().getString(R.string.custom_search_component);
+            if (!customSearch.isEmpty()) {
+                defaultWidgetForSearchPackage = findSearchWidget(customSearch, widgets);
+            }else if (FeatureOption.SPRD_DEBUG_SEARCH_CUSTOMIZE_SUPPORT.get()) {
+                String chromeSearch = getContext().getString(R.string.chrome_search_component);
+                defaultWidgetForSearchPackage = findSearchWidget(chromeSearch, widgets);
+
+                if (defaultWidgetForSearchPackage == null) {
+                    String chromiumSearch = getContext().getString(R.string.chromium_search_component);
+                    defaultWidgetForSearchPackage = findSearchWidget(chromiumSearch, widgets);
+                }
+            }
+
+            if (defaultWidgetForSearchPackage != null) {
+                if (LogUtils.DEBUG) {
+                    LogUtils.d(TAG, "Custom search widget = " + defaultWidgetForSearchPackage);
+                }
+                return defaultWidgetForSearchPackage;
+            }
+
+            for (AppWidgetProviderInfo info : widgets) {
                 if (info.provider.getPackageName().equals(providerPkg) && info.configure == null) {
                     if ((info.widgetCategory
                             & AppWidgetProviderInfo.WIDGET_CATEGORY_SEARCHBOX) != 0) {
+                        if (LogUtils.DEBUG) {
+                            LogUtils.d(TAG, "Use special search widget " + info);
+                        }
                         return info;
                     } else if (defaultWidgetForSearchPackage == null) {
                         defaultWidgetForSearchPackage = info;
                     }
                 }
             }
+            if (LogUtils.DEBUG) {
+                LogUtils.d(TAG, "Default search widget = " + defaultWidgetForSearchPackage);
+            }
             return defaultWidgetForSearchPackage;
         }
+    }
+
+    private static AppWidgetProviderInfo findSearchWidget(String cnName,
+                                                          List<AppWidgetProviderInfo> widgets) {
+        ComponentName cn = ComponentName.unflattenFromString(cnName);
+        if (null != cn) {
+            for (AppWidgetProviderInfo info : widgets) {
+                if (info.provider.getPackageName().equals(cn.getPackageName()) &&
+                        info.provider.getClassName().equals(cn.getClassName())) {
+                    return info;
+                }
+            }
+        }
+        return null;
     }
 
     public static class QsbWidgetHost extends AppWidgetHost {

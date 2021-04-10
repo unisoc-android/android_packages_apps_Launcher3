@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="recent_lock_icon_bgcolor">#55000000</color>
+    <color name="clear_all_bg">#80808080</color>
+</resources>
